@@ -32,6 +32,7 @@
     "remark-gfm": "^4.0.0",
     "remark-rehype-wrap": "0.0.3",
     "remark-unwrap-images": "^4.0.0",
+    "sharp": "^0.33.1",
     "shiki": "^0.14.7",
     "tailwindcss": "^3.4.0",
     "typescript": "5.3.3",
@@ -41,7 +42,24 @@
     "eslint": "8.56.0",
     "eslint-config-next": "14.0.4",
     "prettier": "^3.1.1",
-    "prettier-plugin-tailwindcss": "^0.5.10",
-    "sharp": "^0.33.1"
+    "prettier-plugin-tailwindcss": "^0.5.10"
+  },
+  "pnpm": {
+    "supportedArchitectures": {
+      "os": [
+        "win32",
+        "darwin",
+        "linux",
+        "current"
+      ],
+      "cpu": [
+        "x64",
+        "arm64"
+      ],
+      "libc": [
+        "glibc",
+        "musl"
+      ]
+    }
   }
 }
