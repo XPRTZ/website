@@ -15,11 +15,13 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
+RUN npm install -g --arch=ARM64 --platform=linux --libc=glibc sharp
+
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+COPY --from=deps /app/node_modules ./node_modules
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
@@ -35,11 +37,6 @@ RUN yarn build
 FROM base AS runner
 WORKDIR /app
 
-# RUN npm rebuild
-
-ENV NODE_ENV production
-ENV NEXT_SHARP_PATH=/app/node_modules/sharp
-
 # Uncomment the following line in case you want to disable telemetry during runtime.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
@@ -54,6 +51,7 @@ RUN chown nextjs:nodejs .next
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=deps --chown=nextjs:nodejs /usr/local/lib/node_modules/sharp /usr/local/lib/node_modules/sharp
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
@@ -61,8 +59,9 @@ USER nextjs
 
 EXPOSE 3000
 
+ENV NODE_ENV production
+ENV NEXT_SHARP_PATH=/usr/local/lib/node_modules/sharp
 ENV PORT 3000
-# set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
 # server.js is created by next build from the standalone output
