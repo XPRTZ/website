@@ -7,6 +7,7 @@ permissions:
 jobs:
   run-on-preview:
     runs-on: ubuntu-latest
+    environment: preview
     steps:
       - name: Azure login
         uses: azure/login@v1
@@ -14,7 +15,7 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          environment: Preview
+
 
       - name: Azure CLI script
         uses: azure/CLI@v1
@@ -25,6 +26,7 @@ jobs:
 
   run-on-production:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Azure login
         uses: azure/login@v1
@@ -32,7 +34,6 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          environment: Production
 
       - name: Azure CLI script
         uses: azure/CLI@v1
