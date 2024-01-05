@@ -1,4 +1,4 @@
-name: Run Azure Login with OIDC
+name: Build and Deploy to Azure
 on: [push]
 
 permissions:
@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: preview
     steps:
+      - uses: actions/checkout@main
+      
       - name: Azure login
         uses: azure/login@v1
         with:
@@ -24,7 +26,16 @@ jobs:
           inlineScript: |
             az account show
 
+      - name: deploy
+        uses: azure/arm-deploy@v1
+        with:
+          scope: subscription
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          template: ./deploy/infrastructure.bicep
+          failOnStdErr: false
+
   run-on-production:
+    needs: run-on-preview
     runs-on: ubuntu-latest
     environment: production
     steps:
