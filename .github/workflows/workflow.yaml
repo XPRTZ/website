@@ -5,7 +5,7 @@ permissions:
       id-token: write
       contents: read
 jobs:
-  build-and-deploy:
+  run-on-preview:
     runs-on: ubuntu-latest
     steps:
       - name: Azure login
@@ -14,6 +14,25 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          environment: Preview
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az account show
+
+  run-on-production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          environment: Production
 
       - name: Azure CLI script
         uses: azure/CLI@v1
