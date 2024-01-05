@@ -31,8 +31,8 @@ module containers 'modules/containers.bicep' = {
   name: 'Deploy-ContainerApp'
   params: {
     location: location
-    containerAppUserAssignedIdentityResourceId: userManagedIdentity.outputs.containerAppIdentityResourceId
-    containerAppUserAssignedIdentityClientId: userManagedIdentity.outputs.containerAppIdentityClientId
+    // containerAppUserAssignedIdentityResourceId: userManagedIdentity.outputs.containerAppIdentityResourceId
+    // containerAppUserAssignedIdentityClientId: userManagedIdentity.outputs.containerAppIdentityClientId
   }
   dependsOn: [
     acrAndRoleAssignment

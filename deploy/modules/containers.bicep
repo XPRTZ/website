@@ -1,6 +1,6 @@
 param location string
-param containerAppUserAssignedIdentityResourceId string
-param containerAppUserAssignedIdentityClientId string
+// param containerAppUserAssignedIdentityResourceId string
+// param containerAppUserAssignedIdentityClientId string
 
 module containerAppEnvironment 'container-app-environment.bicep' = {
   name: 'Deploy-Container-App-Environment'
