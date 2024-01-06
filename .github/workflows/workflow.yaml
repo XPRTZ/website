@@ -2,6 +2,7 @@ name: CI/CD workflow
 run-name: ${{ github.actor }} is building the website
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [ main ]
   push:
