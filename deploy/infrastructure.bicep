@@ -26,15 +26,10 @@ module acrAndRoleAssignment 'modules/acr-roleassignment.bicep' = {
   }
 }
 
-module containers 'modules/containers.bicep' = {
+module containerAppEnvironment 'modules/container-app-environment.bicep' = {
   scope: resourceGroup
-  name: 'Deploy-ContainerApp'
+  name: 'Deploy-Container-App-Environment'
   params: {
     location: location
-    // containerAppUserAssignedIdentityResourceId: userManagedIdentity.outputs.containerAppIdentityResourceId
-    // containerAppUserAssignedIdentityClientId: userManagedIdentity.outputs.containerAppIdentityClientId
   }
-  dependsOn: [
-    acrAndRoleAssignment
-  ]
 }

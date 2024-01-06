@@ -1,0 +1,62 @@
+name: test
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+env:
+  AZURE_CONTAINER_REGISTRY: yourcontainerregistry.azurecr.io  # Replace with actual
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@main
+
+    # Setup Azure CLI and login
+    - name: Azure CLI login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # Set up dynamic naming and environment handling
+    - name: Setup variables
+      id: vars
+      run: |
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          echo "::set-output name=environment_name::Preview-PR-${{ github.event.number }}"
+          echo "::set-output name=app_name::myapp-PR-${{ github.event.number }}"
+        else
+          echo "::set-output name=environment_name::Production"
+          echo "::set-output name=app_name::myapp"
+        fi
+
+    # Deploy Infrastructure with Bicep
+    - name: Deploy Infrastructure
+      run: |
+        az deployment group create --resource-group <your-resource-group> \
+          --template-file ./path/to/your/environment.bicep \
+          --parameters environmentName=${{ steps.vars.outputs.environment_name }}
+        az deployment group create --resource-group <your-resource-group> \
+          --template-file ./path/to/your/containerapp.bicep \
+          --parameters appName=${{ steps.vars.outputs.app_name }} acrName=${{ env.AZURE_CONTAINER_REGISTRY }} \
+          environmentName=${{ steps.vars.outputs.environment_name }} \
+          managedIdentityId=<your-managed-identity-id>  # Replace with actual Managed Identity ID
+
+    # Build and push the image to Azure Container Registry
+    - name: Build and push image
+      run: |
+        echo ${{ secrets.ACR_PASSWORD }} | docker login ${{ env.AZURE_CONTAINER_REGISTRY }} --username ${{ secrets.ACR_USERNAME }} --password-stdin
+        docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ steps.vars.outputs.app_name }}:${{ github.sha }} .
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ steps.vars.outputs.app_name }}:${{ github.sha }}
+
+    # Update Azure Container App with the new image
+    - name: Deploy to Azure Container App
+      run: |
+        az containerapp update \
+          --name ${{ steps.vars.outputs.app_name }} \
+          --resource-group <your-resource-group> \
+          --image ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ steps.vars.outputs.app_name }}:${{ github.sha }}

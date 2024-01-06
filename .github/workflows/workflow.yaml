@@ -1,11 +1,17 @@
-name: Build and Deploy to Azure
-on: [push]
+name: CI/CD workflow
+run-name: ${{ github.actor }} is building the website
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
 
 permissions:
       id-token: write
       contents: read
 jobs:
-  run-on-preview:
+  Preview:
     runs-on: ubuntu-latest
     environment: preview
     steps:
@@ -19,14 +25,14 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
 
-      - name: Azure CLI script
+      - name: Show subscription details
         uses: azure/CLI@v1
         with:
           azcliversion: latest
           inlineScript: |
             az account show
 
-      - name: deploy
+      - name: Deploy infrastructure
         uses: azure/arm-deploy@v1
         with:
           scope: subscription
@@ -35,8 +41,8 @@ jobs:
           template: ./deploy/infrastructure.bicep
           failOnStdErr: false
 
-  run-on-production:
-    needs: run-on-preview
+  Production:
+    needs: Preview
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -47,7 +53,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Azure CLI script
+      - name: Show subscription details
         uses: azure/CLI@v1
         with:
           azcliversion: latest
