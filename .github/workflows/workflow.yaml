@@ -3,6 +3,13 @@ run-name: ${{ github.actor }} is building the website
 
 on:
   workflow_dispatch:
+    inputs:
+      infrastructure:
+          description: 'Deploy infrastructure?'
+          required: true
+          default: true
+          type: boolean
+
   pull_request:
     branches: [ main ]
   push:
@@ -25,7 +32,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-
       - name: Show subscription details
         uses: azure/CLI@v1
         with:
@@ -35,6 +41,7 @@ jobs:
 
       - name: Deploy infrastructure
         uses: azure/arm-deploy@v1
+        if: ${{ github.event.inputs.infrastructure == 'true' }}
         with:
           scope: subscription
           region: westeurope
