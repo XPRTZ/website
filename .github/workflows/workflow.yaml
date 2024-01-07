@@ -41,7 +41,7 @@ jobs:
 
       - name: Deploy infrastructure
         uses: azure/arm-deploy@v1
-        if: ${{ github.event.inputs.infrastructure == 'true' }}
+        if: ${{ github.event.inputs.infrastructure == 'true' }} || github.event_name == 'pull_request'
         with:
           scope: subscription
           region: westeurope
