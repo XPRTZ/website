@@ -1,0 +1,11 @@
+{
+  "subscriptionIds": {
+    "common": "92f4e2a9-8f0a-4ecc-90fc-6c77c24a1b31"
+  },
+  "resources": {
+    "acr": {
+      "name": "xprtzbv",
+      "resourceGroupName": "rg-xprtzbv-acr"
+    }
+  }
+}
