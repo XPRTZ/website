@@ -1,0 +1,78 @@
+name: PR workflow
+run-name: ${{ github.actor }} is building the website
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, reopened, closed]
+
+permissions:
+      id-token: write
+      contents: read
+jobs:
+  CI:
+    #if: (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    environment: preview
+    steps:
+      # - uses: actions/checkout@main
+
+      # - name: Azure login
+      #   uses: azure/login@v1
+      #   with:
+      #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
+      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # - name: Show subscription details
+      #   uses: azure/CLI@v1
+      #   with:
+      #     azcliversion: latest
+      #     inlineScript: |
+      #       az account show
+
+      # - name: Deploy infrastructure
+      #   uses: azure/arm-deploy@v1
+      #   with:
+      #     scope: subscription
+      #     region: westeurope
+      #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      #     template: ./deploy/infrastructure.bicep
+      #     failOnStdErr: false
+
+      # build container image
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4
+
+      - name: Display GitHub slug
+        run: echo ${{ env.GITHUB_REF_SLUG }}
+
+      # - name: Docker login
+      #   uses: azure/CLI@v1
+      #   with:
+      #     azcliversion: latest
+      #     inlineScript: |
+      #       az acr login -n ${{ secrets.REGISTRY_NAME }}
+
+      #       # hier nog docker build
+
+
+      #       docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/website:${{ env.GITHUB_REF_SLUG }}
+
+      # - name: Build and push container image
+      #   uses: azure/docker-login@v1
+      #   with:
+      #     login-server: ${{ secrets.REGISTRY_NAME }}.azurecr.io
+      #     username: ${{ secrets.REGISTRY_USERNAME }}
+      #     password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # - name: Deploy website
+      #   uses: azure/arm-deploy@v1
+      #   with:
+      #     scope: subscription
+      #     region: westeurope
+      #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      #     template: ./deploy/main.bicep
+      #     parameters: imageTag=${{ env.GITHUB_REF_SLUG }}
+      #     failOnStdErr: false
+
