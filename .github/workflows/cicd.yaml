@@ -68,6 +68,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+          
       - name: Azure login
         uses: azure/login@v1
         with:
