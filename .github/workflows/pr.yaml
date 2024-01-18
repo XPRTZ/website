@@ -78,4 +78,4 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az containerapp delete -g rg-xprtzbv-website -n ctap-xprtzbv-${{ env.GITHUB_REF_NAME_SLUG }} -y
+            az containerapp delete -g rg-xprtzbv-website -n ctap-xprtzbv-website-${{ env.GITHUB_REF_NAME_SLUG }} -y
