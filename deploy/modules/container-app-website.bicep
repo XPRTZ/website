@@ -3,8 +3,7 @@ param containerAppUserAssignedIdentityResourceId string
 param containerAppUserAssignedIdentityClientId string
 param imageTag string = 'latest'
 
-var name = 'ctap-xprtzbv-website-${imageTag}'
-var nameShort = take('ctap-xprtzbv-website-${imageTag}', 32)
+var name = take('ctap-xprtzbv-website-${imageTag}', 32)
 
 
 var acrServer = 'xprtzbv.azurecr.io'
@@ -16,7 +15,7 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-p
 }
 
 resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
-  name: nameShort
+  name: name
   location: location
   identity: {
     type: 'UserAssigned'
@@ -37,7 +36,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
     template: {
       containers: [
         {
-          name: nameShort
+          name: name
           image: imageName
           resources: {
             cpu: 1
