@@ -1,4 +1,4 @@
-name: PR workflow
+name: CI workflow
 run-name: ${{ github.actor }} is building the website
 
 on:
@@ -13,6 +13,8 @@ jobs:
   CI:
     runs-on: ubuntu-latest
     environment: preview
+    name: CI
+    if: github.event_name != 'closed'
     steps:
       - name: Azure login
         uses: azure/login@v1
@@ -20,15 +22,6 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      # - name: Deploy infrastructure
-      #   uses: azure/arm-deploy@v1
-      #   with:
-      #     scope: subscription
-      #     region: westeurope
-      #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      #     template: ./deploy/infrastructure.bicep
-      #     failOnStdErr: false
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4
@@ -53,7 +46,6 @@ jobs:
           fetch-depth: 0
 
       - name: Deploy website
-        if: github.event_name != 'closed'
         uses: azure/arm-deploy@v1
         with:
           scope: subscription
@@ -63,3 +55,27 @@ jobs:
           parameters: imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
           failOnStdErr: false
 
+  Remove:
+    runs-on: ubuntu-latest
+    environment: preview
+    name: Remove container app
+    if: github.event_name == 'closed'
+    steps:
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4
+        with:
+          slug-maxlength: 11
+
+      - name: Remove container app
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az containerapp delete -g rg-xprtzbv-website -n ctap-xprtzbv-${{ env.GITHUB_REF_NAME_SLUG }} -y
