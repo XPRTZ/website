@@ -1,0 +1,64 @@
+name: PR workflow
+run-name: ${{ github.actor }} is building the website
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+      id-token: write
+      contents: read
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    environment: preview
+    steps:
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # - name: Deploy infrastructure
+      #   uses: azure/arm-deploy@v1
+      #   with:
+      #     scope: subscription
+      #     region: westeurope
+      #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      #     template: ./deploy/infrastructure.bicep
+      #     failOnStdErr: false
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4
+        with:
+          slug-maxlength: 16
+
+      - name: "Login to ACR"
+        run: |
+          set -euo pipefail
+          access_token=$(az account get-access-token --query accessToken -o tsv)
+          refresh_token=$(curl https://${{ secrets.REGISTRY_NAME }}.azurecr.io/oauth2/exchange -v -d "grant_type=access_token&service=${{ secrets.REGISTRY_NAME }}.azurecr.io&access_token=$access_token" | jq -r .refresh_token)
+          docker login -u 00000000-0000-0000-0000-000000000000 --password-stdin ${{ secrets.REGISTRY_NAME }}.azurecr.io <<< "$refresh_token"
+
+      - name: Build and push container image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/website:${{ env.GITHUB_REF_NAME_SLUG }}
+
+      - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+
+      - name: Deploy website
+        uses: azure/arm-deploy@v1
+        with:
+          scope: subscription
+          region: westeurope
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          template: ./deploy/main.bicep
+          parameters: imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
+          failOnStdErr: false
+

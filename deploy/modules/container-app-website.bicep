@@ -3,8 +3,10 @@ param containerAppUserAssignedIdentityResourceId string
 param containerAppUserAssignedIdentityClientId string
 param imageTag string = 'latest'
 
-var name = 'ctap-xprtzbv-website-${imageTag}'
-var acrServer = 'xprtzbvwebsite.azurecr.io'
+var name = take('ctap-xprtzbv-website-${imageTag}', 32)
+
+
+var acrServer = 'xprtzbv.azurecr.io'
 var imageName = '${acrServer}/website:${imageTag}'
 var containerAppEnvironmentName = 'me-xprtzbv-website'
 
@@ -30,6 +32,10 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
           identity: containerAppUserAssignedIdentityResourceId
         }
       ]
+      ingress: {
+        external: true
+        targetPort: 3000
+      }
     }
     template: {
       containers: [

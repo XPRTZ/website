@@ -3,6 +3,8 @@ targetScope = 'subscription'
 param location string = 'westeurope'
 
 var sharedValues = json(loadTextContent('shared-values.json'))
+var subscriptionId = sharedValues.subscriptionIds.common
+var acrResourceGroupName = sharedValues.resources.acr.resourceGroupName
 var resourceGroupName = 'rg-xprtzbv-website'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -18,8 +20,6 @@ module userManagedIdentity 'modules/user-managed-identity.bicep' = {
   }
 }
 
-var subscriptionId = sharedValues.subscriptionIds.common
-var acrResourceGroupName = sharedValues.resources.acr.resourceGroupName
 module acrAndRoleAssignment 'modules/roleassignments.bicep' = {
   scope: az.resourceGroup(subscriptionId, acrResourceGroupName)
   name: 'Deploy-PullRoleAssignment'
