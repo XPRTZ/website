@@ -48,6 +48,10 @@ jobs:
           push: true
           tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/website:${{ env.GITHUB_REF_NAME_SLUG }}
 
+      - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+
       - name: Deploy website
         uses: azure/arm-deploy@v1
         with:
