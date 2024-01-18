@@ -1,4 +1,4 @@
-name: CI workflow
+name: PR workflow
 run-name: ${{ github.actor }} is building the website
 
 on:
@@ -10,11 +10,11 @@ permissions:
       id-token: write
       contents: read
 jobs:
-  CI:
+  ci:
     runs-on: ubuntu-latest
     environment: preview
     name: CI
-    if: github.event_name != 'closed'
+    if: github.event.action != 'closed'
     steps:
       - name: Azure login
         uses: azure/login@v1
@@ -26,7 +26,7 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4
         with:
-          slug-maxlength: 16
+          slug-maxlength: 11
 
       - name: "Login to ACR"
         run: |
@@ -55,11 +55,11 @@ jobs:
           parameters: imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
           failOnStdErr: false
 
-  Remove:
+  remove_container_appp:
     runs-on: ubuntu-latest
     environment: preview
     name: Remove container app
-    if: github.event_name == 'closed'
+    if: github.event.action == 'closed'
     steps:
       - name: Azure login
         uses: azure/login@v1
