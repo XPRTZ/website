@@ -32,6 +32,10 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
           identity: containerAppUserAssignedIdentityResourceId
         }
       ]
+      ingress: {
+        external: true
+        targetPort: 3000
+      }
     }
     template: {
       containers: [
