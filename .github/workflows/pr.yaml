@@ -4,7 +4,7 @@ run-name: ${{ github.actor }} is building the website
 on:
   workflow_dispatch:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, closed]
 
 permissions:
       id-token: write
@@ -53,6 +53,7 @@ jobs:
           fetch-depth: 0
 
       - name: Deploy website
+        if: github.event_name != 'closed'
         uses: azure/arm-deploy@v1
         with:
           scope: subscription
