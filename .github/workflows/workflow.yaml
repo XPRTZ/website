@@ -1,5 +1,5 @@
-name: CI/CD workflow
-run-name: ${{ github.actor }} is building the website
+name: CD workflow
+run-name: ${{ github.actor }} is deploying the website
 
 on:
   workflow_dispatch:
@@ -9,9 +9,6 @@ on:
           required: true
           default: true
           type: boolean
-
-  pull_request:
-    branches: [ main ]
   push:
     branches: [ main ]
 

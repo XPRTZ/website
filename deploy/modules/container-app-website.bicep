@@ -4,7 +4,7 @@ param containerAppUserAssignedIdentityClientId string
 param imageTag string = 'latest'
 
 var name = 'ctap-xprtzbv-website-${imageTag}'
-var acrServer = 'xprtzbvwebsite.azurecr.io'
+var acrServer = 'xprtzbv.azurecr.io'
 var imageName = '${acrServer}/website:${imageTag}'
 var containerAppEnvironmentName = 'me-xprtzbv-website'
 
