@@ -61,12 +61,12 @@ jobs:
       - run: echo ${{ steps.deploybicep.outputs.revisionFqdn }}
 
       - name: Comment PR
-      uses: thollander/actions-comment-pull-request@v2
-      with:
-        message: |
-          Staging environment ready:  
-          ${{ steps.deploybicep.outputs.revisionFqdn }}  
-        pr_number: 15
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            Staging environment ready:  
+            ${{ steps.deploybicep.outputs.revisionFqdn }}  
+          pr_number: 15
 
   remove_container_appp:
     runs-on: ubuntu-latest
