@@ -63,8 +63,7 @@ jobs:
         with:
           message: |
             Staging environment ready:  
-            ${{ steps.deploybicep.outputs.revisionFqdn }}  
-          pr_number: 15 # remove this line to comment the current PR
+            https://${{ steps.deploybicep.outputs.revisionFqdn }}
 
   remove_container_appp:
     runs-on: ubuntu-latest
