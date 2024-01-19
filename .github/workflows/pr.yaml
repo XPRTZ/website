@@ -58,15 +58,13 @@ jobs:
           parameters: imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
           failOnStdErr: false
 
-      - run: echo ${{ steps.deploybicep.outputs.revisionFqdn }}
-
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
             Staging environment ready:  
             ${{ steps.deploybicep.outputs.revisionFqdn }}  
-          pr_number: 15
+          pr_number: 15 # remove this line to comment the current PR
 
   remove_container_appp:
     runs-on: ubuntu-latest

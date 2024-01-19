@@ -26,4 +26,4 @@ module containerAppWebsite 'modules/container-app-website.bicep' = {
   }
 }
 
-output url string = containerAppWebsite.outputs.revisionFqdn
+output revisionFqdn string = containerAppWebsite.outputs.revisionFqdn
