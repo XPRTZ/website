@@ -5,7 +5,6 @@ param imageTag string = 'latest'
 
 var name = take('ctap-xprtzbv-website-${imageTag}', 32)
 
-
 var acrServer = 'xprtzbv.azurecr.io'
 var imageName = '${acrServer}/website:${imageTag}'
 var containerAppEnvironmentName = 'me-xprtzbv-website'
@@ -54,6 +53,9 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
           ]
         }
       ]
+      scale: {
+        minReplicas: 1
+      }
     }
   }
 }

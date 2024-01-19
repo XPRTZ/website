@@ -25,3 +25,5 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-p
 }
 
 output containerAppEnvironmentId string = containerAppEnvironment.id
+output defaultDomain string = containerAppEnvironment.properties.defaultDomain
+output customDomainVerificationId string = containerAppEnvironment.properties.customDomainConfiguration.customDomainVerificationId
