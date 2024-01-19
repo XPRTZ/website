@@ -9,6 +9,24 @@ var acrServer = 'xprtzbv.azurecr.io'
 var imageName = '${acrServer}/website:${imageTag}'
 var containerAppEnvironmentName = 'me-xprtzbv-website'
 
+var customDomains = imageTag == 'lastest'
+ ? [
+  {
+    name: 'xprtz.dev'
+    bindingType: 'Disabled'
+  }
+  {
+    name: 'www.xprtz.dev'
+    bindingType: 'Disabled'
+  }
+]
+: [
+  {
+    name: '${imageTag}.xprtz.dev'
+    bindingType: 'Disabled'
+  }
+]
+
 resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppEnvironmentName
 }
@@ -34,6 +52,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
       ingress: {
         external: true
         targetPort: 3000
+        customDomains: customDomains
       }
     }
     template: {
