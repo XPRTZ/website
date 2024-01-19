@@ -38,7 +38,7 @@ function Clients() {
       <Container>
         <FadeIn className="flex items-center gap-x-8">
           <h2 className="text-center font-display text-sm font-semibold tracking-wider text-white sm:text-left">
-            We’ve worked with hundreds of amazing people
+            We hebben al de samenwerking met honderden klanten mogen aangaan.
           </h2>
           <div className="h-px flex-auto bg-xprtz-800" />
         </FadeIn>
@@ -69,13 +69,11 @@ function CaseStudies({
   return (
     <>
       <SectionIntro
-        title="Harnessing technology for a brighter future"
+        title="We maken gebruik van de nieuwste technologieën."
         className="mt-24 sm:mt-32 lg:mt-40"
       >
         <p>
-          We believe technology is the answer to the world’s greatest
-          challenges. It’s also the cause, so we find ourselves in bit of a
-          catch 22 situation.
+          We geloven dat technologie het antwoord kan zijn op tal van uitdagingen. Soms is technologie ook de oorzaak van een uitdaging. Dat lijkt wel op een catch-22 situatie. Wij helpen je graag om de juiste keuzes te maken.
         </p>
       </SectionIntro>
       <Container className="mt-16">
@@ -174,7 +172,7 @@ function Services() {
 
 export const metadata: Metadata = {
   description:
-    'We are a development studio working at the intersection of design and technology.',
+    'Wij focussen op maatwerk .NET software development',
 }
 
 export default async function Home() {
@@ -185,12 +183,17 @@ export default async function Home() {
       <Container className="mt-24 sm:mt-32 md:mt-56">
         <FadeIn className="max-w-3xl">
           <h1 className="font-display text-5xl font-medium tracking-tight text-xprtz-600 [text-wrap:balance] sm:text-7xl">
-            Award-winning development studio based in Denmark.
+            XPRTZ is dé plek voor .NET experts!
           </h1>
           <p className="mt-6 text-xl text-xprtz-600">
-            We are a development studio working at the intersection of design
-            and technology. It’s a really busy intersection though — a lot of
-            our staff have been involved in hit and runs.
+            <span className='font-bold'>Wij</span> zijn zorgvuldig geselecteerde .NET experts die elkaar écht kennen. Duidelijk in wat we doen.
+          </p>
+          <p className="mt-6 text-xl text-xprtz-600">
+          <span className='font-bold'>Wij</span> focussen op maatwerk .NET software development en doen dit samen, open, eerlijk en op basis van wederzijds vertrouwen.
+          </p>
+          <p className="mt-6 text-xl text-xprtz-600">
+          <span className='font-bold'>Wij</span> zijn een hecht team met een platte organisatievorm en staan voor open en directe communicatie zonder tussenschakels.
+            Continuïteit, stabiliteit, geen veranderende manager of contactpersoon.
           </p>
         </FadeIn>
       </Container>
