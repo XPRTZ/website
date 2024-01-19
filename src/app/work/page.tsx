@@ -29,7 +29,7 @@ function CaseStudies({
   return (
     <Container className="mt-40">
       <FadeIn>
-        <h2 className="font-display text-2xl font-semibold text-neutral-950">
+        <h2 className="font-display text-2xl font-semibold text-xprtz-600">
           Case studies
         </h2>
       </FadeIn>
@@ -46,15 +46,15 @@ function CaseStudies({
                       className="h-16 w-16 flex-none"
                       unoptimized
                     />
-                    <h3 className="mt-6 text-sm font-semibold text-neutral-950 sm:mt-0 lg:mt-8">
+                    <h3 className="mt-6 text-sm font-semibold text-xprtz-600 sm:mt-0 lg:mt-8">
                       {caseStudy.client}
                     </h3>
                   </div>
                   <div className="mt-1 flex gap-x-4 sm:mt-0 lg:block">
-                    <p className="text-sm tracking-tight text-neutral-950 after:ml-4 after:font-semibold after:text-neutral-300 after:content-['/'] lg:mt-2 lg:after:hidden">
+                    <p className="text-sm tracking-tight text-xprtz-600 after:ml-4 after:font-semibold after:text-xprtz-300 after:content-['/'] lg:mt-2 lg:after:hidden">
                       {caseStudy.service}
                     </p>
-                    <p className="text-sm text-neutral-950 lg:mt-2">
+                    <p className="text-sm text-xprtz-600 lg:mt-2">
                       <time dateTime={caseStudy.date}>
                         {formatDate(caseStudy.date)}
                       </time>
@@ -62,10 +62,10 @@ function CaseStudies({
                   </div>
                 </div>
                 <div className="col-span-full lg:col-span-2 lg:max-w-2xl">
-                  <p className="font-display text-4xl font-medium text-neutral-950">
+                  <p className="font-display text-4xl font-medium text-xprtz-600">
                     <Link href={caseStudy.href}>{caseStudy.title}</Link>
                   </p>
-                  <div className="mt-6 space-y-6 text-base text-neutral-600">
+                  <div className="mt-6 space-y-6 text-base text-xprtz-600">
                     {caseStudy.summary.map((paragraph) => (
                       <p key={paragraph}>{paragraph}</p>
                     ))}
@@ -111,7 +111,7 @@ function Clients() {
   return (
     <Container className="mt-24 sm:mt-32 lg:mt-40">
       <FadeIn>
-        <h2 className="font-display text-2xl font-semibold text-neutral-950">
+        <h2 className="font-display text-2xl font-semibold text-xprtz-600">
           You’re in good company
         </h2>
       </FadeIn>

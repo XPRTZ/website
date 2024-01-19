@@ -39,10 +39,10 @@ function Section({
         <div className="mt-12 lg:mt-0 lg:w-[37rem] lg:flex-none lg:group-even/section:order-first">
           <FadeIn>
             <div
-              className="font-display text-base font-semibold before:text-neutral-300 before:content-['/_'] after:text-neutral-950 after:content-[counter(section,decimal-leading-zero)]"
+              className="font-display text-base font-semibold before:text-xprtz-300 before:content-['/_'] after:text-xprtz-600 after:content-[counter(section,decimal-leading-zero)]"
               aria-hidden="true"
             />
-            <h2 className="mt-2 font-display text-3xl font-medium tracking-tight text-neutral-950 sm:text-4xl">
+            <h2 className="mt-2 font-display text-3xl font-medium tracking-tight text-xprtz-600 sm:text-4xl">
               {title}
             </h2>
             <div className="mt-6">{children}</div>
@@ -56,10 +56,10 @@ function Section({
 function Discover() {
   return (
     <Section title="Discover" image={{ src: imageWhiteboard }}>
-      <div className="space-y-6 text-base text-neutral-600">
+      <div className="space-y-6 text-base text-xprtz-600">
         <p>
           We work closely with our clients to understand their{' '}
-          <strong className="font-semibold text-neutral-950">needs</strong> and
+          <strong className="font-semibold text-xprtz-600">needs</strong> and
           goals, embedding ourselves in their every day operations to understand
           what makes their business tick.
         </p>
@@ -68,18 +68,18 @@ function Discover() {
           several weeks while our account managers focus on going through their
           trash. Our senior security experts then perform social engineering
           hacks to gain access to their{' '}
-          <strong className="font-semibold text-neutral-950">business</strong>{' '}
+          <strong className="font-semibold text-xprtz-600">business</strong>{' '}
           accounts — handing that information over to our forensic accounting
           team.
         </p>
         <p>
           Once the full audit is complete, we report back with a comprehensive{' '}
-          <strong className="font-semibold text-neutral-950">plan</strong> and,
+          <strong className="font-semibold text-xprtz-600">plan</strong> and,
           more importantly, a budget.
         </p>
       </div>
 
-      <h3 className="mt-12 font-display text-base font-semibold text-neutral-950">
+      <h3 className="mt-12 font-display text-base font-semibold text-xprtz-600">
         Included in this phase
       </h3>
       <TagList className="mt-4">
@@ -97,7 +97,7 @@ function Discover() {
 function Build() {
   return (
     <Section title="Build" image={{ src: imageLaptop, shape: 1 }}>
-      <div className="space-y-6 text-base text-neutral-600">
+      <div className="space-y-6 text-base text-xprtz-600">
         <p>
           Based off of the discovery phase, we develop a comprehensive roadmap
           for each product and start working towards delivery. The roadmap is an
@@ -133,37 +133,33 @@ function Build() {
 function Deliver() {
   return (
     <Section title="Deliver" image={{ src: imageMeeting, shape: 2 }}>
-      <div className="space-y-6 text-base text-neutral-600">
+      <div className="space-y-6 text-base text-xprtz-600">
         <p>
           About halfway through the Build phase, we push each project out by 6
           weeks due to a change in{' '}
-          <strong className="font-semibold text-neutral-950">
-            requirements
-          </strong>
+          <strong className="font-semibold text-xprtz-600">requirements</strong>
           . This allows us to increase the budget a final time before launch.
         </p>
         <p>
           Despite largely using pre-built components, most of the{' '}
-          <strong className="font-semibold text-neutral-950">progress</strong>{' '}
-          on each project takes place in the final 24 hours. The development
-          time allocated to each client is actually spent making augmented
-          reality demos that go viral on Twitter.
+          <strong className="font-semibold text-xprtz-600">progress</strong> on
+          each project takes place in the final 24 hours. The development time
+          allocated to each client is actually spent making augmented reality
+          demos that go viral on Twitter.
         </p>
         <p>
           We ensure that the main pages of the site are{' '}
-          <strong className="font-semibold text-neutral-950">
+          <strong className="font-semibold text-xprtz-600">
             fully functional
           </strong>{' '}
           at launch — the auxiliary pages will, of course, be lorem ipusm shells
           which get updated as part of our exorbitant{' '}
-          <strong className="font-semibold text-neutral-950">
-            maintenance
-          </strong>{' '}
+          <strong className="font-semibold text-xprtz-600">maintenance</strong>{' '}
           retainer.
         </p>
       </div>
 
-      <h3 className="mt-12 font-display text-base font-semibold text-neutral-950">
+      <h3 className="mt-12 font-display text-base font-semibold text-xprtz-600">
         Included in this phase
       </h3>
       <List className="mt-8">
@@ -187,9 +183,9 @@ function Deliver() {
 function Values() {
   return (
     <div className="relative mt-24 pt-24 sm:mt-32 sm:pt-32 lg:mt-40 lg:pt-40">
-      <div className="absolute inset-x-0 top-0 -z-10 h-[884px] overflow-hidden rounded-t-4xl bg-gradient-to-b from-neutral-50">
+      <div className="absolute inset-x-0 top-0 -z-10 h-[884px] overflow-hidden rounded-t-4xl bg-gradient-to-b from-xprtz-50">
         <GridPattern
-          className="absolute inset-0 h-full w-full fill-neutral-100 stroke-neutral-950/5 [mask-image:linear-gradient(to_bottom_left,white_40%,transparent_50%)]"
+          className="absolute inset-0 h-full w-full fill-xprtz-100 stroke-xprtz-600/5 [mask-image:linear-gradient(to_bottom_left,white_40%,transparent_50%)]"
           yOffset={-270}
         />
       </div>
