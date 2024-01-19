@@ -9,6 +9,8 @@ on:
 permissions:
       id-token: write
       contents: read
+      pull-requests: write
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -46,7 +48,7 @@ jobs:
           fetch-depth: 0
 
       - name: Deploy website
-        id: deploy-bicep
+        id: deploybicep
         uses: azure/arm-deploy@v1
         with:
           scope: subscription
@@ -56,7 +58,15 @@ jobs:
           parameters: imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
           failOnStdErr: false
 
-      - run: echo ${{ steps.deploy-bicep.outputs.revisionFqdn }}          
+      - run: echo ${{ steps.deploybicep.outputs.revisionFqdn }}
+
+      - name: Comment PR
+      uses: thollander/actions-comment-pull-request@v2
+      with:
+        message: |
+          Staging environment ready:  
+          ${{ steps.deploybicep.outputs.revisionFqdn }}  
+        pr_number: 15
 
   remove_container_appp:
     runs-on: ubuntu-latest
