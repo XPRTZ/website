@@ -57,3 +57,5 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
     }
   }
 }
+
+output revisionFqdn string = containerApp.properties.latestRevisionFqdn

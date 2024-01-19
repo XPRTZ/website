@@ -25,3 +25,5 @@ module containerAppWebsite 'modules/container-app-website.bicep' = {
     imageTag: imageTag
   }
 }
+
+output url string = containerAppWebsite.outputs.revisionFqdn

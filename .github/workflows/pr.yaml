@@ -46,6 +46,7 @@ jobs:
           fetch-depth: 0
 
       - name: Deploy website
+        id: deploy-bicep
         uses: azure/arm-deploy@v1
         with:
           scope: subscription
@@ -54,6 +55,8 @@ jobs:
           template: ./deploy/main.bicep
           parameters: imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
           failOnStdErr: false
+
+      - run: echo ${{ steps.deploy-bicep.outputs.revisionFqdn }}          
 
   remove_container_appp:
     runs-on: ubuntu-latest
