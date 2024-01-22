@@ -1,5 +1,5 @@
 @description('The name of the Front Door endpoint to create. This must be globally unique.')
-param frontDoorEndpointName string = 'afd-xprtzbv-website'
+param frontDoorEndpointName string = 'fde-xprtzbv-website'
 
 @description('The name of the SKU to use when creating the Front Door profile.')
 @allowed([
@@ -10,7 +10,7 @@ param frontDoorSkuName string = 'Standard_AzureFrontDoor'
 
 param hostname string
 
-var frontDoorProfileName = 'xprtzbv-website'
+var frontDoorProfileName = 'afd-xprtzbv-website'
 var frontDoorOriginGroupName = 'xprtzbv-website'
 var frontDoorOriginName = 'xprtzv-website'
 var frontDoorRouteName = 'xpzrtbv-website-route'
