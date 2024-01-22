@@ -41,6 +41,6 @@ module frontDoor 'modules/front-door.bicep' = {
   scope: resourceGroup
   name: 'Deploy-FrontDoor'
   params: {
-    backendAddress: ''
+    hostname: 'ctap-xprtzbv-website-latest.ambitiousmoss-9ee74554.westeurope.azurecontainerapps.io'
   }
 }

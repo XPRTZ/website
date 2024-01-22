@@ -1,103 +1,88 @@
-@description('The name of the frontdoor resource.')
-param frontDoorName string = 'afd-xprtzbv-website'
+@description('The name of the Front Door endpoint to create. This must be globally unique.')
+param frontDoorEndpointName string = 'afd-xprtzbv-website'
 
-@description('The hostname of the backend. Must be an IP address or FQDN.')
-param backendAddress string
+@description('The name of the SKU to use when creating the Front Door profile.')
+@allowed([
+  'Standard_AzureFrontDoor'
+  'Premium_AzureFrontDoor'
+])
+param frontDoorSkuName string = 'Standard_AzureFrontDoor'
 
-var frontEndEndpointName = 'frontEndEndpoint'
-var loadBalancingSettingsName = 'loadBalancingSettings'
-var healthProbeSettingsName = 'healthProbeSettings'
-var routingRuleName = 'routingRule'
-var backendPoolName = 'backendPool'
+param hostname string
 
-resource frontDoor 'Microsoft.Network/frontDoors@2020-05-01' = {
-  name: frontDoorName
+var frontDoorProfileName = 'xprtzbv-website'
+var frontDoorOriginGroupName = 'xprtzbv-website'
+var frontDoorOriginName = 'xprtzv-website'
+var frontDoorRouteName = 'xpzrtbv-website-route'
+
+resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' = {
+  name: frontDoorProfileName
+  location: 'global'
+  sku: {
+    name: frontDoorSkuName
+  }
+}
+
+resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
+  name: frontDoorEndpointName
+  parent: frontDoorProfile
   location: 'global'
   properties: {
     enabledState: 'Enabled'
-
-    frontendEndpoints: [
-      {
-        name: frontEndEndpointName
-        properties: {
-          hostName: '${frontDoorName}.azurefd.net'
-          sessionAffinityEnabledState: 'Disabled'
-        }
-      }
-    ]
-
-    loadBalancingSettings: [
-      {
-        name: loadBalancingSettingsName
-        properties: {
-          sampleSize: 4
-          successfulSamplesRequired: 2
-        }
-      }
-    ]
-
-    healthProbeSettings: [
-      {
-        name: healthProbeSettingsName
-        properties: {
-          path: '/'
-          protocol: 'Http'
-          intervalInSeconds: 120
-        }
-      }
-    ]
-
-    backendPools: [
-      {
-        name: backendPoolName
-        properties: {
-          backends: [
-            {
-              address: backendAddress
-              backendHostHeader: backendAddress
-              httpPort: 80
-              httpsPort: 443
-              weight: 50
-              priority: 1
-              enabledState: 'Enabled'
-            }
-          ]
-          loadBalancingSettings: {
-            id: resourceId('Microsoft.Network/frontDoors/loadBalancingSettings', frontDoorName, loadBalancingSettingsName)
-          }
-          healthProbeSettings: {
-            id: resourceId('Microsoft.Network/frontDoors/healthProbeSettings', frontDoorName, healthProbeSettingsName)
-          }
-        }
-      }
-    ]
-
-    routingRules: [
-      {
-        name: routingRuleName
-        properties: {
-          frontendEndpoints: [
-            {
-              id: resourceId('Microsoft.Network/frontDoors/frontEndEndpoints', frontDoorName, frontEndEndpointName)
-            }
-          ]
-          acceptedProtocols: [
-            'Http'
-            'Https'
-          ]
-          patternsToMatch: [
-            '/*'
-          ]
-          routeConfiguration: {
-            '@odata.type': '#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration'
-            forwardingProtocol: 'MatchRequest'
-            backendPool: {
-              id: resourceId('Microsoft.Network/frontDoors/backEndPools', frontDoorName, backendPoolName)
-            }
-          }
-          enabledState: 'Enabled'
-        }
-      }
-    ]
   }
 }
+
+resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
+  name: frontDoorOriginGroupName
+  parent: frontDoorProfile
+  properties: {
+    loadBalancingSettings: {
+      sampleSize: 4
+      successfulSamplesRequired: 3
+    }
+    healthProbeSettings: {
+      probePath: '/'
+      probeRequestType: 'GET'
+      probeProtocol: 'Https'
+      probeIntervalInSeconds: 120
+    }
+  }
+}
+
+resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
+  name: frontDoorOriginName
+  parent: frontDoorOriginGroup
+  properties: {
+    hostName: hostname
+    httpPort: 80
+    httpsPort: 443
+    originHostHeader: hostname
+    priority: 1
+    weight: 1000
+  }
+}
+
+resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
+  name: frontDoorRouteName
+  parent: frontDoorEndpoint
+  dependsOn: [
+    frontDoorOrigin // This explicit dependency is required to ensure that the origin group is not empty when the route is created.
+  ]
+  properties: {
+    originGroup: {
+      id: frontDoorOriginGroup.id
+    }
+    supportedProtocols: [
+      'Http'
+      'Https'
+    ]
+    patternsToMatch: [
+      '/*'
+    ]
+    forwardingProtocol: 'HttpsOnly'
+    linkToDefaultDomain: 'Enabled'
+    httpsRedirect: 'Enabled'
+  }
+}
+
+output frontDoorEndpointHostName string = frontDoorEndpoint.properties.hostName
