@@ -36,3 +36,11 @@ module containerAppEnvironment 'modules/container-app-environment.bicep' = {
     location: location
   }
 }
+
+module frontDoor 'modules/front-door.bicep' = {
+  scope: resourceGroup
+  name: 'Deploy-FrontDoor'
+  params: {
+    backendAddress: ''
+  }
+}
