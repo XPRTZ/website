@@ -1,29 +1,66 @@
 @description('The name of the Front Door endpoint to create. This must be globally unique.')
-param frontDoorEndpointName string = 'fde-xprtzbv-website'
+param frontDoorEndpointName string
 
-@description('The name of the SKU to use when creating the Front Door profile.')
-@allowed([
-  'Standard_AzureFrontDoor'
-  'Premium_AzureFrontDoor'
-])
-param frontDoorSkuName string = 'Standard_AzureFrontDoor'
+@description('The hostname of the origin to use for the Front Door endpoint.')
+param originHostname string
 
-param hostname string
-
+var sharedValues = json(loadTextContent('../shared-values.json'))
+var subscriptionId = sharedValues.subscriptionIds.common
 var frontDoorProfileName = 'afd-xprtzbv-website'
 var frontDoorOriginGroupName = 'xprtzbv-website'
 var frontDoorOriginName = 'xprtzv-website'
 var frontDoorRouteName = 'xpzrtbv-website-route'
+var customDomainApexName = 'xprtz-dev'
+var customDomainWwwName = 'www-xprtz-dev'
+var cnameRecordName = 'www'
 
-resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' = {
-  name: frontDoorProfileName
-  location: 'global'
-  sku: {
-    name: frontDoorSkuName
+module dns 'dns.bicep' = {
+  name: 'Deploy-DNS-Records'
+  scope: resourceGroup(subscriptionId, 'xprtz-mgmt')
+  params: {
+    frontDoorEndpointHostName: frontDoorEndpoint.properties.hostName
+    frontDoorEndpointResourceId: frontDoorEndpoint.id
+    apexValidation: customDomainApex.properties.validationProperties.validationToken
+    cnameRecordName: cnameRecordName
+    cnameValidation: customDomainWww.properties.validationProperties.validationToken
   }
 }
 
-resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
+resource frontDoorProfile 'Microsoft.Cdn/profiles@2023-07-01-preview' existing = {
+  name: frontDoorProfileName
+}
+
+resource customDomainApex 'Microsoft.Cdn/profiles/customDomains@2023-07-01-preview' = {
+  name: customDomainApexName
+  parent: frontDoorProfile
+  properties: {
+    hostName: 'xprtz.dev'
+    azureDnsZone: {
+      id: resourceId(subscriptionId, 'xprtz-mgmt', 'Microsoft.Network/dnszones', 'xprtz.dev')
+    }
+    tlsSettings: {
+      certificateType: 'ManagedCertificate'
+      minimumTlsVersion: 'TLS12'
+    }
+  }
+}
+
+resource customDomainWww 'Microsoft.Cdn/profiles/customDomains@2023-07-01-preview' = {
+  name: customDomainWwwName
+  parent: frontDoorProfile
+  properties: {
+    hostName: 'www.xprtz.dev'
+    azureDnsZone: {
+      id: resourceId(subscriptionId, 'xprtz-mgmt', 'Microsoft.Network/dnszones', 'xprtz.dev')
+    }
+    tlsSettings: {
+      certificateType: 'ManagedCertificate'
+      minimumTlsVersion: 'TLS12'
+    }
+  }
+}
+
+resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2023-07-01-preview' = {
   name: frontDoorEndpointName
   parent: frontDoorProfile
   location: 'global'
@@ -32,7 +69,7 @@ resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
   }
 }
 
-resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
+resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2023-07-01-preview' = {
   name: frontDoorOriginGroupName
   parent: frontDoorProfile
   properties: {
@@ -46,23 +83,25 @@ resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' =
       probeProtocol: 'Https'
       probeIntervalInSeconds: 120
     }
+
   }
 }
 
-resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
+resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2023-07-01-preview' = {
   name: frontDoorOriginName
   parent: frontDoorOriginGroup
   properties: {
-    hostName: hostname
+    hostName: originHostname
     httpPort: 80
     httpsPort: 443
-    originHostHeader: hostname
+    originHostHeader: originHostname
     priority: 1
     weight: 1000
+
   }
 }
 
-resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
+resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2023-07-01-preview' = {
   name: frontDoorRouteName
   parent: frontDoorEndpoint
   dependsOn: [
@@ -82,7 +121,13 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' 
     forwardingProtocol: 'HttpsOnly'
     linkToDefaultDomain: 'Enabled'
     httpsRedirect: 'Enabled'
+    customDomains: [
+      {
+        id: customDomainApex.id
+      }
+      {
+        id: customDomainWww.id
+      }
+    ]
   }
 }
-
-output frontDoorEndpointHostName string = frontDoorEndpoint.properties.hostName
