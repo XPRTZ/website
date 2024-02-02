@@ -5,6 +5,7 @@ param imageTag string = 'latest'
 
 var resourceGroupName = 'rg-xprtzbv-website'
 var containerAppIdentityName = 'id-xprtzbv-website'
+var frontDoorEndpointName = 'fde-xprtzbv-website'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: resourceGroupName
@@ -26,4 +27,13 @@ module containerAppWebsite 'modules/container-app-website.bicep' = {
   }
 }
 
-output revisionFqdn string = containerAppWebsite.outputs.revisionFqdn
+module frontDoor 'modules/front-door.bicep' = {
+  scope: resourceGroup
+  name: 'Deploy-Front-Door'
+  params: {
+    frontDoorEndpointName: frontDoorEndpointName
+    originHostname: containerAppWebsite.outputs.containerAppUrl
+  }
+}
+
+output containerAppUrl string = containerAppWebsite.outputs.containerAppUrl

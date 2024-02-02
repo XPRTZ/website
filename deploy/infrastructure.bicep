@@ -6,6 +6,7 @@ var sharedValues = json(loadTextContent('shared-values.json'))
 var subscriptionId = sharedValues.subscriptionIds.common
 var acrResourceGroupName = sharedValues.resources.acr.resourceGroupName
 var resourceGroupName = 'rg-xprtzbv-website'
+var logAnalyticsWorkspaceName = 'log-xprtzbv-website'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: resourceGroupName
@@ -34,5 +35,15 @@ module containerAppEnvironment 'modules/container-app-environment.bicep' = {
   name: 'Deploy-Container-App-Environment'
   params: {
     location: location
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+  }
+}
+
+module frontDoor 'modules/front-door-profile.bicep' = {
+  scope: resourceGroup
+  name: 'Deploy-Front-Door-Profile'
+  params: {
+    frontDoorSkuName: 'Standard_AzureFrontDoor'
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
   }
 }
