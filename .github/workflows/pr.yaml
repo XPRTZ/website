@@ -63,7 +63,7 @@ jobs:
         with:
           message: |
             Staging environment ready:  
-            https://${{ steps.deploybicep.outputs.revisionFqdn }}
+            https://${{ steps.deploybicep.outputs.containerAppUrl }}
 
   remove_container_appp:
     runs-on: ubuntu-latest
