@@ -1,65 +1,23 @@
 {
-  "name": "xprtz-studio",
-  "version": "0.1.0",
-  "private": true,
+  "name": "",
+  "type": "module",
+  "version": "0.0.1",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
-  "browserslist": "defaults, not ie <= 11",
   "dependencies": {
-    "@leafac/rehype-shiki": "^2.2.1",
-    "@mdx-js/loader": "^3.0.0",
-    "@mdx-js/react": "^3.0.0",
-    "@next/mdx": "14.0.4",
-    "@types/mdx": "^2.0.10",
-    "@types/node": "20.10.5",
-    "@types/react": "18.2.46",
-    "@types/react-dom": "18.2.18",
-    "acorn": "^8.11.3",
-    "acorn-jsx": "^5.3.2",
-    "autoprefixer": "^10.4.16",
-    "clsx": "^2.0.0",
-    "escape-string-regexp": "^5.0.0",
-    "fast-glob": "^3.3.2",
-    "framer-motion": "^10.16.16",
-    "next": "14.0.4",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "recma-import-images": "0.0.3",
-    "remark-gfm": "^4.0.0",
-    "remark-rehype-wrap": "0.0.3",
-    "remark-unwrap-images": "^4.0.0",
-    "sharp": "^0.33.1",
-    "shiki": "^0.14.7",
-    "tailwindcss": "^3.4.0",
-    "typescript": "5.3.3",
-    "unified-conditional": "0.0.2"
-  },
-  "devDependencies": {
-    "eslint": "8.56.0",
-    "eslint-config-next": "14.0.4",
-    "prettier": "^3.1.1",
-    "prettier-plugin-tailwindcss": "^0.5.10"
-  },
-  "pnpm": {
-    "supportedArchitectures": {
-      "os": [
-        "win32",
-        "darwin",
-        "linux",
-        "current"
-      ],
-      "cpu": [
-        "x64",
-        "arm64"
-      ],
-      "libc": [
-        "glibc",
-        "musl"
-      ]
-    }
+    "@astrojs/check": "^0.4.1",
+    "@astrojs/mdx": "^2.1.1",
+    "@astrojs/node": "^8.2.0",
+    "@astrojs/rss": "^4.0.4",
+    "@astrojs/sitemap": "^3.0.5",
+    "@astrojs/tailwind": "^5.1.0",
+    "astro": "^4.3.1",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
   }
 }
