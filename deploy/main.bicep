@@ -35,3 +35,5 @@ module frontDoor 'modules/front-door.bicep' = {
     originHostname: containerAppWebsite.outputs.containerAppUrl
   }
 }
+
+output containerAppUrl string = containerAppWebsite.outputs.containerAppUrl
