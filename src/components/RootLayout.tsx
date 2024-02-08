@@ -72,16 +72,6 @@ function Header({
           onMouseEnter={() => setLogoHovered(true)}
           onMouseLeave={() => setLogoHovered(false)}
         >
-          {/* <Logomark
-            className="h-8 sm:hidden"
-            invert={invert}
-            filled={logoHovered}
-          />
-          <Logo
-            className="hidden h-8 sm:block"
-            invert={invert}
-            filled={logoHovered}
-          /> */}
           <Image src={xprtz_logo} alt="XPRTZ" width={50} height={50} />
         </Link>
         <div className="flex items-center gap-x-8">
