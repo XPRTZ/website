@@ -1,0 +1,52 @@
+---
+import fetchApi from "../../lib/strapi";
+import { marked } from "marked";
+import BlogPost from "../../layouts/BlogPost.astro";
+import type {
+  ApiArticleArticle,
+  ApiAuthorAuthor,
+} from "../../interfaces/contentTypes";
+
+export async function getStaticPaths() {
+  const articles = await fetchApi<ApiArticleArticle[]>({
+    endpoint: "articles",
+    wrappedByKey: "data",
+  });
+
+  return articles.map((article) => ({
+    params: { slug: article.attributes.slug },
+    props: article,
+  }));
+}
+type Props = ApiArticleArticle;
+
+const article = Astro.props;
+
+// quick and dirty conversion so we can use the existing BlogPost component
+const convertedProps = {
+  title: article.attributes.title,
+  description: article.attributes.description,
+  pubDate: new Date(article.attributes.publishedAt),
+  updatedDate: new Date(article.attributes.updatedAt),
+  heroImage: undefined,
+};
+const htmlContent = marked.parse(article.attributes.content);
+---
+
+<BlogPost {...convertedProps}>
+  <article set:html={htmlContent} />
+  <div>
+    {console.log(article.attributes.authors.data[0])}
+    {
+      article.attributes.authors.data &&
+        article.attributes.authors.data.map((author: ApiAuthorAuthor) => (
+          <div>
+            <div style="font-weight: 600">
+              {author.attributes.firstname} {author.attributes.lastname}
+            </div>
+            <p>{author.attributes.biography}</p>
+          </div>
+        ))
+    }
+  </div>
+</BlogPost>
