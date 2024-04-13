@@ -70,6 +70,6 @@ This theme is based off of the lovely [Bear Blog](https://github.com/HermanMarti
 
 ## Docker
 Building locally:
-export STRAPI_URL=http://127.0.0.1:1337
+export STRAPI_URL=http://host.docker.internal:1337
 export STRAPI_TOKEN=<TOKEN>
-DOCKER_BUILDKIT=1 docker build --secret id=strapi_url,env=STRAPI_URL --secret id=strapi_token,env=STRAPI_TOKEN .  
+docker build --secret id=strapi_url,env=STRAPI_URL --secret id=strapi_token,env=STRAPI_TOKEN .  
