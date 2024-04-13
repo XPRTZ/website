@@ -53,6 +53,9 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/website:latest
+          secrets: |
+            "strapi_url=${{ secrets.STRAPI_URL }}"
+            "strapi_token=${{ secrets.STRAPI_TOKEN}"
 
       - name: Deploy website
         uses: azure/arm-deploy@v1

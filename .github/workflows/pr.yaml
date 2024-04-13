@@ -40,6 +40,9 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/website:${{ env.GITHUB_REF_NAME_SLUG }}
+          secrets: |
+            "strapi_url=${{ secrets.STRAPI_URL }}"
+            "strapi_token=${{ secrets.STRAPI_TOKEN}"
 
       - uses: actions/checkout@main
         with:
