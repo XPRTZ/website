@@ -13,7 +13,11 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 FROM build-deps AS build
 COPY . .
-RUN pnpm run build
+RUN --mount=type=secret,id=strapi_url \
+    --mount=type=secret,id=strapi_token \
+    export STRAPI_URL=$(cat /run/secrets/strapi_url) && \
+    export STRAPI_TOKEN=$(cat /run/secrets/strapi_token) && \
+    pnpm run build
 
 FROM base AS runtime
 COPY --from=prod-deps /app/node_modules ./node_modules

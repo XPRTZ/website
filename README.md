@@ -66,3 +66,10 @@ Check out [our documentation](https://docs.astro.build) or jump into our [Discor
 ## Credit
 
 This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+
+
+## Docker
+Building locally:
+export STRAPI_URL=http://host.docker.internal:1337
+export STRAPI_TOKEN=<TOKEN>
+docker build --secret id=strapi_url,env=STRAPI_URL --secret id=strapi_token,env=STRAPI_TOKEN .  

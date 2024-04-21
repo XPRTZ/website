@@ -9,6 +9,8 @@ on:
 permissions:
       id-token: write
       contents: read
+      pull-requests: write
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -40,12 +42,16 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.REGISTRY_NAME }}.azurecr.io/website:${{ env.GITHUB_REF_NAME_SLUG }}
+          secrets: |
+            "strapi_url=${{ secrets.STRAPI_URL }}"
+            "strapi_token=${{ secrets.STRAPI_TOKEN }}"
 
       - uses: actions/checkout@main
         with:
           fetch-depth: 0
 
       - name: Deploy website
+        id: deploybicep
         uses: azure/arm-deploy@v2
         with:
           scope: subscription
@@ -54,6 +60,13 @@ jobs:
           template: ./deploy/main.bicep
           parameters: imageTag=${{ env.GITHUB_REF_NAME_SLUG }}
           failOnStdErr: false
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            Staging environment ready:
+            https://${{ steps.deploybicep.outputs.containerAppUrl }}
 
   remove_container_appp:
     runs-on: ubuntu-latest
