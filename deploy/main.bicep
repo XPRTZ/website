@@ -2,6 +2,7 @@ targetScope = 'subscription'
 
 param location string = 'westeurope'
 param imageTag string = 'latest'
+param isProduction bool = false
 
 var resourceGroupName = 'rg-xprtzbv-website'
 var containerAppIdentityName = 'id-xprtzbv-website'
@@ -24,6 +25,7 @@ module containerAppWebsite 'modules/container-app-website.bicep' = {
     containerAppUserAssignedIdentityResourceId: containerAppIdentity.id
     containerAppUserAssignedIdentityClientId: containerAppIdentity.properties.clientId
     imageTag: imageTag
+    isProduction: isProduction
   }
 }
 

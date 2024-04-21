@@ -2,6 +2,7 @@ param location string
 param containerAppUserAssignedIdentityResourceId string
 param containerAppUserAssignedIdentityClientId string
 param imageTag string = 'latest'
+param isProduction bool
 
 var name = take('ctap-xprtzbv-website-${imageTag}', 32)
 
@@ -55,8 +56,8 @@ resource containerApp 'Microsoft.App/containerApps@2023-08-01-preview' = {
         }
       ]
       scale: {
-       minReplicas: 1
-       maxReplicas: 10
+       minReplicas: isProduction ? 1 : 0
+       maxReplicas: 1
       }
     }
   }
