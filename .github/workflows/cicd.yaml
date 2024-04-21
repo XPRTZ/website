@@ -102,4 +102,5 @@ jobs:
           region: westeurope
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./deploy/main.bicep
+          parameters: isProduction=true
           failOnStdErr: false
