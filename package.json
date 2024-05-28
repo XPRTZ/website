@@ -3,16 +3,15 @@
   "private": true,
   "version": "0.1.0",
   "author": "Alex Schouls",
-  "workspaces": [
-    "libs/ui",
-    "apps/dotnet",
-    "apps/cloud"
-  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "format": "prettier ./**/*.{js,ts,html,css,scss,json,mjs} --write && eslint ./**/*.{js,ts,mjs}",
-    "build": "npm run build --workspaces --if-present",
-    "dev:dotnet": "npm run dev --workspace apps/dotnet",
-    "dev:cloud": "npm run dev --workspace apps/cloud"
+    "dev:dotnet": "pnpm run --filter ./apps/dotnet dev",
+    "dev:cloud": "pnpm run --filter ./apps/cloud dev",
+    "dev": "pnpm run --filter ./apps/* --if-present dev",
+    "build": "pnpm run --filter ./libs/* --if-present build"
   },
   "devDependencies": {
     "@eslint/js": "^9.3.0",
@@ -22,5 +21,6 @@
     "prettier": "3.2.5",
     "typescript": "^5.4.5",
     "typescript-eslint": "^8.0.0-alpha.20"
-  }
+  },
+  "packageManager": "pnpm@9.1.3"
 }

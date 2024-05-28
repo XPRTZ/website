@@ -12,7 +12,7 @@
   "dependencies": {
     "astro": "^4.9.2",
     "@astrojs/check": "^0.7.0",
-    "@xprtz/ui": "*"
+    "@xprtz/ui": "link:../../libs/ui"
   },
   "author": "Alex Schouls"
 }
