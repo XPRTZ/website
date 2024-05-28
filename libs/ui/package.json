@@ -1,0 +1,10 @@
+{
+  "name": "@xprtz/ui",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "astro check && astro build"
+  },
+  "author": "Alex Schouls"
+}
