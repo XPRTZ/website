@@ -5,12 +5,14 @@
   "author": "Alex Schouls",
   "workspaces": [
     "libs/ui",
-    "apps/dotnet"
+    "apps/dotnet",
+    "apps/cloud"
   ],
   "scripts": {
     "format": "prettier ./**/*.{js,ts,html,css,scss,json,mjs} --write && eslint ./**/*.{js,ts,mjs}",
     "build": "npm run build --workspaces --if-present",
-    "dev:dotnet": "npm run dev --workspace apps/dotnet"
+    "dev:dotnet": "npm run dev --workspace apps/dotnet",
+    "dev:cloud": "npm run dev --workspace apps/cloud"
   },
   "devDependencies": {
     "@eslint/js": "^9.3.0",
