@@ -4,11 +4,13 @@
   "version": "0.1.0",
   "author": "Alex Schouls",
   "workspaces": [
-    "libs/ui"
+    "libs/ui",
+    "apps/dotnet"
   ],
   "scripts": {
     "format": "prettier ./**/*.{js,ts,html,css,scss,json,mjs} --write && eslint ./**/*.{js,ts,mjs}",
-    "build": "npm run build --workspaces --if-present"
+    "build": "npm run build --workspaces --if-present",
+    "dev:dotnet": "npm run dev --workspace apps/dotnet"
   },
   "devDependencies": {
     "@eslint/js": "^9.3.0",
