@@ -2,5 +2,11 @@
   "name": "xprtz-websites",
   "private": "true",
   "version": "0.1.0",
-  "author": "Alex Schouls"
+  "author": "Alex Schouls",
+  "scripts": {
+    "format": "prettier ./**/*.{js,ts,html,css,scss} --write"
+  },
+  "devDependencies": {
+    "prettier": "3.2.5"
+  }
 }
