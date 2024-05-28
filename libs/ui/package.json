@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "version": "0.1.0",
-  "scripts": {
-    "build": "astro check && astro build"
-  },
-  "author": "Alex Schouls"
+  "author": "Alex Schouls",
+  "dependencies": {
+    "@astrojs/check": "^0.7.0",
+    "astro": "^4.9.2"
+  }
 }
