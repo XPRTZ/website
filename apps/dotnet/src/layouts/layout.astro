@@ -1,0 +1,19 @@
+---
+import { BaseHead, Footer, Header } from '@xprtz/ui'
+import Logo from '../images/logo.svg'
+const { title, description } = Astro.props;
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <BaseHead title={title} description={description} />
+  </head>
+  <body class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <Header Logo={Logo.src}/>
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
