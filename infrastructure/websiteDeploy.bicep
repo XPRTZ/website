@@ -7,7 +7,18 @@ resource websiteResourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = 
   name: 'rg-xprtzbv-website-${environment}'
 }
 
-module storageAccountModule 'modules/storageAccount.bicep' = {
+module cloudStorageAccountModule 'modules/storageAccount.bicep' = {
   scope: websiteResourceGroup
-  name: 'storageAccountDeploy'
+  name: 'cloudStorageAccountDeploy'
+  params: {
+    app: 'cloud'
+  }
+}
+
+module dotnetStorageAccountModule 'modules/storageAccount.bicep' = {
+  scope: websiteResourceGroup
+  name: 'dotnetStorageAccountDeploy'
+  params: {
+    app: 'dotnet'
+  }
 }

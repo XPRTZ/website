@@ -9,9 +9,10 @@
   'Standard_ZRS'
 ])
 param sku string = 'Standard_LRS'
+param app string
 
 resource websiteStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' = {
-  name: 'stxprtz${uniqueString(resourceGroup().id)}'
+  name: 'st${app}${uniqueString(resourceGroup().id)}'
   location: resourceGroup().location
   kind: 'StorageV2'
   sku: {
