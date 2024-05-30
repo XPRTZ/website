@@ -21,6 +21,7 @@ jobs:
     name: Apply infrastructure
     runs-on: ubuntu-latest
     environment: ${{ inputs.githubEnvironment }}
+    if: ${{ github.event.action != 'closed' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -44,7 +45,7 @@ jobs:
     name: Remove infrastructure
     runs-on: ubuntu-latest
     environment: ${{ inputs.githubEnvironment }}
-    if: ${{ inputs.tearDown }}
+    if: ${{ inputs.tearDown }} && github.event.action == 'closed'
     steps:
       - name: Azure CLI script
         uses: azure/cli@v2
