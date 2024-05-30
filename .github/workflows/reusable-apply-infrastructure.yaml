@@ -45,3 +45,4 @@ jobs:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./infrastructure/websiteDeploy.bicep
           parameters: "suffix=${{ inputs.suffix }}"
+          region: westeurope
