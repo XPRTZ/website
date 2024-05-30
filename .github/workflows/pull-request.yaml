@@ -14,3 +14,16 @@ jobs:
       azureEnvironment: ${{ github.run_id }}
       githubEnvironment: preview
       tearDown: true
+    secrets: inherit
+
+  build-cloud-application:
+    uses: ./.github/workflows/reusable-build-application.yaml
+    with:
+      application: cloud
+    needs: [apply-pull-request-infrastructure]
+
+  build-dotnet-application:
+    uses: ./.github/workflows/reusable-build-application.yaml
+    with:
+      application: dotnet
+    needs: [apply-pull-request-infrastructure]
