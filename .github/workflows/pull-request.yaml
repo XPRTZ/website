@@ -1,0 +1,16 @@
+name: Pull request workflow
+run-name: Running pull request flow for ${{ github.base_ref }}
+concurrency: pull-request
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+jobs:
+  apply-pull-request-infrastructure:
+    uses: ./.github/workflows/reusable-apply-infrastructure.yaml
+    with:
+      azureEnvironment: ${{ github.run_id }}
+      githubEnvironment: preview
+      tearDown: true
