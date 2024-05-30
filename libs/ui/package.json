@@ -4,6 +4,7 @@
   "type": "module",
   "version": "0.1.0",
   "author": "Alex Schouls",
+  "main": "index.ts",
   "dependencies": {
     "@astrojs/check": "^0.7.0",
     "@astrojs/react": "^3.4.0",

@@ -10,7 +10,7 @@ const { title, description } = Astro.props;
     <BaseHead title={title} description={description} />
   </head>
   <body class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <Header Logo={Logo.src}/>
+    <Header Logo={Logo.src} client:load/>
     <main>
       <slot />
     </main>
