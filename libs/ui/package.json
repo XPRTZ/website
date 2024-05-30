@@ -4,9 +4,17 @@
   "type": "module",
   "version": "0.1.0",
   "author": "Alex Schouls",
+  "main": "index.ts",
   "dependencies": {
     "@astrojs/check": "^0.7.0",
-    "astro": "^4.9.2"
+    "@astrojs/react": "^3.4.0",
+    "@headlessui/react": "^2.0.4",
+    "@heroicons/react": "^2.1.3",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "astro": "^4.9.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "scripts": {
     "build": "astro check"
