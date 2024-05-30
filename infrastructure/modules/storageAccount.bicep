@@ -22,5 +22,24 @@ resource websiteStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' = 
     supportsHttpsTrafficOnly: true
     accessTier: 'Hot'
     allowBlobPublicAccess: true
+    minimumTlsVersion: 'TLS1_2'
+  }
+}
+
+resource websiteStorageBlobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' existing = {
+  parent: websiteStorageAccount
+  name: 'default'
+}
+
+resource websiteStorageContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
+  parent: websiteStorageBlobServices
+  name: '$web'
+  properties: {
+    immutableStorageWithVersioning: {
+      enabled: false
+    }
+    defaultEncryptionScope: '$account-encryption-key'
+    denyEncryptionScopeOverride: false
+    publicAccess: 'None'
   }
 }
