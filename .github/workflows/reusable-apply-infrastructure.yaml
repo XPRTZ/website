@@ -13,6 +13,11 @@ on:
       tearDown:
         type: boolean
         default: false
+    outputs:
+      cloudStorageAccount:
+        value: ${{ jobs.apply-infrastructure.outputs.cloudStorageAccount }}
+      dotnetStorageAccount:
+        value: ${{ jobs.apply-infrastructure.outputs.dotnetStorageAccount }}
 env:
   RESOURCE_GROUP_NAME: rg-xprtzbv-website-${{ inputs.azureEnvironment }}
 
@@ -22,6 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.githubEnvironment }}
     if: ${{ github.event.action != 'closed' }}
+    outputs:
+      cloudStorageAccount: ${{ steps.deploybicep.outputs.cloudStorageAccountName }}
+      dotnetStorageAccount: ${{ steps.deploybicep.outputs.dotnetStorageAccountName }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,6 +41,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy Bicep file
+        id: deploybicep
         uses: azure/arm-deploy@v2
         with:
           scope: subscription

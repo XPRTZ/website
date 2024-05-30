@@ -22,3 +22,6 @@ module dotnetStorageAccountModule 'modules/storageAccount.bicep' = {
     app: 'dotnet'
   }
 }
+
+output cloudStorageAccountName string = cloudStorageAccountModule.outputs.storageAccountName
+output dotnetStorageAccountName string = dotnetStorageAccountModule.outputs.storageAccountName

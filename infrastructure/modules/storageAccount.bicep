@@ -25,6 +25,7 @@ resource websiteStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' = 
     minimumTlsVersion: 'TLS1_2'
   }
 }
+output storageAccountName string = websiteStorageAccount.name
 
 resource websiteStorageBlobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' existing = {
   parent: websiteStorageAccount

@@ -26,8 +26,9 @@ jobs:
     uses: ./.github/workflows/reusable-deploy-application.yaml
     with:
       application: cloud
-      storageAccount: ""
-    needs: [build-cloud-application]
+      storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.cloudStorageAccount }}
+    needs: [apply-pull-request-infrastructure, build-cloud-application]
+    secrets: inherit
 
   build-dotnet-application:
     uses: ./.github/workflows/reusable-build-application.yaml
@@ -39,5 +40,6 @@ jobs:
     uses: ./.github/workflows/reusable-deploy-application.yaml
     with:
       application: dotnet
-      storageAccount: ""
-    needs: [build-dotnet-application]
+      storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.dotnetStorageAccount }}
+    needs: [apply-pull-request-infrastructure, build-dotnet-application]
+    secrets: inherit
