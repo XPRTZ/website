@@ -10,6 +10,9 @@ on:
       azureEnvironment:
         required: true
         type: string
+      resourceGroup:
+        required: true
+        type: string
       tearDown:
         type: boolean
         default: false
@@ -18,8 +21,6 @@ on:
         value: ${{ jobs.apply-infrastructure.outputs.cloudStorageAccount }}
       dotnetStorageAccount:
         value: ${{ jobs.apply-infrastructure.outputs.dotnetStorageAccount }}
-env:
-  RESOURCE_GROUP_NAME: rg-xprtzbv-website-${{ inputs.azureEnvironment }}
 
 jobs:
   apply-infrastructure:
@@ -46,7 +47,7 @@ jobs:
         with:
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          resourceGroupName: ${{ env.RESOURCE_GROUP_NAME }}
+          resourceGroupName: ${{ inputs.resourceGroup }}
           template: ./infrastructure/websiteDeploy.bicep
           parameters: "environment=${{ inputs.azureEnvironment }}"
 
@@ -60,4 +61,4 @@ jobs:
         uses: azure/cli@v2
         with:
           azcliversion: latest
-          inlineScript: az group delete --name ${{ env.RESOURCE_GROUP_NAME }} --yes
+          inlineScript: az group delete --name ${{ inputs.resourceGroup }} --yes

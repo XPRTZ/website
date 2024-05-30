@@ -11,6 +11,9 @@ on:
       storageAccount:
         required: true
         type: string
+      resourceGroup:
+        required: true
+        type: string
 
 jobs:
   deploy-application:
@@ -43,5 +46,5 @@ jobs:
       - name: Set static web hosting properties for Storage Account
         uses: azure/powershell@v2
         with:
-          inlineScript: ./infrastructure/setStaticWebsiteHosting.ps1
+          inlineScript: ./infrastructure/setStaticWebsiteHosting.ps1 -ResourceGroupName ${{ inputs.resourceGroup }} -StorageAccountName ${{ inputs.storageAccount }} -IndexFileName index.html -NotFoundFileName 404.html
           azPSVersion: "latest"

@@ -7,12 +7,16 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
 
+env:
+  RESOURCE_GROUP_NAME: rg-xprtzbv-website-${{ github.run_id }}
+
 jobs:
   apply-pull-request-infrastructure:
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
       azureEnvironment: ${{ github.run_id }}
       githubEnvironment: preview
+      resourceGroup: $RESOURCE_GROUP_NAME
       tearDown: true
     secrets: inherit
 
@@ -27,6 +31,7 @@ jobs:
     with:
       application: cloud
       storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.cloudStorageAccount }}
+      resourceGroup: $RESOURCE_GROUP_NAME
     needs: [apply-pull-request-infrastructure, build-cloud-application]
     secrets: inherit
 
@@ -41,5 +46,6 @@ jobs:
     with:
       application: dotnet
       storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.dotnetStorageAccount }}
+      resourceGroup: $RESOURCE_GROUP_NAME
     needs: [apply-pull-request-infrastructure, build-dotnet-application]
     secrets: inherit
