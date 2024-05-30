@@ -1,5 +1,5 @@
 name: Pull request workflow
-run-name: Running pull request flow for ${{ github.base_ref }}
+run-name: Running pull request flow for ${{ github.head_ref }}
 concurrency: pull-request
 
 on:
@@ -7,45 +7,58 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
 
-env:
-  RESOURCE_GROUP_NAME: rg-xprtzbv-website-${{ github.run_id }}
-
 jobs:
   apply-pull-request-infrastructure:
+    if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
-      azureEnvironment: ${{ github.run_id }}
-      githubEnvironment: preview
-      resourceGroup: $RESOURCE_GROUP_NAME
-      tearDown: true
+      suffix: ${{ github.head_ref }}
+      environment: preview
     secrets: inherit
 
   build-cloud-application:
+    if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-build-application.yaml
     with:
       application: cloud
     needs: [apply-pull-request-infrastructure]
 
   deploy-cloud-application:
+    if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-deploy-application.yaml
     with:
       application: cloud
       storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.cloudStorageAccount }}
-      resourceGroup: $RESOURCE_GROUP_NAME
+      resourceGroup: ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }}
     needs: [apply-pull-request-infrastructure, build-cloud-application]
     secrets: inherit
 
   build-dotnet-application:
+    if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-build-application.yaml
     with:
       application: dotnet
     needs: [apply-pull-request-infrastructure]
 
   deploy-dotnet-application:
+    if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-deploy-application.yaml
     with:
       application: dotnet
       storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.dotnetStorageAccount }}
-      resourceGroup: $RESOURCE_GROUP_NAME
+      resourceGroup: ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }}
     needs: [apply-pull-request-infrastructure, build-dotnet-application]
     secrets: inherit
+
+  remove-infrastructure:
+    if: github.event.action == 'closed'
+    name: Remove infrastructure
+    runs-on: ubuntu-latest
+    environment: preview
+    needs: [apply-pull-request-infrastructure]
+    steps:
+      - name: Azure CLI script
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: az group delete --name ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }} --yes

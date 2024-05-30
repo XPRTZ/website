@@ -1,10 +1,10 @@
 targetScope = 'subscription'
 
-param environment string
+param suffix string
 
 resource websiteResourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   location: deployment().location
-  name: 'rg-xprtzbv-website-${environment}'
+  name: 'rg-xprtzbv-website-${uniqueString(suffix)}'
 }
 
 module cloudStorageAccountModule 'modules/storageAccount.bicep' = {
@@ -25,3 +25,4 @@ module dotnetStorageAccountModule 'modules/storageAccount.bicep' = {
 
 output cloudStorageAccountName string = cloudStorageAccountModule.outputs.storageAccountName
 output dotnetStorageAccountName string = dotnetStorageAccountModule.outputs.storageAccountName
+output resourceGroupName string = websiteResourceGroup.name

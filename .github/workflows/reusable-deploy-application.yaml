@@ -31,7 +31,6 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          enable-AzPSSession: true
 
       - name: Download build artifacts for ${{ inputs.application }}
         uses: actions/download-artifact@v4
@@ -44,7 +43,7 @@ jobs:
           inlineScript: az storage blob upload-batch --account-name ${{ inputs.storageAccount }} --auth-mode key -d '$web' -s ./dist
 
       - name: Set static web hosting properties for Storage Account
-        uses: azure/powershell@v2
+        uses: azure/CLI@v2
         with:
-          inlineScript: ./infrastructure/setStaticWebsiteHosting.ps1 -ResourceGroupName ${{ inputs.resourceGroup }} -StorageAccountName ${{ inputs.storageAccount }} -IndexFileName index.html -NotFoundFileName 404.html
-          azPSVersion: "latest"
+          inlineScript: |
+            az storage blob service-properties update --account-name ${{ inputs.storageAccount }} --static-website --404-document 404.html --index-document index.html

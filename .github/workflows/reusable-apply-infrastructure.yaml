@@ -4,33 +4,29 @@ concurrency: infrastructure
 on:
   workflow_call:
     inputs:
-      githubEnvironment:
+      environment:
         required: true
         type: string
-      azureEnvironment:
+      suffix:
         required: true
         type: string
-      resourceGroup:
-        required: true
-        type: string
-      tearDown:
-        type: boolean
-        default: false
     outputs:
       cloudStorageAccount:
         value: ${{ jobs.apply-infrastructure.outputs.cloudStorageAccount }}
       dotnetStorageAccount:
         value: ${{ jobs.apply-infrastructure.outputs.dotnetStorageAccount }}
+      resourceGroup:
+        value: ${{ jobs.apply-infrastructure.outputs.resourceGroup }}
 
 jobs:
   apply-infrastructure:
     name: Apply infrastructure
     runs-on: ubuntu-latest
-    environment: ${{ inputs.githubEnvironment }}
-    if: ${{ github.event.action != 'closed' }}
+    environment: ${{ inputs.environment }}
     outputs:
       cloudStorageAccount: ${{ steps.deploybicep.outputs.cloudStorageAccountName }}
       dotnetStorageAccount: ${{ steps.deploybicep.outputs.dotnetStorageAccountName }}
+      resourceGroup: ${{ steps.deploybicep.outputs.resourceGroupName }}
     steps:
       - uses: actions/checkout@v4
 
@@ -47,18 +43,5 @@ jobs:
         with:
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          resourceGroupName: ${{ inputs.resourceGroup }}
           template: ./infrastructure/websiteDeploy.bicep
-          parameters: "environment=${{ inputs.azureEnvironment }}"
-
-  remove-infrastructure:
-    name: Remove infrastructure
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.githubEnvironment }}
-    if: ${{ inputs.tearDown }} && github.event.action == 'closed'
-    steps:
-      - name: Azure CLI script
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: az group delete --name ${{ inputs.resourceGroup }} --yes
+          parameters: "suffix=${{ inputs.suffix }}"
