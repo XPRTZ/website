@@ -35,3 +35,9 @@ jobs:
 
       - name: Build application
         run: pnpm run build:${{ inputs.application }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.application }}-dist
+          path: ./dist

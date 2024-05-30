@@ -22,8 +22,22 @@ jobs:
       application: cloud
     needs: [apply-pull-request-infrastructure]
 
+  deploy-cloud-application:
+    uses: ./.github/workflows/reusable-deploy-application.yaml
+    with:
+      application: cloud
+      storageAccount: ""
+    needs: [build-cloud-application]
+
   build-dotnet-application:
     uses: ./.github/workflows/reusable-build-application.yaml
     with:
       application: dotnet
     needs: [apply-pull-request-infrastructure]
+
+  deploy-dotnet-application:
+    uses: ./.github/workflows/reusable-deploy-application.yaml
+    with:
+      application: dotnet
+      storageAccount: ""
+    needs: [build-dotnet-application]
