@@ -38,4 +38,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.application }}-dist
-          path: ~/runner/work/website/website/apps/${{ inputs.application }}/dist/
+          path: ~/work/website/website/apps/${{ inputs.application }}/dist/
