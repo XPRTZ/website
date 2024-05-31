@@ -58,13 +58,9 @@ jobs:
 
   remove-infrastructure:
     if: github.event.action == 'closed'
-    name: Remove infrastructure
-    runs-on: ubuntu-latest
-    environment: preview
+    uses: ./.github/workflows/reusable-destroy-infrastructure.yaml
+    with:
+      environment: preview
+      resourcegroup: ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }}
     needs: [apply-pull-request-infrastructure]
-    steps:
-      - name: Azure CLI script
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: az group delete --name ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }} --yes
+    secrets: inherit
