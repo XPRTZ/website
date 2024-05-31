@@ -35,6 +35,7 @@ jobs:
       application: cloud
       storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.cloudStorageAccount }}
       resourceGroup: ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }}
+      environment: preview
     needs: [apply-pull-request-infrastructure, build-cloud-application]
     secrets: inherit
 
@@ -52,6 +53,7 @@ jobs:
       application: dotnet
       storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.dotnetStorageAccount }}
       resourceGroup: ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }}
+      environment: preview
     needs: [apply-pull-request-infrastructure, build-dotnet-application]
     secrets: inherit
 

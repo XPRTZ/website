@@ -5,6 +5,9 @@ concurrency: deploy-${{ inputs.application }}
 on:
   workflow_call:
     inputs:
+      environment:
+        required: true
+        type: string
       application:
         required: true
         type: string
@@ -22,6 +25,7 @@ jobs:
       run:
         working-directory: ./apps/${{ inputs.application }}
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v4
 
