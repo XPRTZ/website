@@ -14,7 +14,6 @@ permissions:
 
 jobs:
   apply-pull-request-infrastructure:
-    if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
       suffix: ${{ github.head_ref }}
