@@ -1,0 +1,54 @@
+name: "[Reusable workflow] Deploy application"
+run-name: Deploying application for ${{ inputs.application }}
+concurrency: deploy-${{ inputs.application }}
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      application:
+        required: true
+        type: string
+      storageAccount:
+        required: true
+        type: string
+      resourceGroup:
+        required: true
+        type: string
+
+jobs:
+  deploy-application:
+    name: Deploy ${{ inputs.application }}
+    defaults:
+      run:
+        working-directory: ./apps/${{ inputs.application }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Download build artifacts for ${{ inputs.application }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.application }}-dist
+          path: ${{ github.workspace }}/dist
+
+      - name: Upload application to blob storage
+        uses: azure/CLI@v2
+        with:
+          inlineScript: az storage blob upload-batch --account-name ${{ inputs.storageAccount }} --auth-mode key -d '$web' -s ${{ github.workspace }}/dist
+
+      - name: Set static web hosting properties for Storage Account
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az storage blob service-properties update --account-name ${{ inputs.storageAccount }} --static-website --404-document 404.html --index-document index.html

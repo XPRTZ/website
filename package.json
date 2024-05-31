@@ -11,7 +11,9 @@
     "dev:dotnet": "pnpm run --filter ./apps/dotnet dev",
     "dev:cloud": "pnpm run --filter ./apps/cloud dev",
     "dev": "pnpm run --filter ./apps/* --if-present dev",
-    "build": "pnpm run --filter ./libs/* --if-present build"
+    "build": "pnpm run --if-present build",
+    "build:dotnet": "pnpm run --filter ./apps/dotnet build",
+    "build:cloud": "pnpm run --filter ./apps/cloud build"
   },
   "devDependencies": {
     "@eslint/js": "^9.3.0",

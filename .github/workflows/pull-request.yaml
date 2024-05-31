@@ -1,0 +1,71 @@
+name: Pull request workflow
+run-name: Running pull request flow for ${{ github.head_ref }}
+concurrency: pull-request
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  apply-pull-request-infrastructure:
+    if: github.event.action != 'closed'
+    uses: ./.github/workflows/reusable-apply-infrastructure.yaml
+    with:
+      suffix: ${{ github.head_ref }}
+      environment: preview
+    secrets: inherit
+
+  build-cloud-application:
+    if: github.event.action != 'closed'
+    uses: ./.github/workflows/reusable-build-application.yaml
+    with:
+      application: cloud
+    needs: [apply-pull-request-infrastructure]
+
+  deploy-cloud-application:
+    if: github.event.action != 'closed'
+    uses: ./.github/workflows/reusable-deploy-application.yaml
+    with:
+      application: cloud
+      storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.cloudStorageAccount }}
+      resourceGroup: ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }}
+      environment: preview
+    needs: [apply-pull-request-infrastructure, build-cloud-application]
+    secrets: inherit
+
+  build-dotnet-application:
+    if: github.event.action != 'closed'
+    uses: ./.github/workflows/reusable-build-application.yaml
+    with:
+      application: dotnet
+    needs: [apply-pull-request-infrastructure]
+
+  deploy-dotnet-application:
+    if: github.event.action != 'closed'
+    uses: ./.github/workflows/reusable-deploy-application.yaml
+    with:
+      application: dotnet
+      storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.dotnetStorageAccount }}
+      resourceGroup: ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }}
+      environment: preview
+    needs: [apply-pull-request-infrastructure, build-dotnet-application]
+    secrets: inherit
+
+  remove-infrastructure:
+    if: github.event.action == 'closed'
+    name: Remove infrastructure
+    runs-on: ubuntu-latest
+    environment: preview
+    needs: [apply-pull-request-infrastructure]
+    steps:
+      - name: Azure CLI script
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: az group delete --name ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }} --yes
