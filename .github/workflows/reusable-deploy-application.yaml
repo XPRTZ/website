@@ -40,11 +40,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.application }}-dist
+          path: ${{ github.workspace }}/dist
 
       - name: Upload application to blob storage
         uses: azure/CLI@v2
         with:
-          inlineScript: az storage blob upload-batch --account-name ${{ inputs.storageAccount }} --auth-mode key -d '$web' -s ${{ github.workspace }}
+          inlineScript: az storage blob upload-batch --account-name ${{ inputs.storageAccount }} --auth-mode key -d '$web' -s ${{ github.workspace }}/dist
 
       - name: Set static web hosting properties for Storage Account
         uses: azure/CLI@v2
