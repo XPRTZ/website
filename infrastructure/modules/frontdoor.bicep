@@ -1,11 +1,15 @@
 param frontDoorProfileName string
 param frontDoorOriginHost string
 param application string
+param rootDomain string
+param subDomain string
 
 var frontDoorOriginName = 'afd-origin-${application}'
 var frontDoorEndpointName = 'fde-${application}-${uniqueString(resourceGroup().id)}'
 var frontDoorOriginGroupName = 'xprtz-website-${application}'
 var frontDoorRouteName = 'inbound'
+var customDomainHost = '${subDomain}.${rootDomain}'
+var customDomainResourceName = replace('${customDomainHost}', '.', '-')
 
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2024-02-01' existing = {
   name: frontDoorProfileName
@@ -57,6 +61,11 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
     frontDoorOrigin
   ]
   properties: {
+    customDomains: [
+      {
+        id: frontDoorCustomDomain.id
+      }
+    ]
     originGroup: {
       id: frontDoorOriginGroup.id
     }
@@ -72,3 +81,18 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
     httpsRedirect: 'Enabled'
   }
 }
+
+resource frontDoorCustomDomain 'Microsoft.Cdn/profiles/customDomains@2024-02-01' = {
+  name: customDomainResourceName
+  parent: frontDoorProfile
+  properties: {
+    hostName: customDomainHost
+    tlsSettings: {
+      certificateType: 'ManagedCertificate'
+      minimumTlsVersion: 'TLS12'
+    }
+  }
+}
+
+output frontDoorCustomDomainValidationToken string = frontDoorCustomDomain.properties.validationProperties.validationToken
+output frontDoorCustomDomainHost string = frontDoorEndpoint.properties.hostName
