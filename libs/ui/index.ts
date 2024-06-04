@@ -21,5 +21,5 @@ export {
   Testimonials,
   BlogListing,
   JobListings,
-  Team
-}
+  Team,
+};

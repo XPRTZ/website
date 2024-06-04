@@ -7,7 +7,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "format": "prettier ./**/*.{js,ts,html,css,scss,json,mjs} --write && eslint ./**/*.{js,ts,mjs}",
+    "format": "prettier ./**/*.{js,ts,html,css,scss,json,mjs,tsx} --write && eslint ./**/*.{js,ts,mjs,tsx}",
     "dev:dotnet": "pnpm run --filter ./apps/dotnet dev",
     "dev:cloud": "pnpm run --filter ./apps/cloud dev",
     "dev": "pnpm run --filter ./apps/* --if-present dev",
