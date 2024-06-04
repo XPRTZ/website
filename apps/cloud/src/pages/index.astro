@@ -1,17 +1,12 @@
 ---
-import { Component } from "@xprtz/ui";
+import Layout from "../layouts/layout.astro";
+import { Hero, Features, Testimonials, BlogListing, Team } from "@xprtz/ui";
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astro</title>
-  </head>
-  <body>
-    <h1>Astro</h1>
-    <Component />
-  </body>
-</html>
+<Layout title="XPRTZ.cloud" description="Dé plek voor Cloud experts!">
+  <Hero />
+  <Features />
+	<Testimonials />
+	<BlogListing />
+	<Team />
+</Layout>
