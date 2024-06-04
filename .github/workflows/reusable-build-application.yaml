@@ -8,6 +8,9 @@ on:
       application:
         required: true
         type: string
+      upload-artifcats:
+        type: boolean
+        default: true
 
 jobs:
   build-application:
@@ -35,6 +38,7 @@ jobs:
         run: pnpm run build
 
       - name: Upload build artifacts
+        if: ${{ inputs.upload-artifcats }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.application }}-dist
