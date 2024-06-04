@@ -1,4 +1,4 @@
-param frontDoorProfileName string = 'afd-xprtzbv-website'
+param frontDoorProfileName string
 param frontDoorOriginHost string
 param application string
 param rootDomain string

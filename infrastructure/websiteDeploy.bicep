@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 param suffix string
-param frontDoorProfileName string
+param frontDoorProfileName string = 'afd-xprtzbv-website'
 param rootDomain string = 'xprtz.dev'
 param dotnetSubDomain string
 param cloudSubDomain string
