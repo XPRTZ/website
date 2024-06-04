@@ -10,8 +10,8 @@ var dotnetApplicationName = 'dotnet'
 var cloudApplicationName = 'cloud'
 
 var sharedValues = json(loadTextContent('shared-values.json'))
-var productionSubscriptionId = sharedValues.subscriptionIds.xprtz
-var managementResourceGroup = 'xprtz-mgmt'
+var managementResourceGroup = resourceGroup(sharedValues.subscriptionIds.xprtz, 'xprtz-mgmt')
+var infrastructureResourceGroup = resourceGroup(sharedValues.resourceGroups.infrastructure)
 
 resource websiteResourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   location: deployment().location
@@ -27,7 +27,7 @@ module cloudStorageAccountModule 'modules/storageAccount.bicep' = {
 }
 
 module cloudFrontDoorSettings 'modules/frontdoor.bicep' = {
-  scope: websiteResourceGroup
+  scope: infrastructureResourceGroup
   name: 'cloudFrontDoorSettingsDeploy'
   params: {
     frontDoorOriginHost: cloudStorageAccountModule.outputs.storageAccountHost
@@ -39,7 +39,7 @@ module cloudFrontDoorSettings 'modules/frontdoor.bicep' = {
 }
 
 module cloudDnsSettings 'modules/dns.bicep' = {
-  scope: resourceGroup(productionSubscriptionId, managementResourceGroup)
+  scope: managementResourceGroup
   name: 'cloudDnsSettingsDeploy'
   params: {
     origin: cloudFrontDoorSettings.outputs.frontDoorCustomDomainHost
@@ -58,7 +58,7 @@ module dotnetStorageAccountModule 'modules/storageAccount.bicep' = {
 }
 
 module dotnetFrontDoorSettings 'modules/frontdoor.bicep' = {
-  scope: websiteResourceGroup
+  scope: infrastructureResourceGroup
   name: 'dotnetFrontDoorSettingsDeploy'
   params: {
     frontDoorOriginHost: dotnetStorageAccountModule.outputs.storageAccountHost
@@ -70,7 +70,7 @@ module dotnetFrontDoorSettings 'modules/frontdoor.bicep' = {
 }
 
 module dotnetDnsSettings 'modules/dns.bicep' = {
-  scope: resourceGroup(productionSubscriptionId, managementResourceGroup)
+  scope: managementResourceGroup
   name: 'dotnetDnsSettingsDeploy'
   params: {
     origin: dotnetFrontDoorSettings.outputs.frontDoorCustomDomainHost
