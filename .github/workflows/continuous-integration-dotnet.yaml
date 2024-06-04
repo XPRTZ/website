@@ -1,5 +1,5 @@
 name: Continuous integration workflow for XPRTZ.net
-run-name: Continuous Integration - XPRTZ.net
+run-name: Continuous Integration - XPRTZ.net - ${{ github.ref_name }}
 concurrency: ci-dotnet
 
 on:
