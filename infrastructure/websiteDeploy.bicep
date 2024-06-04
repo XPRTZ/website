@@ -1,6 +1,15 @@
 targetScope = 'subscription'
 
 param suffix string
+param frontDoorProfileName string
+param rootDomain string = 'xprtz.dev'
+
+var dotnetApplicationName = 'dotnet'
+var cloudApplicationName = 'cloud'
+
+var sharedValues = json(loadTextContent('shared-values.json'))
+var productionSubscriptionId = sharedValues.subscriptionIds.xprtz
+var managementResourceGroup = 'xprtz-mgmt'
 
 resource websiteResourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   location: deployment().location
@@ -15,11 +24,57 @@ module cloudStorageAccountModule 'modules/storageAccount.bicep' = {
   }
 }
 
+module cloudFrontDoorSettings 'modules/frontdoor.bicep' = {
+  scope: websiteResourceGroup
+  name: 'cloudFrontDoorSettingsDeploy'
+  params: {
+    frontDoorOriginHost: cloudStorageAccountModule.outputs.storageAccountHost
+    frontDoorProfileName: frontDoorProfileName
+    application: cloudApplicationName
+    rootDomain: rootDomain
+    subDomain: cloudApplicationName
+  }
+}
+
+module cloudDnsSettings 'modules/dns.bicep' = {
+  scope: resourceGroup(productionSubscriptionId, managementResourceGroup)
+  name: 'cloudDnsSettingsDeploy'
+  params: {
+    origin: cloudFrontDoorSettings.outputs.frontDoorCustomDomainHost
+    rootDomain: rootDomain
+    subDomain: cloudApplicationName
+    validationToken: cloudFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
+  }
+}
+
 module dotnetStorageAccountModule 'modules/storageAccount.bicep' = {
   scope: websiteResourceGroup
   name: 'dotnetStorageAccountDeploy'
   params: {
     app: 'dotnet'
+  }
+}
+
+module dotnetFrontDoorSettings 'modules/frontdoor.bicep' = {
+  scope: websiteResourceGroup
+  name: 'dotnetFrontDoorSettingsDeploy'
+  params: {
+    frontDoorOriginHost: dotnetStorageAccountModule.outputs.storageAccountHost
+    frontDoorProfileName: frontDoorProfileName
+    application: dotnetApplicationName
+    rootDomain: rootDomain
+    subDomain: dotnetApplicationName
+  }
+}
+
+module dotnetDnsSettings 'modules/dns.bicep' = {
+  scope: resourceGroup(productionSubscriptionId, managementResourceGroup)
+  name: 'dotnetDnsSettingsDeploy'
+  params: {
+    origin: dotnetFrontDoorSettings.outputs.frontDoorCustomDomainHost
+    rootDomain: rootDomain
+    subDomain: dotnetApplicationName
+    validationToken: dotnetFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
   }
 }
 
