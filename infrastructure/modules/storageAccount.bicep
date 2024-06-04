@@ -26,6 +26,7 @@ resource websiteStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' = 
   }
 }
 output storageAccountName string = websiteStorageAccount.name
+output storageAccountHost string = split(websiteStorageAccount.properties.primaryEndpoints.web, '/')[2]
 
 resource websiteStorageBlobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' existing = {
   parent: websiteStorageAccount
