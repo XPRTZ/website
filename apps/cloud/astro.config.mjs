@@ -9,4 +9,3 @@ export default defineConfig({
   site: "https://cloud.xprtz.net",
   integrations: [tailwind(), sitemap(), react()],
 });
-
