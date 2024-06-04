@@ -1,0 +1,23 @@
+name: Continuous integration workflow for XPRTZ.cloud
+run-name: Continuous Integration - XPRTZ.cloud
+concurrency: ci-cloud
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - ".github/workflows/**"
+      - "apps/cloud/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-cloud-application:
+    uses: ./.github/workflows/reusable-build-application.yaml
+    with:
+      application: cloud
+      upload-artifcats: false

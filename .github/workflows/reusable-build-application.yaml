@@ -8,6 +8,9 @@ on:
       application:
         required: true
         type: string
+      upload-artifcats:
+        type: boolean
+        default: true
 
 jobs:
   build-application:
