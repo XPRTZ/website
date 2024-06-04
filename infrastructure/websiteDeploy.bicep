@@ -3,6 +3,8 @@ targetScope = 'subscription'
 param suffix string
 param frontDoorProfileName string
 param rootDomain string = 'xprtz.dev'
+param dotnetSubDomain string
+param cloudSubDomain string
 
 var dotnetApplicationName = 'dotnet'
 var cloudApplicationName = 'cloud'
@@ -32,7 +34,7 @@ module cloudFrontDoorSettings 'modules/frontdoor.bicep' = {
     frontDoorProfileName: frontDoorProfileName
     application: cloudApplicationName
     rootDomain: rootDomain
-    subDomain: cloudApplicationName
+    subDomain: cloudSubDomain
   }
 }
 
@@ -42,7 +44,7 @@ module cloudDnsSettings 'modules/dns.bicep' = {
   params: {
     origin: cloudFrontDoorSettings.outputs.frontDoorCustomDomainHost
     rootDomain: rootDomain
-    subDomain: cloudApplicationName
+    subDomain: cloudSubDomain
     validationToken: cloudFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
   }
 }
@@ -63,7 +65,7 @@ module dotnetFrontDoorSettings 'modules/frontdoor.bicep' = {
     frontDoorProfileName: frontDoorProfileName
     application: dotnetApplicationName
     rootDomain: rootDomain
-    subDomain: dotnetApplicationName
+    subDomain: dotnetSubDomain
   }
 }
 
@@ -73,7 +75,7 @@ module dotnetDnsSettings 'modules/dns.bicep' = {
   params: {
     origin: dotnetFrontDoorSettings.outputs.frontDoorCustomDomainHost
     rootDomain: rootDomain
-    subDomain: dotnetApplicationName
+    subDomain: dotnetSubDomain
     validationToken: dotnetFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
   }
 }
