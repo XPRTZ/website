@@ -19,7 +19,7 @@ jobs:
       subdomainHash: ${{ steps.generateHash.outputs.hash }}
     steps:
       - id: generateHash
-        run: echo hash=${{ github.ref_name }} -n | md5sum | awk -F "-" '{print $1}' >> "$GITHUB_OUTPUT"
+        run: echo hash=${{ github.ref_name }} -n | md5sum | awk -F "-" '{print $1}' | tr -d '[:space:]' >> "$GITHUB_OUTPUT"
 
   apply-pull-request-infrastructure:
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
