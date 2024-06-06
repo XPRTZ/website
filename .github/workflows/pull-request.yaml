@@ -20,7 +20,7 @@ jobs:
     steps:
       - id: generateHash
         run: |
-          branch_hash="${{ github.head_ref }} | md5sum | awk -F "-" '{print $1}' | tr -d '[:space:]'"
+          branch_hash=${{ github.head_ref }} | md5sum | awk -F "-" '{print $1}' | tr -d '[:space:]'
           echo "Hash: $branch_hash"
           echo -n "hash=$branch_hash" >> "$GITHUB_OUTPUT"
 
