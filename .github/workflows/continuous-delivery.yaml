@@ -17,6 +17,8 @@ jobs:
     with:
       suffix: production
       environment: production
+      cloudSubDomain: cloud
+      dotnetSubDomain: dotnet
     secrets: inherit
 
   build-cloud-application:

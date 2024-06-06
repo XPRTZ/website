@@ -7,6 +7,12 @@ on:
       environment:
         required: true
         type: string
+      cloudSubDomain:
+        required: true
+        type: string
+      dotnetSubDomain:
+        required: true
+        type: string
       suffix:
         required: true
         type: string
@@ -44,5 +50,5 @@ jobs:
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./infrastructure/websiteDeploy.bicep
-          parameters: "suffix=${{ inputs.suffix }}"
+          parameters: "suffix=${{ inputs.suffix }} cloudSubDomain=${{ inputs.cloudSubDomain }}  dotnetSubDomain=${{ inputs.dotnetSubDomain }}"
           region: westeurope
