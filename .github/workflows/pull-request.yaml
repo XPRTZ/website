@@ -18,8 +18,8 @@ jobs:
     with:
       suffix: ${{ github.head_ref }}
       environment: preview
-      cloudSubDomain: preview.cloud
-      dotnetSubDomain: preview.dotnet
+      cloudSubDomain: ${{ github.run_id }}.cloud
+      dotnetSubDomain: ${{ github.run_id }}.dotnet
     secrets: inherit
 
   build-cloud-application:
