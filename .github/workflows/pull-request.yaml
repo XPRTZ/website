@@ -20,8 +20,8 @@ jobs:
     steps:
       - id: generateHash
         run: |
-          branch_hash=${{ github.head_ref }} -n | md5sum | awk -F "-" '{print $1}' | tr -d '[:space:]'
-          echo "hash=$branch_hash" >> "$GITHUB_OUTPUT"
+          branch_hash=${{ github.head_ref }} | md5sum | awk -F "-" '{print $1}' | tr -d '[:space:]'
+          echo -n "hash=$branch_hash" >> "$GITHUB_OUTPUT"
 
   apply-pull-request-infrastructure:
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
