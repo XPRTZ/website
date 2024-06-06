@@ -1,6 +1,6 @@
 name: Continuous integration workflow for XPRTZ.cloud
 run-name: Continuous Integration - XPRTZ.cloud - ${{ github.ref_name }}
-concurrency: ci-cloud
+concurrency: ci-cloud-${{ github.ref_name }}
 
 on:
   workflow_dispatch:

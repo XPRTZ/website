@@ -1,6 +1,6 @@
 name: Continuous delivery workflow
 run-name: Deploying website to the production environment
-concurrency: continuous-delivery
+concurrency: continuous-delivery-${{ github.ref_name }}
 
 on:
   workflow_dispatch:

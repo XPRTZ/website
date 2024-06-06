@@ -1,6 +1,6 @@
 name: Pull request workflow
 run-name: Running pull request flow for ${{ github.head_ref }}
-concurrency: pull-request
+concurrency: pull-request-${{ github.ref_name }}
 
 on:
   workflow_dispatch:

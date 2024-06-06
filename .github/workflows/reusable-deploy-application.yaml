@@ -1,6 +1,6 @@
 name: "[Reusable workflow] Deploy application"
 run-name: Deploying application for ${{ inputs.application }}
-concurrency: deploy-${{ inputs.application }}
+concurrency: deploy-${{ inputs.application }}-${{ github.ref_name }}
 
 on:
   workflow_call:
