@@ -20,8 +20,7 @@ jobs:
     steps:
       - id: generateHash
         run: |
-          branch_hash=($(md5sum <<< ${{ github.head_ref }}))
-          echo "Hash: $branch_hash"
+          branch_hash=($(sha1sum <<< ${{ github.head_ref }} | rev | cut -c 32- | rev))
           echo -n "hash=$branch_hash" >> "$GITHUB_OUTPUT"
 
   apply-pull-request-infrastructure:
