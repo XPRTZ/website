@@ -13,13 +13,22 @@ permissions:
   pull-requests: write
 
 jobs:
+  create-subdomain-hash:
+    runs-on: ubuntu-latest
+    outputs:
+      subdomainHash: ${{ steps.generateHash.outputs.hash }}
+    steps:
+      - id: generateHash
+        run: echo hash=${{ github.ref_name }} -n | md5sum | awk -F "-" '{print $1}' >> "$GITHUB_OUTPUT"
+
   apply-pull-request-infrastructure:
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
       suffix: ${{ github.head_ref }}
       environment: preview
-      cloudSubDomain: ${{ github.run_id }}.cloud
-      dotnetSubDomain: ${{ github.run_id }}.dotnet
+      cloudSubDomain: ${{ needs.create-subdomain-hash.outputs.subdomainHash }}.cloud
+      dotnetSubDomain: ${{ needs.create-subdomain-hash.outputs.subdomainHash }}.dotnet
+    needs: [create-subdomain-hash]
     secrets: inherit
 
   build-cloud-application:
