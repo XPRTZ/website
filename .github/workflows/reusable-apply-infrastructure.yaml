@@ -13,9 +13,6 @@ on:
       dotnetSubDomain:
         required: true
         type: string
-      suffix:
-        required: true
-        type: string
     outputs:
       cloudStorageAccount:
         value: ${{ jobs.apply-infrastructure.outputs.cloudStorageAccount }}
@@ -43,6 +40,11 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Slugify Github variables
+        uses: rlespinasse/github-slug-action@v4
+        with:
+          slug-maxlength: 50
+
       - name: Deploy Bicep file
         id: deploybicep
         uses: azure/arm-deploy@v2
@@ -50,7 +52,7 @@ jobs:
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./infrastructure/websiteDeploy.bicep
-          parameters: "suffix=${{ inputs.suffix }} cloudSubDomain=${{ inputs.cloudSubDomain }}  dotnetSubDomain=${{ inputs.dotnetSubDomain }}"
+          parameters: "resourceGroupSuffix=${{ env.GITHUB_REF_NAME_SLUG }} cloudSubDomain=${{ inputs.cloudSubDomain }}  dotnetSubDomain=${{ inputs.dotnetSubDomain }}"
           region: westeurope
 
       - name: Comment Website FQDNs on Pull Requests

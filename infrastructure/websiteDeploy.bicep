@@ -1,11 +1,15 @@
 targetScope = 'subscription'
 
-param suffix string
+param resourceGroupSuffix string
 param frontDoorProfileName string = 'afd-xprtzbv-websites'
 param rootDomain string = 'xprtz.dev'
 param dotnetSubDomain string
 param cloudSubDomain string
 
+var resourceGroupPrefix = 'rg-xprtzbv-website'
+var resourceGroupName = endsWith(resourceGroupSuffix, 'main')
+  ? resourceGroupPrefix
+  : '${resourceGroupPrefix}-${resourceGroupSuffix}'
 var dotnetApplicationName = 'dotnet'
 var cloudApplicationName = 'cloud'
 
@@ -18,7 +22,7 @@ var infrastructureResourceGroup = resourceGroup(
 
 resource websiteResourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   location: deployment().location
-  name: 'rg-xprtzbv-website-${uniqueString(suffix)}'
+  name: resourceGroupName
 }
 
 module cloudStorageAccountModule 'modules/storageAccount.bicep' = {

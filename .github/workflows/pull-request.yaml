@@ -28,7 +28,6 @@ jobs:
     name: Apply infrastructure
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
-      suffix: ${{ github.head_ref }}
       environment: preview
       cloudSubDomain: ${{ needs.create-subdomain-hash.outputs.subdomainHash }}.cloud
       dotnetSubDomain: ${{ needs.create-subdomain-hash.outputs.subdomainHash }}.dotnet
