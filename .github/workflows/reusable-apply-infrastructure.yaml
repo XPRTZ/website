@@ -63,10 +63,13 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `# Preview environment URLs
-                ## Cloud
-                ${{ steps.deploybicep.outputs.cloudFqdn }}
 
-                ## Dotnet
-                ${{ steps.deploybicep.outputs.dotnetFqdn }}
+              ## Cloud
+
+              ${{ steps.deploybicep.outputs.cloudFqdn }}
+
+              ## Dotnet
+              
+              ${{ steps.deploybicep.outputs.dotnetFqdn }}
               `
             })
