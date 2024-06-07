@@ -1,10 +1,9 @@
 targetScope = 'subscription'
 
 param resourceGroupSuffix string
+param deployDns bool
 param frontDoorProfileName string = 'afd-xprtzbv-websites'
 param rootDomain string = 'xprtz.dev'
-param dotnetSubDomain string
-param cloudSubDomain string
 
 var resourceGroupPrefix = 'rg-xprtzbv-website'
 var resourceGroupName = endsWith(resourceGroupSuffix, 'main')
@@ -29,11 +28,11 @@ module cloudStorageAccountModule 'modules/storageAccount.bicep' = {
   scope: websiteResourceGroup
   name: 'cloudStorageAccountDeploy'
   params: {
-    app: 'cloud'
+    app: cloudApplicationName
   }
 }
 
-module cloudFrontDoorSettings 'modules/frontdoor.bicep' = {
+module cloudFrontDoorSettings 'modules/frontdoor.bicep' = if (deployDns) {
   scope: infrastructureResourceGroup
   name: 'cloudFrontDoorSettingsDeploy'
   params: {
@@ -41,17 +40,17 @@ module cloudFrontDoorSettings 'modules/frontdoor.bicep' = {
     frontDoorProfileName: frontDoorProfileName
     application: cloudApplicationName
     rootDomain: rootDomain
-    subDomain: cloudSubDomain
+    subDomain: cloudApplicationName
   }
 }
 
-module cloudDnsSettings 'modules/dns.bicep' = {
+module cloudDnsSettings 'modules/dns.bicep' = if (deployDns) {
   scope: managementResourceGroup
   name: 'cloudDnsSettingsDeploy'
   params: {
     origin: cloudFrontDoorSettings.outputs.frontDoorCustomDomainHost
     rootDomain: rootDomain
-    subDomain: cloudSubDomain
+    subDomain: cloudApplicationName
     validationToken: cloudFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
   }
 }
@@ -60,11 +59,11 @@ module dotnetStorageAccountModule 'modules/storageAccount.bicep' = {
   scope: websiteResourceGroup
   name: 'dotnetStorageAccountDeploy'
   params: {
-    app: 'dotnet'
+    app: dotnetApplicationName
   }
 }
 
-module dotnetFrontDoorSettings 'modules/frontdoor.bicep' = {
+module dotnetFrontDoorSettings 'modules/frontdoor.bicep' = if (deployDns) {
   scope: infrastructureResourceGroup
   name: 'dotnetFrontDoorSettingsDeploy'
   params: {
@@ -72,17 +71,17 @@ module dotnetFrontDoorSettings 'modules/frontdoor.bicep' = {
     frontDoorProfileName: frontDoorProfileName
     application: dotnetApplicationName
     rootDomain: rootDomain
-    subDomain: dotnetSubDomain
+    subDomain: dotnetApplicationName
   }
 }
 
-module dotnetDnsSettings 'modules/dns.bicep' = {
+module dotnetDnsSettings 'modules/dns.bicep' = if (deployDns) {
   scope: managementResourceGroup
   name: 'dotnetDnsSettingsDeploy'
   params: {
     origin: dotnetFrontDoorSettings.outputs.frontDoorCustomDomainHost
     rootDomain: rootDomain
-    subDomain: dotnetSubDomain
+    subDomain: dotnetApplicationName
     validationToken: dotnetFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
   }
 }
@@ -90,5 +89,9 @@ module dotnetDnsSettings 'modules/dns.bicep' = {
 output cloudStorageAccountName string = cloudStorageAccountModule.outputs.storageAccountName
 output dotnetStorageAccountName string = dotnetStorageAccountModule.outputs.storageAccountName
 output resourceGroupName string = websiteResourceGroup.name
-output cloudFqdn string = 'https://${cloudSubDomain}.${rootDomain}/'
-output dotnetFqdn string = 'https://${dotnetSubDomain}.${rootDomain}/'
+output cloudFqdn string = deployDns
+  ? 'https://${cloudApplicationName}.${rootDomain}/'
+  : cloudStorageAccountModule.outputs.storageAccountFqdn
+output dotnetFqdn string = deployDns
+  ? 'https://${dotnetApplicationName}.${rootDomain}/'
+  : dotnetStorageAccountModule.outputs.storageAccountFqdn

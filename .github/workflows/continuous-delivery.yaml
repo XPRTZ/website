@@ -16,10 +16,8 @@ jobs:
     name: Apply infrastructure
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
-      suffix: production
       environment: production
-      cloudSubDomain: cloud
-      dotnetSubDomain: dotnet
+      deployDns: true
     secrets: inherit
 
   build-cloud-application:
@@ -35,7 +33,6 @@ jobs:
     with:
       application: cloud
       storageAccount: ${{ needs.apply-infrastructure.outputs.cloudStorageAccount }}
-      resourceGroup: ${{ needs.apply-infrastructure.outputs.resourceGroup }}
       environment: production
     needs: [apply-infrastructure, build-cloud-application]
     secrets: inherit
@@ -53,7 +50,6 @@ jobs:
     with:
       application: dotnet
       storageAccount: ${{ needs.apply-infrastructure.outputs.dotnetStorageAccount }}
-      resourceGroup: ${{ needs.apply-infrastructure.outputs.resourceGroup }}
       environment: production
     needs: [apply-infrastructure, build-dotnet-application]
     secrets: inherit

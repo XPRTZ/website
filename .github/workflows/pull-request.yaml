@@ -13,25 +13,13 @@ permissions:
   pull-requests: write
 
 jobs:
-  create-subdomain-hash:
-    name: Create a deterministic subdomain hash based on the branch name
-    runs-on: ubuntu-latest
-    outputs:
-      subdomainHash: ${{ steps.generateHash.outputs.hash }}
-    steps:
-      - id: generateHash
-        run: |
-          branch_hash=($(sha1sum <<< ${{ github.head_ref }} | rev | cut -c 32- | rev))
-          echo -n "hash=$branch_hash" >> "$GITHUB_OUTPUT"
-
   apply-infrastructure:
     name: Apply infrastructure
+    if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
       environment: preview
-      cloudSubDomain: ${{ needs.create-subdomain-hash.outputs.subdomainHash }}.cloud
-      dotnetSubDomain: ${{ needs.create-subdomain-hash.outputs.subdomainHash }}.dotnet
-    needs: [create-subdomain-hash]
+      deployDns: false
     secrets: inherit
 
   build-cloud-application:
@@ -49,7 +37,6 @@ jobs:
     with:
       application: cloud
       storageAccount: ${{ needs.apply-infrastructure.outputs.cloudStorageAccount }}
-      resourceGroup: ${{ needs.apply-infrastructure.outputs.resourceGroup }}
       environment: preview
     needs: [apply-infrastructure, build-cloud-application]
     secrets: inherit
@@ -69,7 +56,6 @@ jobs:
     with:
       application: dotnet
       storageAccount: ${{ needs.apply-infrastructure.outputs.dotnetStorageAccount }}
-      resourceGroup: ${{ needs.apply-infrastructure.outputs.resourceGroup }}
       environment: preview
     needs: [apply-infrastructure, build-dotnet-application]
     secrets: inherit
@@ -80,6 +66,4 @@ jobs:
     uses: ./.github/workflows/reusable-destroy-infrastructure.yaml
     with:
       environment: preview
-      resourcegroup: ${{ needs.apply-infrastructure.outputs.resourceGroup }}
-    needs: [apply-infrastructure]
     secrets: inherit

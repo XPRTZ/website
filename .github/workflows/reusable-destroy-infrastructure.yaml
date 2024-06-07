@@ -7,9 +7,6 @@ on:
       environment:
         required: true
         type: string
-      resourcegroup:
-        required: true
-        type: string
 
 jobs:
   destroy-infrastructure:
@@ -26,8 +23,13 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Slugify Github variables
+        uses: rlespinasse/github-slug-action@v4
+        with:
+          slug-maxlength: 50
+
       - name: Remove resource group
         uses: azure/cli@v2
         with:
           azcliversion: latest
-          inlineScript: az group delete --name ${{ inputs.resourcegroup }} --yes
+          inlineScript: az group delete --name rg-xprtzbv-website-${{ env.GITHUB_REF_NAME_SLUG }} --yes

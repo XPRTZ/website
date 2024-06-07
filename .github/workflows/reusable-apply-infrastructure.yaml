@@ -7,12 +7,9 @@ on:
       environment:
         required: true
         type: string
-      cloudSubDomain:
+      deployDns:
         required: true
-        type: string
-      dotnetSubDomain:
-        required: true
-        type: string
+        type: boolean
     outputs:
       cloudStorageAccount:
         value: ${{ jobs.apply-infrastructure.outputs.cloudStorageAccount }}
@@ -52,7 +49,7 @@ jobs:
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./infrastructure/websiteDeploy.bicep
-          parameters: "resourceGroupSuffix=${{ env.GITHUB_REF_NAME_SLUG }} cloudSubDomain=${{ inputs.cloudSubDomain }}  dotnetSubDomain=${{ inputs.dotnetSubDomain }}"
+          parameters: "resourceGroupSuffix=${{ env.GITHUB_REF_NAME_SLUG }} deployDns=${{ inputs.deployDns }}"
           region: westeurope
 
       - name: Comment Website FQDNs on Pull Requests
