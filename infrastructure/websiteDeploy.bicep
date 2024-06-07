@@ -83,3 +83,5 @@ module dotnetDnsSettings 'modules/dns.bicep' = {
 output cloudStorageAccountName string = cloudStorageAccountModule.outputs.storageAccountName
 output dotnetStorageAccountName string = dotnetStorageAccountModule.outputs.storageAccountName
 output resourceGroupName string = websiteResourceGroup.name
+output cloudFqdn string = 'https://${cloudSubDomain}.${rootDomain}/'
+output dotnetFqdn string = 'https://${dotnetSubDomain}.${rootDomain}/'
