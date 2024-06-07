@@ -1,5 +1,5 @@
 name: "[Reusable workflow] Destroy infrastructure"
-concurrency: destroy-infrastructure-${{ github.ref_name }}
+concurrency: destroy-infrastructure-${{ github.ref_name }}-${{ github.event_name }}
 
 on:
   workflow_call:
