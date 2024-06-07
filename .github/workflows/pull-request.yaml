@@ -19,6 +19,7 @@ jobs:
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
       environment: preview
+      deployDns: false
     secrets: inherit
 
   build-cloud-application:
@@ -36,7 +37,6 @@ jobs:
     with:
       application: cloud
       storageAccount: ${{ needs.apply-infrastructure.outputs.cloudStorageAccount }}
-      resourceGroup: ${{ needs.apply-infrastructure.outputs.resourceGroup }}
       environment: preview
     needs: [apply-infrastructure, build-cloud-application]
     secrets: inherit
@@ -56,7 +56,6 @@ jobs:
     with:
       application: dotnet
       storageAccount: ${{ needs.apply-infrastructure.outputs.dotnetStorageAccount }}
-      resourceGroup: ${{ needs.apply-infrastructure.outputs.resourceGroup }}
       environment: preview
     needs: [apply-infrastructure, build-dotnet-application]
     secrets: inherit
@@ -67,6 +66,4 @@ jobs:
     uses: ./.github/workflows/reusable-destroy-infrastructure.yaml
     with:
       environment: preview
-      resourcegroup: ${{ needs.apply-infrastructure.outputs.resourceGroup }}
-    needs: [apply-infrastructure]
     secrets: inherit

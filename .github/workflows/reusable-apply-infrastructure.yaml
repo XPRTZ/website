@@ -8,8 +8,8 @@ on:
         required: true
         type: string
       deployDns:
+        required: true
         type: boolean
-        default: false
     outputs:
       cloudStorageAccount:
         value: ${{ jobs.apply-infrastructure.outputs.cloudStorageAccount }}

@@ -14,9 +14,6 @@ on:
       storageAccount:
         required: true
         type: string
-      resourceGroup:
-        required: true
-        type: string
 
 jobs:
   deploy-application:
