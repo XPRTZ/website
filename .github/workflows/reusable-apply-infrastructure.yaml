@@ -52,3 +52,24 @@ jobs:
           template: ./infrastructure/websiteDeploy.bicep
           parameters: "suffix=${{ inputs.suffix }} cloudSubDomain=${{ inputs.cloudSubDomain }}  dotnetSubDomain=${{ inputs.dotnetSubDomain }}"
           region: westeurope
+
+      - name: Comment Website FQDNs on Pull Requests
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `# Preview environment URLs
+
+              ## Cloud
+
+              ${{ steps.deploybicep.outputs.cloudFqdn }}
+
+              ## Dotnet
+              
+              ${{ steps.deploybicep.outputs.dotnetFqdn }}
+              `
+            })
