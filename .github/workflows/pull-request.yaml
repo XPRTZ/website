@@ -24,7 +24,8 @@ jobs:
           branch_hash=($(sha1sum <<< ${{ github.head_ref }} | rev | cut -c 32- | rev))
           echo -n "hash=$branch_hash" >> "$GITHUB_OUTPUT"
 
-  apply-pull-request-infrastructure:
+  apply-infrastructure:
+    name: Apply infrastructure
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
       suffix: ${{ github.head_ref }}
@@ -35,46 +36,51 @@ jobs:
     secrets: inherit
 
   build-cloud-application:
+    name: Build XPRTZ Cloud application
     if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-build-application.yaml
     with:
       application: cloud
-    needs: [apply-pull-request-infrastructure]
+    needs: [apply-infrastructure]
 
   deploy-cloud-application:
+    name: Deploy XPRTZ Cloud application
     if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-deploy-application.yaml
     with:
       application: cloud
-      storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.cloudStorageAccount }}
-      resourceGroup: ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }}
+      storageAccount: ${{ needs.apply-infrastructure.outputs.cloudStorageAccount }}
+      resourceGroup: ${{ needs.apply-infrastructure.outputs.resourceGroup }}
       environment: preview
-    needs: [apply-pull-request-infrastructure, build-cloud-application]
+    needs: [apply-infrastructure, build-cloud-application]
     secrets: inherit
 
   build-dotnet-application:
+    name: Build XPRTZ .NET application
     if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-build-application.yaml
     with:
       application: dotnet
-    needs: [apply-pull-request-infrastructure]
+    needs: [apply-infrastructure]
 
   deploy-dotnet-application:
+    name: Deploy XPRTZ .NET application
     if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-deploy-application.yaml
     with:
       application: dotnet
-      storageAccount: ${{ needs.apply-pull-request-infrastructure.outputs.dotnetStorageAccount }}
-      resourceGroup: ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }}
+      storageAccount: ${{ needs.apply-infrastructure.outputs.dotnetStorageAccount }}
+      resourceGroup: ${{ needs.apply-infrastructure.outputs.resourceGroup }}
       environment: preview
-    needs: [apply-pull-request-infrastructure, build-dotnet-application]
+    needs: [apply-infrastructure, build-dotnet-application]
     secrets: inherit
 
   remove-infrastructure:
+    name: Remove preview environment infrastructure
     if: github.event.action == 'closed'
     uses: ./.github/workflows/reusable-destroy-infrastructure.yaml
     with:
       environment: preview
-      resourcegroup: ${{ needs.apply-pull-request-infrastructure.outputs.resourceGroup }}
-    needs: [apply-pull-request-infrastructure]
+      resourcegroup: ${{ needs.apply-infrastructure.outputs.resourceGroup }}
+    needs: [apply-infrastructure]
     secrets: inherit
