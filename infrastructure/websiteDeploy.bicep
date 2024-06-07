@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 param suffix string
-param frontDoorProfileName string = 'afd-xprtzbv-website'
+param frontDoorProfileName string = 'afd-xprtzbv-websites'
 param rootDomain string = 'xprtz.dev'
 param dotnetSubDomain string
 param cloudSubDomain string
@@ -10,8 +10,11 @@ var dotnetApplicationName = 'dotnet'
 var cloudApplicationName = 'cloud'
 
 var sharedValues = json(loadTextContent('shared-values.json'))
-var managementResourceGroup = resourceGroup(sharedValues.subscriptionIds.xprtz, 'xprtz-mgmt')
-var infrastructureResourceGroup = resourceGroup(sharedValues.resourceGroups.infrastructure)
+var managementResourceGroup = resourceGroup(sharedValues.subscriptionIds.xprtz, sharedValues.resourceGroups.management)
+var infrastructureResourceGroup = resourceGroup(
+  sharedValues.subscriptionIds.xprtz,
+  sharedValues.resourceGroups.infrastructure
+)
 
 resource websiteResourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   location: deployment().location
