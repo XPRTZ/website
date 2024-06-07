@@ -16,10 +16,8 @@ jobs:
     name: Apply infrastructure
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
-      suffix: production
       environment: production
-      cloudSubDomain: cloud
-      dotnetSubDomain: dotnet
+      deployDns: true
     secrets: inherit
 
   build-cloud-application:

@@ -13,25 +13,12 @@ permissions:
   pull-requests: write
 
 jobs:
-  create-subdomain-hash:
-    name: Create a deterministic subdomain hash based on the branch name
-    runs-on: ubuntu-latest
-    outputs:
-      subdomainHash: ${{ steps.generateHash.outputs.hash }}
-    steps:
-      - id: generateHash
-        run: |
-          branch_hash=($(sha1sum <<< ${{ github.head_ref }} | rev | cut -c 32- | rev))
-          echo -n "hash=$branch_hash" >> "$GITHUB_OUTPUT"
-
   apply-infrastructure:
     name: Apply infrastructure
+    if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
       environment: preview
-      cloudSubDomain: ${{ needs.create-subdomain-hash.outputs.subdomainHash }}.cloud
-      dotnetSubDomain: ${{ needs.create-subdomain-hash.outputs.subdomainHash }}.dotnet
-    needs: [create-subdomain-hash]
     secrets: inherit
 
   build-cloud-application:
