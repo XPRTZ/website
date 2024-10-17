@@ -1,12 +1,103 @@
 ---
+import type { Testimonial, TestimonialGroup, NestedTestimonials } from "@xprtz/ui/src/Types";
 import Layout from "../layouts/layout.astro";
 import { Hero, Features, Testimonials, BlogListing, Team } from "@xprtz/ui";
+
+//////////////////////////////////////////////////////
+//Testimonials
+
+const testimonialsGreeting = "Reviews";
+const testimonialsDescription = "Wat onze klanten over ons denken";
+const testimonialArray0: Testimonial[] = [
+  {
+    body: "Super bedankt, Jasper en Dennis! De cloud engineer die jullie stuurden voor ons Azure project was echt een topper. Hij had overal een oplossing voor en maakte het hele proces zoveel makkelijker voor ons. We hadden dit zonder jullie expertise nooit zo snel voor elkaar gekregen, echt blij met de samenwerking!",
+    author: {
+      name: "Leslie Alexander",
+      handle: "lesliealexander",
+      imageURL:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+  }
+];
+const testimonialArray1: Testimonial[] = [
+  {
+    body: "XPRTZ bestaat uit een top-team van super behulpzame mensen, zij hebben onze migratie naar de Azure cloud zoveel makkelijker gemaakt!",
+    author: {
+      name: "Lindsay Walton",
+      handle: "lindsaywalton",
+      imageURL:
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+  }
+];
+const testimonialArray2: Testimonial[] = [
+  {
+    body: "De cloud engineer van XPRTZ die ons hielp met de opzet van onze solution architecture was scherp, professioneel en efficiënt. Hij wist direct wat er nodig was en leverde zonder gedoe een prima resultaat. Een waardevolle kracht voor elk IT-project.",
+    author: {
+      name: "Tom Cook",
+      handle: "tomcook",
+      imageURL:
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+  }
+];
+const testimonialArray3: Testimonial[] = [
+  {
+    body: "Een dikke dankjewel aan Jasper en zijn team! Altijd een fijne ervaring om met zulke pros te werken. Tot de volgende!",
+    author: {
+      name: "Leonard Krasner",
+      handle: "leonardkrasner",
+      imageURL:
+        "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+  }
+];
+const testimonialGroup0: TestimonialGroup = [
+  testimonialArray0,
+  testimonialArray1
+];
+const testimonialGroup1: TestimonialGroup = [
+  testimonialArray2,
+  testimonialArray3
+];
+const nestedTestimonials: NestedTestimonials = [
+  testimonialGroup0,
+  testimonialGroup1
+];
+const featuredTestimonial: Testimonial = {
+  body: "Wij hebben samengewerkt met XPRTZ voor een migratie van onze omgevingen naar de Azure Cloud. Hun technische expertise is indrukwekkend en ze wisten ons landschap boven verwachting te verbeteren. Zeer aan te raden voor bedrijven die op zoek zijn naar een betrouwbare partner.",
+  author: {
+    name: "Brenna Goyette",
+    handle: "brennagoyette",
+    imageURL:
+      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=1024&h=1024&q=80",
+    logoURL: "https://tailwindui.com/img/logos/savvycal-logo-gray-900.svg",
+  }
+};
+
+//////////////////////////////////////////////////////
+// Team
+
+const meetUsGreeting = "Ontmoet ons";
+const meetUsDescription0 = "Bij XPRTZ onderkennen we het belang van het actief delen van kennis. Onze experts delen hun kennis intern bij de klant, tijdens een van onze kennisavonden en labdagen, tijdens trainingen, tijdens een meetup, of op internationale congressen. We informeren onszelf en elkaar om continu de juiste oplossingen voor onze klanten te kunnen bieden.";
+const meetUsDescription1 = "Je werkt liever in een team dan alleen. Wilt niet blijven hangen bij een opdracht maar wilt doorgroeien. Je kennis ontwikkelen door eens een goed artikel te publiceren, podcast op te nemen, of een talk op een event, meetup of kennissessie te houden.";
+const meetUsDescription2 = "Kortom: jij bent een kick-ass cloud professional met passie voor het vak.";
+const meetUsButton = "Werken bij XPRTZ.CLOUD";
 ---
 
 <Layout title="XPRTZ.cloud" description="Dé plek voor Cloud experts!">
   <Hero />
   <Features />
-	<Testimonials />
+	<Testimonials
+		testimonialsGreeting={testimonialsGreeting}
+		testimonialsDescription={testimonialsDescription}
+		nestedTestimonials={nestedTestimonials}
+		featuredTestimonial={featuredTestimonial}/>
 	<BlogListing />
-	<Team />
+	<Team
+		meetUsGreeting={meetUsGreeting}
+		meetUsDescription0={meetUsDescription0}
+		meetUsDescription1={meetUsDescription1}
+		meetUsDescription2={meetUsDescription2}
+		meetUsButton={meetUsButton}/>
 </Layout>
