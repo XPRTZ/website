@@ -1,5 +1,5 @@
 const featuredTestimonial = {
-  body: "Integer id nunc sit semper purus. Bibendum at lacus ut arcu blandit montes vitae auctor libero. Hac condimentum dignissim nibh vulputate ut nunc. Amet nibh orci mi venenatis blandit vel et proin. Non hendrerit in vel ac diam.",
+  body: "Wij hebben samengewerkt met XPRTZ voor een migratie van onze omgevingen naar de Azure Cloud. Hun technische expertise is indrukwekkend en ze wisten ons landschap boven verwachting te verbeteren. Zeer aan te raden voor bedrijven die op zoek zijn naar een betrouwbare partner.",
   author: {
     name: "Brenna Goyette",
     handle: "brennagoyette",
@@ -12,7 +12,7 @@ const testimonials = [
   [
     [
       {
-        body: "Laborum quis quam. Dolorum et ut quod quia. Voluptas numquam delectus nihil. Aut enim doloremque et ipsam.",
+        body: "Super bedankt, Jasper en Dennis! De cloud engineer die jullie stuurden voor ons Azure project was echt een topper. Hij had overal een oplossing voor en maakte het hele proces zoveel makkelijker voor ons. We hadden dit zonder jullie expertise nooit zo snel voor elkaar gekregen, echt blij met de samenwerking!",
         author: {
           name: "Leslie Alexander",
           handle: "lesliealexander",
@@ -20,11 +20,10 @@ const testimonials = [
             "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
         },
       },
-      // More testimonials...
     ],
     [
       {
-        body: "Aut reprehenderit voluptatem eum asperiores beatae id. Iure molestiae ipsam ut officia rem nulla blanditiis.",
+        body: "XPRTZ bestaat uit een top-team van super behulpzame mensen, zij hebben ons Azure project zoveel makkelijker gemaakt!",
         author: {
           name: "Lindsay Walton",
           handle: "lindsaywalton",
@@ -32,13 +31,12 @@ const testimonials = [
             "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
         },
       },
-      // More testimonials...
     ],
   ],
   [
     [
       {
-        body: "Voluptas quos itaque ipsam in voluptatem est. Iste eos blanditiis repudiandae. Earum deserunt enim molestiae ipsum perferendis recusandae saepe corrupti.",
+        body: "De cloud engineer van XPRTZ die ons hielp met de opzet van onze solution architecture was scherp, professioneel en efficiënt. Hij wist direct wat er nodig was en leverde zonder gedoe een prima resultaat. Een waardevolle kracht voor elk IT-project.",
         author: {
           name: "Tom Cook",
           handle: "tomcook",
@@ -46,11 +44,10 @@ const testimonials = [
             "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
         },
       },
-      // More testimonials...
     ],
     [
       {
-        body: "Molestias ea earum quos nostrum doloremque sed. Quaerat quasi aut velit incidunt excepturi rerum voluptatem minus harum.",
+        body: "Een dikke dankjewel aan Jasper en zijn team! Altijd een fijne ervaring om met zulke pros te werken. Tot de volgende!",
         author: {
           name: "Leonard Krasner",
           handle: "leonardkrasner",
@@ -58,7 +55,6 @@ const testimonials = [
             "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
         },
       },
-      // More testimonials...
     ],
   ],
 ];
@@ -97,10 +93,10 @@ export default function Testimonials() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-xl text-center">
           <h2 className="text-lg font-semibold leading-8 tracking-tight text-primary-600">
-            Testimonials
+            Reviews
           </h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            We have worked with thousands of amazing people
+            Wat onze klanten over ons denken
           </p>
         </div>
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 grid-rows-1 gap-8 text-sm leading-6 text-gray-900 sm:mt-20 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-4">
