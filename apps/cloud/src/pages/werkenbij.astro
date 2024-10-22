@@ -1,0 +1,90 @@
+---
+import Layout from "../layouts/layout.astro";
+import { JobListings } from "@xprtz/ui";
+import type { Position } from "@xprtz/ui/src/Types";
+
+const companyGreeting = "Werken bij XPRTZ.CLOUD";
+const jobDescription0 = "De Azure cloud biedt organisaties legio manieren om te versnellen. En als Azure cloud professional help je klanten om deze versnelling te realiseren.";
+const jobDescription1 = "Bij XPRTZ kiezen we samen jouw ideale opdracht.";
+const jobDescription2 = "In ons clubhuis laat je jouw pool-, race- en cloudskills zien tijdens de diverse meetups, kennissessies en labdagen of praat je gewoon lekker bij met gelijkgestemde cloud experts die je écht kent. Jouw expertise en T-shaped profiel laat zich niet makkelijk labelen, maar we onderscheiden grofweg de volgende rollen:";
+const positions: Position[] = [
+    {
+        id: 1,
+        role: "Devops engineer",
+        href: "#",
+        description:
+        "Engineers die hun energie halen uit het inrichten en verbeteren van CI/CD pipelines richting de cloud en het automatiseren van allerhande zaken in het domein van software development en quality assurance.",
+    },
+    {
+        id: 2,
+        role: "Cloud engineer",
+        href: "#",
+        description:
+        "Vanuit een DevOps mindset applicaties maken en doorontwikkelen in de Azure cloud met een brede kennis van Azure services en diensten. Zaken als containerization, networking en cloud native concepten zijn gesneden koek voor deze experts.",
+    },
+    {
+        id: 3,
+        role: "Cloud architect",
+        href: "#",
+        description:
+        "Onze klanten helpen bij het inpassen van workloads in het bestaande applicatielandschap in de Azure cloud. Je staat echter nog met beide benen in de techniek en je snapt, naast de architectuur thema's, ook de complexiteiten van software ontwikkeling voor de cloud.",
+    }
+];
+const contactGreeting = "Meer weten?";
+const contactDescription = "We maken graag een vrijblijvende afspraak om onze kennis en enthousiasme te delen, op een locatie en tijdstip dat iedereen het beste uitkomt.";
+const addressLink = "https://maps.app.goo.gl/ammAASzpD2papF1GA";
+const addressPart0 = "Tractieweg 41";
+const addressPart1 = "Utrecht, 3534 AP";
+const phone0Link = "tel:+31 (6) 10394044";
+const phone0 = "+31 (6) 10 39 40 44";
+const phone0Suffix = "(Jasper)";
+const phone1Link = "tel:+31 (6) 11109466";
+const phone1 = "+31 (6) 11 10 94 66";
+const phone1Suffix = "(Dennis)";
+const mailtoLink = "mailto:algemeen@xprtz.cloud";
+const email = "algemeen@xprtz.cloud";
+const whatYouGetGreeting = "Wat krijg je?";
+const whatYouGetList: string[] = [
+    "Fulltime vast contract (40 uur).",
+    "Een laptop naar keuze.",
+    "26 vakantiedagen.",
+    "Riante winstdeling aan het einde van het jaar.",
+    "Opleidingsbudget.",
+    "Stabiele organisatie met lange termijn focus.",
+    "Toonaangevende opdrachtgevers in heel Nederland."
+];
+const whatYouBringGreeting = "Wat vragen wij?";
+const whatYouBringList: string[] = [
+    "Minimaal HBO werk- en denkniveau.",
+    "Je hebt minimaal 3 jaar werkervaring met de Azure cloud.",
+    "Je bent op de hoogte van de laatste trends en ontwikkelingen op het gebied van cloud.",
+    "Ondernemende mindset: je denkt niet in problemen, maar in oplossingen.",
+    "Naast hard werken vind je het ook belangrijk om plezier te maken met je collega's."
+];
+---
+
+<Layout title="XPRTZ.cloud" description="Dé plek voor Cloud experts!">
+    <JobListings
+        companyGreeting={companyGreeting}
+        jobDescription0={jobDescription0}
+        jobDescription1={jobDescription1}
+        jobDescription2={jobDescription2}
+        positions={positions}
+        contactGreeting={contactGreeting}
+        contactDescription={contactDescription}
+        addressLink={addressLink}
+        addressPart0={addressPart0}
+        addressPart1={addressPart1}
+        phone0Link={phone0Link}
+        phone0={phone0}
+        phone0Suffix={phone0Suffix}
+        phone1Link={phone1Link}
+        phone1={phone1}
+        phone1Suffix={phone1Suffix}
+        mailtoLink={mailtoLink}
+        email={email}
+        whatYouGetGreeting={whatYouGetGreeting}
+        whatYouGetList={whatYouGetList}
+        whatYouBringGreeting={whatYouBringGreeting}
+        whatYouBringList={whatYouBringList}/>
+</Layout>
