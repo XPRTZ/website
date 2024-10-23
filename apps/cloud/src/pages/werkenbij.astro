@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/layout.astro";
-import { JobListings } from "@xprtz/ui";
+import { WorkAt } from "@xprtz/ui";
 import type { Position } from "@xprtz/ui/src/Types";
 
 const companyGreeting = "Werken bij XPRTZ.CLOUD";
@@ -64,7 +64,7 @@ const whatYouBringList: string[] = [
 ---
 
 <Layout title="XPRTZ.cloud" description="Dé plek voor Cloud experts!">
-    <JobListings client:only
+    <WorkAt client:only
         companyGreeting={companyGreeting}
         jobDescription0={jobDescription0}
         jobDescription1={jobDescription1}

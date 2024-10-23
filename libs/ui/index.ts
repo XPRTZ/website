@@ -7,7 +7,7 @@ import Container from "./src/Container.tsx";
 import Features from "./src/Features.tsx";
 import Testimonials from "./src/Testimonials.tsx";
 import BlogListing from "./src/BlogListing.tsx";
-import JobListings from "./src/JobListings.tsx";
+import WorkAt from "./src/WorkAt.tsx";
 import Team from "./src/Team.astro";
 
 export {
@@ -20,6 +20,6 @@ export {
   Features,
   Testimonials,
   BlogListing,
-  JobListings,
+  WorkAt,
   Team,
 };

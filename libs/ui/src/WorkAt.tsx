@@ -1,6 +1,6 @@
 import type { Position } from "./Types";
 
-interface IJobListings {
+interface IWorkAt {
   companyGreeting: string;
   jobDescription0: string;
   jobDescription1: string;
@@ -25,7 +25,7 @@ interface IJobListings {
   whatYouBringList: string[];
 }
 
-export default function JobListings(
+export default function WorkAt(
   {
     companyGreeting,
     jobDescription0,
@@ -49,7 +49,7 @@ export default function JobListings(
     whatYouGetList,
     whatYouBringGreeting,
     whatYouBringList
-  }: IJobListings
+  }: IWorkAt
 ) {
   return (
     <div className="bg-white pt-32">
