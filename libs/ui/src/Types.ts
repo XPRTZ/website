@@ -13,3 +13,10 @@ export type Testimonial = {
 export type TestimonialArray = Testimonial[];         // Array of Testimonials
 export type TestimonialGroup = TestimonialArray[];    // Array of arrays of Testimonials
 export type NestedTestimonials = TestimonialGroup[];  // Array of Testimonial groups
+
+export type Position = {
+    id: number;
+    role: string;
+    href: string;
+    description: string;
+};
