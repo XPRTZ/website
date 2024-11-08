@@ -1,20 +1,20 @@
 ---
-import { fetchData } from "@xprtz/cms";
+import { fetchData, type Page } from "@xprtz/cms";
 export async function getStaticPaths() {
-  const pageData = await fetchData<Array<object>>({
+  const pageData = await fetchData<Array<Page>>({
     endpoint: "pages",
     wrappedByKey: "data",
     query: {
       "filters[site][$eq]": "dotnet",
     },
   });
-  return pageData.map((data: any) => ({
+  return pageData.map((data: Page) => ({
     params: { slug: data.slug },
     props: data,
   }));
 }
 
-const page: any = Astro.props;
+const page: Page = Astro.props;
 ---
 
 <h1>{page.title}</h1>

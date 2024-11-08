@@ -1,3 +1,4 @@
-import fetchData from "./api.js";
+import Page from "./models/page.js";
+import fetchData from "./wrapper/api.js";
 
-export { fetchData };
+export { fetchData, type Page };
