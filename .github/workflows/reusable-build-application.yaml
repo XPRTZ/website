@@ -22,20 +22,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: lts/Iron
-          cache: "pnpm"
+          node-version: lts/*
 
-      - name: pnpm install
-        run: pnpm install
+      - name: npm install
+        run: npm install
 
       - name: Build application
-        run: pnpm run build
+        run: npm run build
 
       - name: Upload build artifacts
         if: ${{ inputs.upload-artifcats }}

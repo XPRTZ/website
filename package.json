@@ -6,14 +6,17 @@
   "engines": {
     "node": ">=20"
   },
+  "workspaces": [
+    "apps/dotnet",
+    "apps/cloud"
+  ],
   "scripts": {
     "format": "prettier ./**/*.{js,ts,html,css,scss,json,mjs,tsx} --write && eslint ./**/*.{js,ts,mjs,tsx}",
-    "dev:dotnet": "pnpm run --filter ./apps/dotnet dev",
-    "dev:cloud": "pnpm run --filter ./apps/cloud dev",
-    "dev": "pnpm run --filter ./apps/* --if-present dev",
-    "build": "pnpm run --if-present build",
-    "build:dotnet": "pnpm run --filter ./apps/dotnet build",
-    "build:cloud": "pnpm run --filter ./apps/cloud build"
+    "develop:dotnet": "npm run --workspace=apps/dotnet develop",
+    "develop:cloud": "npm run --workspace=apps/cloud develop",
+    "build": "npm run --workspaces --if-present build",
+    "build:dotnet": "npm run --workspace=apps/dotnet build",
+    "build:cloud": "npm run --workspace=apps/cloud build"
   },
   "devDependencies": {
     "@eslint/js": "^9.3.0",
@@ -23,6 +26,5 @@
     "prettier": "3.2.5",
     "typescript": "^5.4.5",
     "typescript-eslint": "^8.0.0-alpha.20"
-  },
-  "packageManager": "pnpm@9.1.3"
+  }
 }
