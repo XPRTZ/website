@@ -18,6 +18,7 @@
     "@heroicons/react": "^2.1.3",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@xprtz/cms": "file:../../libs/cms",
     "@xprtz/ui": "file:../../libs/ui",
     "astro": "^4.16.10",
     "react": "^18.3.1",

@@ -9,7 +9,8 @@
   "workspaces": [
     "apps/dotnet",
     "apps/cloud",
-    "libs/ui"
+    "libs/ui",
+    "libs/cms"
   ],
   "scripts": {
     "format": "prettier ./**/*.{js,ts,html,css,scss,json,mjs,tsx} --write && eslint ./**/*.{js,ts,mjs,tsx}",

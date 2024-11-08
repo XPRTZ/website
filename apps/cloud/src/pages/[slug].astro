@@ -1,15 +1,17 @@
 ---
+import { fetchData } from "@xprtz/cms";
 export async function getStaticPaths() {
-  const pageData = await fetch(
-    "https://cms.xprtz.dev/api/pages?sort[0]=order:asc&filters[site][$eq]=dotnet&pagination[pageSize]=10&pagination[page]=1&publicationState=live"
-  );
-  const parsedPageData: any = await pageData.json();
-  const pageDataArray = parsedPageData.data;
-  const pageParameters = pageDataArray.map((data: any) => ({
+  const pageData = await fetchData<Array<object>>({
+    endpoint: "pages",
+    wrappedByKey: "data",
+    query: {
+      "filters[site][$eq]": "dotnet",
+    },
+  });
+  return pageData.map((data: any) => ({
     params: { slug: data.slug },
     props: data,
   }));
-  return pageParameters;
 }
 
 const page: any = Astro.props;
