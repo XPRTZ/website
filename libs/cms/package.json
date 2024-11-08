@@ -1,0 +1,16 @@
+{
+  "name": "@xprtz/cms",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "author": "Alex Schouls",
+  "main": "index.ts",
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "scripts": {
+    "build": "npx tsc"
+  },
+  "license": "ISC",
+  "description": ""
+}
