@@ -12,6 +12,9 @@ on:
         type: boolean
         default: true
 
+env:
+  PUBLIC_STRAPI_URL: ${{ vars.PUBLIC_STRAPI_URL }}
+
 jobs:
   build-application:
     name: Build ${{ inputs.application }}
