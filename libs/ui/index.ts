@@ -9,6 +9,7 @@ import Testimonials from "./src/Testimonials.tsx";
 import BlogListing from "./src/BlogListing.tsx";
 import WorkAt from "./src/WorkAt.tsx";
 import Team from "./src/Team.astro";
+import Content from "./src/Content.tsx";
 
 export {
   Component,
@@ -22,4 +23,5 @@ export {
   BlogListing,
   WorkAt,
   Team,
+  Content,
 };

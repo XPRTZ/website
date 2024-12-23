@@ -1,7 +1,8 @@
-export default interface Page {
-  title: string;
+export type Page = {
+  title_website: string;
+  title_cms: string;
   description: string;
-  order: number;
-  slug: string;
   site: string;
+  locale: string;
+  documentId: string;
 }

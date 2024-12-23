@@ -1,14 +1,29 @@
 import { useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { fetchData, type GlobalSettings, type Page } from "@xprtz/cms";
 
-const navigation = [
-  { name: "Kernwaarden", href: "#" },
-  { name: "Techniek", href: "#" },
-  { name: "Werken met", href: "/werkenmet" },
-  { name: "Werken bij", href: "/werkenbij" },
-  { name: "Contact", href: "/contact" },
-];
+function slugify(title: string): string {
+  const normalized = title.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+  const slug = normalized.toLowerCase().replace(/[^a-z0-9\s-]/g, "");
+  return slug.trim().replace(/[-\s]+/g, "-");
+}
+
+const pageData = await fetchData<Array<GlobalSettings>>({
+  endpoint: "global-settings",
+  wrappedByKey: "data",
+  query: {
+    "filters[site][$eq]": "dotnet",
+    "populate[pages][fields][0]": "title_website",
+    "populate[pages][fields][1]": "description",
+    status: "published",
+  },
+});
+
+const navigation = pageData[0]?.pages?.map((data: Page) => ({
+  name: data.title_website,
+  href: `/${slugify(data.title_website)}`,
+}));
 
 interface HeaderProps {
   Logo: string;

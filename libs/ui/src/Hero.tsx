@@ -59,13 +59,13 @@ export default function Hero() {
                 </p>
                 <div className="mt-10 flex items-center gap-x-6">
                   <a
-                    href="#"
+                    href="/start-de-samenwerking"
                     className="rounded-md bg-primary-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
                   >
                     Start de samenwerking
                   </a>
                   <a
-                    href="#"
+                    href="/meer-weten"
                     className="text-sm font-semibold leading-6 text-primary-900"
                   >
                     Meer weten <span aria-hidden="true">→</span>
