@@ -1,4 +1,5 @@
 import BaseHead from "./src/BaseHead.astro";
+import Page from "./src/Page.astro";
 import Footer from "./src/Footer.astro";
 import Hero from "./src/Hero.tsx";
 import Header from "./src/Header.tsx";
@@ -24,4 +25,5 @@ export {
   WorkAt,
   Team,
   Content,
+  Page
 };
