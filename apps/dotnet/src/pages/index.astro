@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/layout.astro";
 import { fetchData, type GlobalSettings } from "@xprtz/cms";
-import { Content } from "@xprtz/ui";
+import { Features, Hero, TestimonialWithImage, BlogListing } from "@xprtz/ui";
 
 const title_website = "XPRTZ.net";
 const description = "Dé plek voor .NET experts!";
@@ -10,6 +10,8 @@ const page = { title_website, description };
 ---
 
 <Layout title={title_website} description={description}>
-  <!-- <pre>{JSON.stringify(homepage, null, 2)}</pre> -->
-  <Content {...page} />
+  <!-- <Hero /> -->
+  <Features />
+  <TestimonialWithImage />
+  <BlogListing />
 </Layout>
