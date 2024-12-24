@@ -9,11 +9,13 @@ function slugify(title: string): string {
   return slug.trim().replace(/[-\s]+/g, "-");
 }
 
+const site = import.meta.env.PUBLIC_SITE || "no-site-found";
+
 const pageData = await fetchData<Array<GlobalSettings>>({
   endpoint: "global-settings",
   wrappedByKey: "data",
   query: {
-    "filters[site][$eq]": "dotnet",
+    "filters[site][$eq]": site,
     "populate[pages][fields][0]": "title_website",
     "populate[pages][fields][1]": "description",
     status: "published",
