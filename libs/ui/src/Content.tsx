@@ -4,9 +4,11 @@ import {
   ServerIcon,
 } from "@heroicons/react/20/solid";
 
+import Container from "./Container";
+
 export default function Content({ title_website: title, description }) {
   return (
-    <>
+    <Container>
       <div className="relative isolate">
         <svg
           className="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]"
@@ -56,7 +58,7 @@ export default function Content({ title_website: title, description }) {
                 <p className="text-base/7 font-semibold text-primary-600">
                   {title}
                 </p>
-                <h1 className="mt-2 text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                <h1 className="mt-2 text-pretty text-4xl font-semibold tracking-tight text-primary-800 sm:text-5xl">
                   {title}
                 </h1>
                 <p className="mt-6 text-xl/8 text-gray-700">{description}</p>
@@ -77,7 +79,7 @@ export default function Content({ title_website: title, description }) {
                       className="mt-1 size-5 flex-none text-primary-600"
                     />
                     <span>
-                      <strong className="font-semibold text-gray-900">
+                      <strong className="font-semibold text-primary-800">
                         Push to deploy.
                       </strong>{" "}
                       Lorem ipsum, dolor sit amet consectetur adipisicing elit.
@@ -91,7 +93,7 @@ export default function Content({ title_website: title, description }) {
                       className="mt-1 size-5 flex-none text-primary-600"
                     />
                     <span>
-                      <strong className="font-semibold text-gray-900">
+                      <strong className="font-semibold text-primary-800">
                         SSL certificates.
                       </strong>{" "}
                       Anim aute id magna aliqua ad ad non deserunt sunt. Qui
@@ -104,7 +106,7 @@ export default function Content({ title_website: title, description }) {
                       className="mt-1 size-5 flex-none text-primary-600"
                     />
                     <span>
-                      <strong className="font-semibold text-gray-900">
+                      <strong className="font-semibold text-primary-800">
                         Database backups.
                       </strong>{" "}
                       Ac tincidunt sapien vehicula erat auctor pellentesque
@@ -119,7 +121,7 @@ export default function Content({ title_website: title, description }) {
                   varius vulputate et ultrices hac adipiscing egestas. Iaculis
                   convallis ac tempor et ut. Ac lorem vel integer orci.
                 </p>
-                <h2 className="mt-16 text-2xl font-bold tracking-tight text-gray-900">
+                <h2 className="mt-16 text-2xl font-bold tracking-tight text-primary-800">
                   No server? No problem.
                 </h2>
                 <p className="mt-6">
@@ -138,7 +140,7 @@ export default function Content({ title_website: title, description }) {
           </div>
         </div>
       </div>
-    </>
+    </Container>
   );
 }
 

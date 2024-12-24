@@ -5,12 +5,14 @@ import Hero from "./src/Hero.tsx";
 import Header from "./src/Header.tsx";
 import Container from "./src/Container.tsx";
 import Features from "./src/Features.tsx";
-import Testimonials from "./src/Testimonials.tsx";
-import TestimonialWithImage from "./src/TestimonialWithImage.astro";
-import BlogListing from "./src/BlogListing.tsx";
-import WorkAt from "./src/WorkAt.tsx";
+import BlogListing from "./src/BlogListing.astro";
 import Team from "./src/Team.astro";
 import Content from "./src/Content.tsx";
+import Mission from "./src/Mission.astro";
+import Image from "./src/Image.astro";
+import ImageWithTitle from "./src/ImageWithTitle.astro";
+import Values from "./src/Values.astro";
+import LogoCloud from "./src/LogoCloud.astro";
 
 export {
   BaseHead,
@@ -19,11 +21,13 @@ export {
   Header,
   Container,
   Features,
-  Testimonials,
-  TestimonialWithImage,
   BlogListing,
-  WorkAt,
   Team,
   Content,
-  Page
+  Page,
+  Mission,
+  Image,
+  ImageWithTitle,
+  Values,
+  LogoCloud
 };

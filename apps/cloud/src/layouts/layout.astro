@@ -9,9 +9,9 @@ const { title, description } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <BaseHead title={title} description={description} />
   </head>
-  <body class="container mx-auto px-4 sm:px-6 lg:px-8">
+  <body>
     <Header Logo={Logo.src} client:load/>
-    <main>
+    <main class="isolate">
       <slot />
     </main>
     <Footer />
