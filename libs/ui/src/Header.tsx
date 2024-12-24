@@ -9,8 +9,8 @@ function slugify(title: string): string {
   return slug.trim().replace(/[-\s]+/g, "-");
 }
 
-const site = process.env.PUBLIC_SITE || "dotnet";
-console.log("site", site);
+const site = import.meta.env.PUBLIC_SITE || "no-site-found";
+
 const pageData = await fetchData<Array<GlobalSettings>>({
   endpoint: "global-settings",
   wrappedByKey: "data",
