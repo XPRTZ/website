@@ -9,6 +9,7 @@
   "workspaces": [
     "apps/dotnet",
     "apps/cloud",
+    "apps/landing",
     "libs/ui",
     "libs/cms"
   ],
@@ -16,9 +17,11 @@
     "format": "prettier ./**/*.{js,ts,html,css,scss,json,mjs,tsx} --write && eslint ./**/*.{js,ts,mjs,tsx}",
     "develop:dotnet": "npm run --workspace=apps/dotnet develop",
     "develop:cloud": "npm run --workspace=apps/cloud develop",
+    "develop:landing": "npm run --workspace=apps/landing develop",
     "build": "npm run --workspaces --if-present build",
     "build:dotnet": "npm run --workspace=apps/dotnet build",
     "build:cloud": "npm run --workspace=apps/cloud build",
+    "build:landing": "npm run --workspace=apps/landing build",
     "build:ui": "npm run --workspace=libs/ui build"
   },
   "devDependencies": {
