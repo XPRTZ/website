@@ -9,7 +9,6 @@ import Container from "./Container";
 export default function Content({ title_website: title, description }) {
   return (
     <Container>
-      <div className="relative isolate">
         <svg
           className="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]"
           aria-hidden="true"
@@ -139,7 +138,6 @@ export default function Content({ title_website: title, description }) {
             </div>
           </div>
         </div>
-      </div>
     </Container>
   );
 }
