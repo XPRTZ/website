@@ -60,6 +60,25 @@ jobs:
     needs: [apply-infrastructure, build-dotnet-application]
     secrets: inherit
 
+  build-landing-application:
+      name: Build XPRTZ Landing application
+      if: github.event.action != 'closed'
+      uses: ./.github/workflows/reusable-build-application.yaml
+      with:
+        application: landing
+      needs: [apply-infrastructure]
+
+  deploy-landing-application:
+      name: Deploy XPRTZ Landing application
+      if: github.event.action != 'closed'
+      uses: ./.github/workflows/reusable-deploy-application.yaml
+      with:
+        application: landing
+        storageAccount: ${{ needs.apply-infrastructure.outputs.landingStorageAccount }}
+        environment: preview
+      needs: [apply-infrastructure, build-landing-application]
+      secrets: inherit
+
   remove-infrastructure:
     name: Remove preview environment infrastructure
     if: github.event.action == 'closed'

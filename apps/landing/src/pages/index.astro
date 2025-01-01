@@ -1,24 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Logo from '../assets/xprtz.svg';
+import Background from '../components/Background.astro';
+import Logo from '../components/Logo.astro';
 ---
 
-<Layout>
-		<div class="container">
-			<Logo />
-		</div>
+<Layout title="XPRTZ">
+  <main class="h-screen w-screen overflow-hidden relative pb-[72px] md:pb-[60px]">
+    <Background />
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <Logo />
+    </div>
+  </main>
 </Layout>
-
-<style>
-	.container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		height: 100vh;
-		background-image: url('mixed-hor.jpg');
-		background-size: cover;
-	}
-	.container h1 {
-		font-size: 3rem;
-	}
-</style>

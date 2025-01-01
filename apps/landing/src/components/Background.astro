@@ -1,0 +1,24 @@
+---
+import SideLink from './SideLink.astro';
+---
+<div class="absolute inset-0">
+  <img
+    src="/mixed-hor.jpg"
+    alt="XPRTZ Background"
+    class="w-full h-full object-cover"
+  />
+  <div class="absolute inset-0 flex">
+    <SideLink
+      href="https://xprtz.net"
+      text=".NET"
+      subtext="Dé plek voor .NET experts"
+      side="left"
+    />
+    <SideLink
+      href="https://xprtz.cloud"
+      text="Cloud"
+      subtext="Dé plek voor cloud experts"
+      side="right"
+    />
+  </div>
+</div>

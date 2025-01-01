@@ -15,6 +15,8 @@ on:
         value: ${{ jobs.apply-infrastructure.outputs.cloudStorageAccount }}
       dotnetStorageAccount:
         value: ${{ jobs.apply-infrastructure.outputs.dotnetStorageAccount }}
+      landingStorageAccount:
+        value: ${{ jobs.apply-infrastructure.outputs.landingStorageAccount }}
       resourceGroup:
         value: ${{ jobs.apply-infrastructure.outputs.resourceGroup }}
 
@@ -26,6 +28,7 @@ jobs:
     outputs:
       cloudStorageAccount: ${{ steps.deploybicep.outputs.cloudStorageAccountName }}
       dotnetStorageAccount: ${{ steps.deploybicep.outputs.dotnetStorageAccountName }}
+      landingStorageAccount: ${{ steps.deploybicep.outputs.landingStorageAccountName }}
       resourceGroup: ${{ steps.deploybicep.outputs.resourceGroupName }}
     steps:
       - uses: actions/checkout@v4
@@ -68,7 +71,11 @@ jobs:
               ${{ steps.deploybicep.outputs.cloudFqdn }}
 
               ## Dotnet
-              
+
               ${{ steps.deploybicep.outputs.dotnetFqdn }}
+
+              ## Landing
+
+              ${{ steps.deploybicep.outputs.landingFqdn }}
               `
             })
