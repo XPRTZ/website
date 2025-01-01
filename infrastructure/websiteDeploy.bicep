@@ -91,7 +91,7 @@ module landingStorageAccountModule 'modules/storageAccount.bicep' = {
   scope: websiteResourceGroup
   name: 'landingStorageAccountDeploy'
   params: {
-    app: dotnetApplicationName
+    app: landingApplicationName
   }
 }
 
