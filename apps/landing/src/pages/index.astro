@@ -1,0 +1,14 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Background from '../components/Background.astro';
+import Logo from '../components/Logo.astro';
+---
+
+<Layout title="XPRTZ">
+  <main class="h-screen w-screen overflow-hidden relative pb-[72px] md:pb-[60px]">
+    <Background />
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <Logo />
+    </div>
+  </main>
+</Layout>

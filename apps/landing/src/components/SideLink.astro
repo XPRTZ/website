@@ -1,0 +1,25 @@
+---
+interface Props {
+  href: string;
+  text: string;
+  subtext: string;
+  side: 'left' | 'right';
+}
+
+const { href, text, subtext, side } = Astro.props;
+const colorClass = side === 'left' ? 'text-green-100' : 'text-blue-100';
+const hoverBgClass = side === 'left' ? 'hover:bg-green-900/10' : 'hover:bg-blue-900/10';
+const id = `${side}-side`;
+---
+<a
+  href={href}
+  class={`w-1/2 transition-opacity duration-300 ${hoverBgClass} relative flex items-center justify-center group`}
+  id={id}
+>
+  <div class="text-center">
+    <h2 class={`text-4xl font-bold ${colorClass} mb-2`}>{text}</h2>
+    <p class="text-white text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      {subtext}
+    </p>
+  </div>
+</a>

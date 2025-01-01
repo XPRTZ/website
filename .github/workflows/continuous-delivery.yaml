@@ -53,3 +53,20 @@ jobs:
       environment: production
     needs: [apply-infrastructure, build-dotnet-application]
     secrets: inherit
+
+  build-landing-application:
+    name: Build XPRTZ Landing application
+    uses: ./.github/workflows/reusable-build-application.yaml
+    with:
+      application: landing
+    needs: [apply-infrastructure]
+
+  deploy-landing-application:
+    name: Deploy XPRTZ Landing application
+    uses: ./.github/workflows/reusable-deploy-application.yaml
+    with:
+      application: landing
+      storageAccount: ${{ needs.apply-infrastructure.outputs.landingStorageAccount }}
+      environment: production
+    needs: [apply-infrastructure, build-landing-application]
+    secrets: inherit

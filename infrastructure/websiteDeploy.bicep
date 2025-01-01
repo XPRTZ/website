@@ -11,6 +11,7 @@ var resourceGroupName = endsWith(resourceGroupSuffix, 'main')
   : '${resourceGroupPrefix}-${resourceGroupSuffix}'
 var dotnetApplicationName = 'dotnet'
 var cloudApplicationName = 'cloud'
+var landingApplicationName = 'landing'
 
 var sharedValues = json(loadTextContent('shared-values.json'))
 var managementResourceGroup = resourceGroup(sharedValues.subscriptionIds.xprtz, sharedValues.resourceGroups.management)
@@ -86,8 +87,40 @@ module dotnetDnsSettings 'modules/dns.bicep' = if (deployDns) {
   }
 }
 
+module landingStorageAccountModule 'modules/storageAccount.bicep' = {
+  scope: websiteResourceGroup
+  name: 'landingStorageAccountDeploy'
+  params: {
+    app: landingApplicationName
+  }
+}
+
+module landingFrontDoorSettings 'modules/frontdoor.bicep' = if (deployDns) {
+  scope: infrastructureResourceGroup
+  name: 'landingFrontDoorSettingsDeploy'
+  params: {
+    frontDoorOriginHost: landingStorageAccountModule.outputs.storageAccountHost
+    frontDoorProfileName: frontDoorProfileName
+    application: landingApplicationName
+    rootDomain: rootDomain
+    subDomain: landingApplicationName
+  }
+}
+
+module landingDnsSettings 'modules/dns.bicep' = if (deployDns) {
+  scope: managementResourceGroup
+  name: 'landingDnsSettingsDeploy'
+  params: {
+    origin: landingFrontDoorSettings.outputs.frontDoorCustomDomainHost
+    rootDomain: rootDomain
+    subDomain: landingApplicationName
+    validationToken: landingFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
+  }
+}
+
 output cloudStorageAccountName string = cloudStorageAccountModule.outputs.storageAccountName
 output dotnetStorageAccountName string = dotnetStorageAccountModule.outputs.storageAccountName
+output landingStorageAccountName string = landingStorageAccountModule.outputs.storageAccountName
 output resourceGroupName string = websiteResourceGroup.name
 output cloudFqdn string = deployDns
   ? 'https://${cloudApplicationName}.${rootDomain}/'
@@ -95,3 +128,6 @@ output cloudFqdn string = deployDns
 output dotnetFqdn string = deployDns
   ? 'https://${dotnetApplicationName}.${rootDomain}/'
   : dotnetStorageAccountModule.outputs.storageAccountFqdn
+output landingFqdn string = deployDns
+  ? 'https://${landingApplicationName}.${rootDomain}/'
+  : landingStorageAccountModule.outputs.storageAccountFqdn
