@@ -3,6 +3,7 @@ param frontDoorOriginHost string
 param application string
 param rootDomain string
 param subDomain string
+param isLandinSite bool = false
 
 var frontDoorOriginName = 'afd-origin-${application}'
 var frontDoorEndpointName = 'fde-${application}-${uniqueString(resourceGroup().id)}'
@@ -54,7 +55,7 @@ resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2024-02-01
   }
 }
 
-resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = {
+resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = if (!isLandinSite) {
   name: frontDoorRouteName
   parent: frontDoorEndpoint
   dependsOn: [
@@ -80,6 +81,50 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
     linkToDefaultDomain: 'Enabled'
     httpsRedirect: 'Enabled'
   }
+}
+
+resource frontDoorRouteLandingSite 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = if (isLandinSite) {
+  name: frontDoorRouteName
+  parent: frontDoorEndpoint
+  dependsOn: [
+    frontDoorOrigin
+  ]
+  properties: {
+    customDomains: [
+      {
+        id: frontDoorCustomDomain.id
+      }
+      {
+        id: frontDoorCustomDomainWww.id
+      }
+      {
+        id: frontDoorCustomDomainXprtzNl.id
+      }
+    ]
+    originGroup: {
+      id: frontDoorOriginGroup.id
+    }
+    supportedProtocols: [
+      'Http'
+      'Https'
+    ]
+    patternsToMatch: [
+      '/*'
+    ]
+    forwardingProtocol: 'HttpsOnly'
+    linkToDefaultDomain: 'Enabled'
+    httpsRedirect: 'Enabled'
+  }
+}
+
+resource frontDoorCustomDomainWww 'Microsoft.Cdn/profiles/customDomains@2024-02-01' existing = {
+  name: 'www-xprtz-nl-379c'
+  parent: frontDoorProfile
+}
+
+resource frontDoorCustomDomainXprtzNl 'Microsoft.Cdn/profiles/customDomains@2024-02-01' existing = {
+  name: 'xprtz-nl-5c4c'
+  parent: frontDoorProfile
 }
 
 resource frontDoorCustomDomain 'Microsoft.Cdn/profiles/customDomains@2024-02-01' = {
