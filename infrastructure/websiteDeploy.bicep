@@ -104,6 +104,7 @@ module landingFrontDoorSettings 'modules/frontdoor.bicep' = if (deployDns) {
     application: landingApplicationName
     rootDomain: rootDomain
     subDomain: landingApplicationName
+    isLandingSite: true
   }
 }
 
