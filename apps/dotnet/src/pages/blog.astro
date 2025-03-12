@@ -1,0 +1,10 @@
+---
+import { Content } from "@xprtz/ui";
+import Layout from "../layouts/layout.astro";
+import { type Page } from "@xprtz/cms";
+
+const page: Page = Astro.props;
+---
+<Layout title={page.title_website} description={page.description}>
+  <Content {...page} />
+</Layout>

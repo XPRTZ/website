@@ -8,6 +8,7 @@ import Features from "./src/Features.tsx";
 import BlogListing from "./src/BlogListing.astro";
 import Team from "./src/Team.astro";
 import Content from "./src/Content.tsx";
+import ContentSmall from "./src/ContentSmall.tsx";
 import Mission from "./src/Mission.astro";
 import Image from "./src/Image.astro";
 import ImageWithTitle from "./src/ImageWithTitle.astro";
@@ -24,6 +25,7 @@ export {
   BlogListing,
   Team,
   Content,
+  ContentSmall,
   Page,
   Mission,
   Image,

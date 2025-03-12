@@ -6,7 +6,7 @@ import {
 
 import Container from "./Container";
 
-export default function Content({ title_website: title, description }) {
+export default function Content({ title_website: title, subtitle, description }) {
   return (
     <Container>
         <svg
@@ -55,7 +55,7 @@ export default function Content({ title_website: title, description }) {
             <div className="mx-auto max-w-2xl gap-x-14 lg:mx-0 lg:max-w-none lg:items-center">
               <div className="mx-auto lg:mx-0">
                 <p className="text-base/7 font-semibold text-primary-600">
-                  {title}
+                  {subtitle ?? title}
                 </p>
                 <h1 className="mt-2 text-pretty text-4xl font-semibold tracking-tight text-primary-800 sm:text-5xl">
                   {title}
