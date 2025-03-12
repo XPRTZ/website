@@ -1,0 +1,24 @@
+---
+interface Props {
+  title: string;
+  defaultOpen?: boolean;
+}
+
+const { title = "Solution", defaultOpen = false } = Astro.props;
+---
+
+<div class="my-4 border dark:border-primary-700 rounded-lg">
+  <details class="group" open={defaultOpen}>
+    <summary class="flex justify-between items-center p-4 cursor-pointer bg-primary-400 dark:bg-primary-900 rounded-t-lg ">
+      <span class="font-medium">{title}</span>
+      <span class="transform group-open:rotate-180 transition-transform duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </span>
+    </summary>
+    <div class="p-4 bg-white dark:bg-gray-900">
+      <slot />
+    </div>
+  </details>
+</div>
