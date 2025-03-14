@@ -12,6 +12,7 @@ var resourceGroupName = endsWith(resourceGroupSuffix, 'main')
 var dotnetApplicationName = 'dotnet'
 var cloudApplicationName = 'cloud'
 var landingApplicationName = 'landing'
+var learningApplicationName = 'learning'
 
 var sharedValues = json(loadTextContent('shared-values.json'))
 var managementResourceGroup = resourceGroup(sharedValues.subscriptionIds.xprtz, sharedValues.resourceGroups.management)
@@ -119,9 +120,41 @@ module landingDnsSettings 'modules/dns.bicep' = if (deployDns) {
   }
 }
 
+module learningStorageAccountModule 'modules/storageAccount.bicep' = {
+  scope: websiteResourceGroup
+  name: 'learningStorageAccountDeploy'
+  params: {
+    app: learningApplicationName
+  }
+}
+
+module learningFrontDoorSettings 'modules/frontdoor.bicep' = if (deployDns) {
+  scope: infrastructureResourceGroup
+  name: 'learningFrontDoorSettingsDeploy'
+  params: {
+    frontDoorOriginHost: learningStorageAccountModule.outputs.storageAccountHost
+    frontDoorProfileName: frontDoorProfileName
+    application: learningApplicationName
+    rootDomain: rootDomain
+    subDomain: learningApplicationName
+  }
+}
+
+module learningDnsSettings 'modules/dns.bicep' = if (deployDns) {
+  scope: managementResourceGroup
+  name: 'learningDnsSettingsDeploy'
+  params: {
+    origin: learningFrontDoorSettings.outputs.frontDoorCustomDomainHost
+    rootDomain: rootDomain
+    subDomain: learningApplicationName
+    validationToken: learningFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
+  }
+}
+
 output cloudStorageAccountName string = cloudStorageAccountModule.outputs.storageAccountName
 output dotnetStorageAccountName string = dotnetStorageAccountModule.outputs.storageAccountName
 output landingStorageAccountName string = landingStorageAccountModule.outputs.storageAccountName
+output learningStorageAccountName string = learningStorageAccountModule.outputs.storageAccountName
 output resourceGroupName string = websiteResourceGroup.name
 output cloudFqdn string = deployDns
   ? 'https://${cloudApplicationName}.${rootDomain}/'
@@ -132,3 +165,6 @@ output dotnetFqdn string = deployDns
 output landingFqdn string = deployDns
   ? 'https://${landingApplicationName}.${rootDomain}/'
   : landingStorageAccountModule.outputs.storageAccountFqdn
+  output learningFqdn string = deployDns
+  ? 'https://${learningApplicationName}.${rootDomain}/'
+  : learningStorageAccountModule.outputs.storageAccountFqdn

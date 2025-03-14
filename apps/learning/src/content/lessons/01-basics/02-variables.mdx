@@ -1,0 +1,130 @@
+---
+title: "Variables and Data Types"
+description: "Learn about variables and basic data types in each language"
+section: "🚀 Basics"
+order: 2
+languages: ["csharp", "python", "go"]
+---
+
+# Variables and Data Types
+
+Learn how variables and basic data types work in each language.
+
+## Exercise: Temperature Converter
+
+Create a program that converts a temperature from Celsius to Fahrenheit. The program should:
+1. Declare a variable to store the Celsius temperature
+2. Convert it to Fahrenheit using the formula: °F = °C × (9/5) + 32
+3. Print both temperatures with appropriate labels
+
+Try to implement this in each language before looking at the solution!
+
+<Collapsible title="C# solution">
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        double celsius = 25.0;
+        double fahrenheit = celsius * (9.0/5.0) + 32;
+
+        Console.WriteLine($"{celsius}°C is equal to {fahrenheit}°F");
+    }
+}
+```
+</Collapsible>
+<Collapsible title="Python solution">
+## Python Solution
+
+```python
+celsius = 25.0
+fahrenheit = celsius * (9/5) + 32
+
+print(f"{celsius}°C is equal to {fahrenheit}°F")
+```
+</Collapsible>
+<Collapsible title="Go solution">
+## Go Solution
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    celsius := 25.0
+    fahrenheit := celsius * (9.0/5.0) + 32
+
+    fmt.Printf("%.1f°C is equal to %.1f°F\n", celsius, fahrenheit)
+}
+```
+</Collapsible>
+
+## Exercise: Personal Information
+
+Create a program that stores and displays personal information using different data types:
+1. Name (string)
+2. Age (integer)
+3. Height in meters (floating-point)
+4. Is a student (boolean)
+
+Print all the information in a formatted way.
+
+<Collapsible title="C# solution">
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        string name = "Alice";
+        int age = 20;
+        double height = 1.75;
+        bool isStudent = true;
+
+        Console.WriteLine($"Name: {name}");
+        Console.WriteLine($"Age: {age}");
+        Console.WriteLine($"Height: {height}m");
+        Console.WriteLine($"Student: {isStudent}");
+    }
+}
+```
+</Collapsible>
+<Collapsible title="Python solution">
+
+```python
+name = "Alice"
+age = 20
+height = 1.75
+is_student = True
+
+print(f"Name: {name}")
+print(f"Age: {age}")
+print(f"Height: {height}m")
+print(f"Student: {is_student}")
+```
+
+</Collapsible>
+<Collapsible title="Go solution">
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    name := "Alice"
+    age := 20
+    height := 1.75
+    isStudent := true
+
+    fmt.Printf("Name: %s\n", name)
+    fmt.Printf("Age: %d\n", age)
+    fmt.Printf("Height: %.2fm\n", height)
+    fmt.Printf("Student: %v\n", isStudent)
+}
+```
+</Collapsible>

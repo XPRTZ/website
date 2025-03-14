@@ -1,0 +1,97 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Collapsible from "../../components/Collapsible.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import LessonsNavigation from "../../components/LessonsNavigation.astro";
+
+export async function getStaticPaths() {
+  function sortLessons(lessons) {
+    return lessons.sort((a, b) => {
+      // Extract section numbers for primary sorting
+      const aSectionMatch = a.slug.match(/^(\d+)-/);
+      const bSectionMatch = b.slug.match(/^(\d+)-/);
+
+      const aSectionNum = aSectionMatch ? parseInt(aSectionMatch[1]) : 999;
+      const bSectionNum = bSectionMatch ? parseInt(bSectionMatch[1]) : 999;
+
+      // First sort by section number
+      if (aSectionNum !== bSectionNum) {
+        return aSectionNum - bSectionNum;
+      }
+
+      // Then sort by order property within the same section
+      return a.data.order - b.data.order;
+    });
+  }
+  const lessons = await getCollection("lessons");
+
+  const sortedLessons = sortLessons(lessons);
+
+  return sortedLessons.map((lesson, index) => {
+    // Determine previous and next lessons
+    const previousLesson = index > 0 ? {
+      slug: sortedLessons[index - 1].slug,
+      title: sortedLessons[index - 1].data.title
+    } : null;
+
+    const nextLesson = index < sortedLessons.length - 1 ? {
+      slug: sortedLessons[index + 1].slug,
+      title: sortedLessons[index + 1].data.title
+    } : null;
+
+    return {
+      params: { slug: lesson.slug },
+      props: { lesson, previousLesson, nextLesson },
+    };
+  });
+}
+
+const { lesson, previousLesson, nextLesson } = Astro.props;
+const { Content } = await lesson.render();
+---
+
+<Layout title={`${lesson.data.title} - Polyglot Programming`}>
+  <article class="max-w-4xl mx-auto">
+    <Breadcrumbs section={lesson.data.section} title={lesson.data.title} />
+    <div class="prose dark:prose-invert">
+      <div class="mb-6">
+        <h1>{lesson.data.title}</h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          {lesson.data.description}
+        </p>
+        <div class="flex gap-2 mt-2">
+          {
+            lesson.data.languages.map((lang) => (
+              <span class="px-2 py-1 text-sm rounded bg-gray-200 dark:bg-gray-700">
+                {lang}
+              </span>
+            ))
+          }
+        </div>
+      </div>
+      <Content components={{ Collapsible }} />
+
+      <LessonsNavigation
+        previousLesson={previousLesson}
+        nextLesson={nextLesson}
+      />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  /* Add styles for code blocks within the prose content */
+  :global(.prose pre) {
+    @apply bg-gray-100 dark:bg-gray-800 p-4 rounded-lg;
+  }
+
+  :global(.prose code) {
+    @apply text-sm;
+  }
+
+  /* Ensure proper spacing for collapsible sections */
+  :global(.prose .solution-wrapper) {
+    @apply my-8;
+  }
+</style>

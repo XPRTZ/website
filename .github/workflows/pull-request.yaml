@@ -79,6 +79,25 @@ jobs:
       needs: [apply-infrastructure, build-landing-application]
       secrets: inherit
 
+  build-learning-application:
+      name: Build XPRTZ Learning application
+      if: github.event.action != 'closed'
+      uses: ./.github/workflows/reusable-build-application.yaml
+      with:
+        application: learning
+      needs: [apply-infrastructure]
+
+  deploy-learning-application:
+      name: Deploy XPRTZ Learning application
+      if: github.event.action != 'closed'
+      uses: ./.github/workflows/reusable-deploy-application.yaml
+      with:
+        application: learning
+        storageAccount: ${{ needs.apply-infrastructure.outputs.learningStorageAccount }}
+        environment: preview
+      needs: [apply-infrastructure, build-learning-application]
+      secrets: inherit
+
   remove-infrastructure:
     name: Remove preview environment infrastructure
     if: github.event.action == 'closed'

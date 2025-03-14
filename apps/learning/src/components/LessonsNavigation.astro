@@ -1,0 +1,64 @@
+---
+interface Props {
+  previousLesson: {
+    slug: string;
+    title: string;
+  } | null;
+  nextLesson: {
+    slug: string;
+    title: string;
+  } | null;
+}
+
+const { previousLesson, nextLesson } = Astro.props;
+---
+
+<div class="mt-12 pt-6 border-t border-gray-200 dark:border-gray-700">
+  <nav class="flex justify-between">
+    {previousLesson ? (
+      <a
+        href={`/lessons/${previousLesson.slug}`}
+        class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span>
+          <span class="block text-xs text-gray-500 dark:text-gray-400">Previous</span>
+          {previousLesson.title}
+        </span>
+      </a>
+    ) : (
+      <div></div> <!-- Empty div for spacing when no previous lesson -->
+    )}
+
+    {nextLesson ? (
+      <a
+        href={`/lessons/${nextLesson.slug}`}
+        class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+      >
+        <span>
+          <span class="block text-xs text-gray-500 dark:text-gray-400">Next</span>
+          {nextLesson.title}
+        </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 ml-2 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    ) : (
+      <div></div>
+    )}
+  </nav>
+</div>

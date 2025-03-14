@@ -70,3 +70,20 @@ jobs:
       environment: production
     needs: [apply-infrastructure, build-landing-application]
     secrets: inherit
+
+  build-learning-application:
+    name: Build XPRTZ Learning application
+    uses: ./.github/workflows/reusable-build-application.yaml
+    with:
+      application: learning
+    needs: [apply-infrastructure]
+
+  deploy-learning-application:
+    name: Deploy XPRTZ Learning application
+    uses: ./.github/workflows/reusable-deploy-application.yaml
+    with:
+      application: learning
+      storageAccount: ${{ needs.apply-infrastructure.outputs.learningStorageAccount }}
+      environment: production
+    needs: [apply-infrastructure, build-learning-application]
+    secrets: inherit

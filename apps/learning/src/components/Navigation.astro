@@ -1,0 +1,210 @@
+---
+import { getCollection } from "astro:content";
+
+const { pathname } = Astro.url;
+const currentPath = pathname.replace(/\/$/, "");
+
+const lessons = await getCollection("lessons");
+
+// Group lessons by section
+const sections = lessons.reduce(
+  (acc, lesson) => {
+    const section = lesson.data.section;
+    if (!acc[section]) {
+      acc[section] = [];
+    }
+    acc[section].push(lesson);
+    return acc;
+  },
+  {} as Record<string, typeof lessons>
+);
+
+// Extract section order from folder structure in slug
+function getSectionOrder(sectionName) {
+  // Find a lesson in this section
+  const sampleLesson = lessons.find(
+    (lesson) => lesson.data.section === sectionName
+  );
+  if (!sampleLesson) return 999; // Default high number if not found
+
+  // Extract order from folder name in slug (e.g., "01-basics/01-getting-started" -> 01)
+  const match = sampleLesson.slug.match(/^(\d+)-/);
+  return match ? parseInt(match[1]) : 999;
+}
+
+// Sort sections based on folder structure order
+const sortedSections = Object.entries(sections).sort(
+  ([sectionA], [sectionB]) => {
+    const orderA = getSectionOrder(sectionA);
+    const orderB = getSectionOrder(sectionB);
+    return orderA - orderB;
+  }
+);
+
+// Sort lessons within each section by their order property
+for (const [_, sectionLessons] of sortedSections) {
+  sectionLessons.sort((a, b) => a.data.order - b.data.order);
+}
+
+// Function to clean section names by removing numeric prefixes
+function cleanSectionName(sectionName) {
+  return sectionName.replace(/^\d+-/, "").replace(/-/g, " ");
+}
+
+// Determine if a section contains the active page
+function isSectionActive(sectionLessons) {
+  return sectionLessons.some(
+    (lesson) => `/lessons/${lesson.slug}` === currentPath
+  );
+}
+---
+
+<nav class="w-64 bg-gray-100 dark:bg-gray-800 p-4 transition-colors border-r border-primary-900 dark:border-gray-400">
+  <div class="flex justify-between items-center mb-4 lg:hidden">
+    <h2 class="font-bold text-gray-800 dark:text-gray-200">Navigation</h2>
+    <button
+      id="mobile-nav-toggle"
+      class="p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16m-7 6h7"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div
+    id="navigation-content"
+    class="space-y-4 max-h-[calc(100vh-120px)] overflow-y-auto hidden lg:block"
+  >
+    {
+      sortedSections.map(([section, sectionLessons]) => {
+        const isActive = isSectionActive(sectionLessons);
+        return (
+          <div class="section-container">
+            <button
+              class="section-toggle w-full flex justify-between items-center py-2 px-1 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
+              aria-expanded={isActive ? "true" : "false"}
+            >
+              <span>{cleanSectionName(section)}</span>
+              <svg
+                class={`transform transition-transform duration-200 h-5 w-5 ${isActive ? "rotate-180" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            <ul
+              class={`lessons-list space-y-1 mt-1 ml-2 ${isActive ? "block" : "hidden"}`}
+            >
+              {sectionLessons.map((lesson) => {
+                const href = `/lessons/${lesson.slug}`;
+                const isLessonActive = currentPath === href;
+                return (
+                  <li>
+                    <a
+                      href={href}
+                      class={`block px-3 py-2 rounded-md text-sm ${
+                        isLessonActive
+                          ? "bg-primary-600 text-white"
+                          : "text-gray-600 dark:text-gray-200 hover:bg-primary-200 dark:hover:bg-primary-800"
+                      }`}
+                    >
+                      → {lesson.data.title}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })
+    }
+  </div>
+</nav>
+
+<script>
+  // Handle section toggle clicks
+  document.addEventListener("DOMContentLoaded", () => {
+    // Mobile navigation toggle
+    const mobileToggle = document.getElementById("mobile-nav-toggle");
+    const navContent = document.getElementById("navigation-content");
+
+    if (mobileToggle && navContent) {
+      mobileToggle.addEventListener("click", () => {
+        navContent.classList.toggle("hidden");
+      });
+    }
+
+    // Section toggles
+    const sectionToggles = document.querySelectorAll(".section-toggle");
+
+    sectionToggles.forEach((toggle) => {
+      toggle.addEventListener("click", () => {
+        // Toggle this section
+        const isExpanded = toggle.getAttribute("aria-expanded") === "true";
+        toggle.setAttribute("aria-expanded", !isExpanded);
+
+        // Toggle the arrow icon
+        const arrow = toggle.querySelector("svg");
+        if (arrow) {
+          arrow.classList.toggle("rotate-180");
+        }
+
+        // Toggle the lessons list visibility
+        const lessonsList = toggle.nextElementSibling;
+        if (lessonsList) {
+          lessonsList.classList.toggle("hidden");
+        }
+      });
+    });
+  });
+
+  // Automatically expand the section when the window is resized to desktop
+  window.addEventListener("resize", () => {
+    const navContent = document.getElementById("navigation-content");
+    if (window.innerWidth >= 1024 && navContent) {
+      // 1024px is the 'lg' breakpoint in Tailwind
+      navContent.classList.remove("hidden");
+    }
+  });
+</script>
+
+<style>
+  /* Smooth transition for collapsing/expanding */
+  .lessons-list {
+    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+  }
+
+  /* Scrollbar styling */
+  #navigation-content::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  #navigation-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  #navigation-content::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 4px;
+  }
+</style>
