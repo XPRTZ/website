@@ -1,5 +1,5 @@
 ---
-title: "Getting Started"
+title: "Getting started"
 description: "Set up your development environment for C#, Python, and Go"
 section: "🚀 Basics"
 order: 1
@@ -9,6 +9,83 @@ languages: ["csharp", "python", "go"]
 ## Getting Started with C#, Python, and Go
 
 This guide will help you set up your development environment for all three languages.
+
+### Setup development environment
+
+This guide will be using VS Code and Windows Subsystem for Linux version 2.
+
+#### C#
+
+Install the .NET SDK in WSL: add the Microsoft package signing key and repository.
+For Ubuntu (adjust based on your Ubuntu release; here we assume Ubuntu 24.04):
+```bash
+sudo apt install -y apt-transport-https ca-certificates wget
+wget https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+sudo dpkg -i packages-microsoft-prod.deb
+rm packages-microsoft-prod.deb
+```
+
+Update package lists and install the .NET SDK (use the version you need; here we install the latest version):
+```bash
+sudo apt update
+sudo apt install -y dotnet-sdk-9.0
+```
+
+You can verify the installation with:
+```bash
+dotnet --version
+```
+
+Visual Studio Code extensions:
+- [C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit)
+- [IntelliCode for C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.vscodeintellicode-csharp)
+
+#### Python
+
+In the WSL terminal, run:
+```bash
+sudo apt update
+sudo apt install -y python3 python3-pip
+```
+
+Verify the installation:
+
+```bash
+python3 --version
+pip3 --version
+```
+
+Set up a virtual environment:
+Install the venv module if required (most distributions include it):
+```bash
+python3 -m venv myenv
+```
+
+Activate the environment:
+```bash
+source myenv/bin/activate
+```
+
+Visual Studio Code extensions:
+- [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+- [Python Debugger](https://marketplace.visualstudio.com/items?itemName=ms-python.debugpy)
+
+#### Go
+
+In the WSL terminal, run:
+```bash
+sudo apt update
+sudo apt install -y golang-go
+```
+
+Verify the installation:
+
+```bash
+go version
+```
+
+Visual Studio Code extensions:
+- [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go)
 
 ### Exercise: Hello, World!
 
