@@ -1,0 +1,128 @@
+---
+title: "Exercise 1"
+description: "Learn the basics of the Python and Go programming languages with exercises."
+section: "🏃‍♂️ Getting started"
+order: 3
+languages: ["python", "go"]
+---
+
+In this exercise, each line of the input contains some text. To extract the calibration value from a line, we must take the first digit (from left to right) and the last digit (from right to left) found on that line, concatenate them into a two‐digit number, and then add all such numbers together.
+
+For example, given the following lines
+```
+1abc2
+pqr3stu8vwx
+a1b2c3d4e5f
+treb7uchet
+```
+
+The extracted values are
+```
+"1abc2" → first digit “1”, last digit “2” → 12
+"pqr3stu8vwx" → first digit “3”, last digit “8” → 38
+"a1b2c3d4e5f" → first digit “1”, last digit “5” → 15
+"treb7uchet" → first digit “7”, last digit “7” → 77
+```
+
+Summing these gives 12 + 38 + 15 + 77 = 142.
+
+## Python
+
+<Collapsible title="Solution">
+```python
+def extract_calibration_value(line: str) -> int:
+    # Find all digits in the current line.
+    digits = [c for c in line if c.isdigit()]
+
+    # If there are no digits, we skip the line. (Depending on input, you may choose to error out.)
+    if not digits:
+        return 0  # or raise an exception if appropriate
+
+    # The calibration value is the concatenation of the first and last digit.
+    calib_str = digits[0] + digits[-1]
+    return int(calib_str)
+
+def main():
+    total = 0
+
+    with open("input.txt", "r") as f:
+        for line in f:
+            # Remove potential newline or trailing spaces.
+            line = line.strip()
+            if not line:
+                continue
+            total += extract_calibration_value(line)
+
+    print("Total calibration value:", total)
+
+if __name__ == "__main__":
+    main()
+```
+</Collapsible>
+
+## Go
+
+<Collapsible title="Solution">
+```go
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"unicode"
+)
+
+func extractCalibrationValue(line string) int {
+	var firstDigit, lastDigit rune
+	foundFirst := false
+	for _, char := range line {
+		if unicode.IsDigit(char) {
+			if !foundFirst {
+				firstDigit = char
+				foundFirst = true
+			}
+			lastDigit = char
+		}
+	}
+
+	if !foundFirst {
+		// No digit found in the line; returning 0.
+		return 0
+	}
+
+	// Convert runes (digits) to their string equivalent.
+	calibStr := string(firstDigit) + string(lastDigit)
+	calibVal, err := strconv.Atoi(calibStr)
+	if err != nil {
+		// In case of conversion error; this shouldn't occur if the input is valid.
+		log.Fatalf("Error converting %s to integer: %v", calibStr, err)
+	}
+	return calibVal
+}
+
+func main() {
+	file, err := os.Open("input.txt")
+	if err != nil {
+		log.Fatalf("Failed to open input.txt: %v", err)
+	}
+	defer file.Close()
+
+	total := 0
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if len(line) == 0 {
+			continue
+		}
+		total += extractCalibrationValue(line)
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatalf("Error reading input.txt: %v", err)
+	}
+	fmt.Println("Total calibration value:", total)
+}
+```
+</Collapsible>

@@ -1,0 +1,832 @@
+---
+title: "Go language basics"
+description: "Learn the basics of the Go programming language."
+section: "🏃‍♂️ Getting started"
+order: 1
+languages: ["go"]
+---
+# Getting Started with Go: Core Language Features
+
+This guide focuses on fundamental Go language features you need to understand when building applications like the `envtamer` CLI tool. We'll cover Go-specific concepts that might be new to programmers coming from other languages.
+
+## 1. Go Basics
+
+### Package System
+
+All Go programs start with a package declaration:
+
+```go
+package main // Executable program
+```
+
+```go
+package util // Reusable library
+```
+
+Only files with `package main` and a `main()` function can be directly executed.
+
+### Importing Packages
+
+Go uses explicit imports from the standard library or other modules:
+
+```go
+import (
+    "fmt"        // Formatting/printing
+    "os"         // Operating system functions
+    "strings"    // String manipulation
+    "path/filepath" // Cross-platform file paths
+)
+
+// Multiple imports can be grouped
+import (
+    "database/sql" // Database access
+    "encoding/json" // JSON encoding/decoding
+)
+```
+
+## 2. Variables and Types
+
+### Basic Types
+
+```go
+// Basic types
+var i int = 10          // Integer
+var f float64 = 3.14    // Floating point
+var s string = "hello"  // String
+var b bool = true       // Boolean
+
+// Type inference with short declaration
+name := "John"          // Infers string type
+count := 42             // Infers int type
+```
+
+### Constants
+
+```go
+const (
+    StatusOK = 0
+    StatusError = 1
+
+    // iota creates incrementing constants
+    Sunday = iota  // 0
+    Monday         // 1
+    Tuesday        // 2
+)
+```
+
+### Zero Values
+
+Every type has a "zero value" used when variables are declared but not initialized:
+
+```go
+var i int      // 0
+var f float64  // 0.0
+var s string   // "" (empty string)
+var b bool     // false
+var p *int     // nil (pointer)
+```
+
+## 3. Pointers
+
+Go has pointers but no pointer arithmetic:
+
+```go
+// Creating a pointer
+x := 10
+var ptr *int = &x  // ptr points to x
+
+// Dereferencing
+fmt.Println(*ptr)  // Prints 10
+
+// Changing value through pointer
+*ptr = 20
+fmt.Println(x)     // Prints 20, x is now 20
+
+// Zero value for pointers is nil
+var p *int  // p is nil
+```
+
+### When to Use Pointers
+
+- When you need to modify the original variable
+- When the object is large and copying would be expensive
+- When implementing methods that need to modify the receiver
+
+## 4. Structs and Constructors
+
+### Defining Structs
+
+```go
+type Person struct {
+    FirstName string
+    LastName  string
+    Age       int
+}
+```
+
+### Creating Struct Instances
+
+```go
+// Direct initialization
+p1 := Person{
+    FirstName: "John",
+    LastName:  "Doe",
+    Age:       30,
+}
+
+// Zero initialization and field assignment
+var p2 Person
+p2.FirstName = "Jane"
+p2.LastName = "Doe"
+p2.Age = 28
+```
+
+### Constructor Pattern
+
+Go doesn't have built-in constructors, but uses factory functions instead:
+
+```go
+// Constructor for Person
+func NewPerson(firstName, lastName string, age int) *Person {
+    // Validation can be done here
+    if age < 0 {
+        age = 0
+    }
+
+    return &Person{
+        FirstName: firstName,
+        LastName:  lastName,
+        Age:       age,
+    }
+}
+
+// Usage
+person := NewPerson("John", "Smith", 25)
+```
+
+This pattern was used in the `envtamer` storage package:
+
+```go
+// Constructor for Storage
+func New() (*Storage, error) {
+    home, err := os.UserHomeDir()
+    if err != nil {
+        return nil, fmt.Errorf("failed to get user home directory: %w", err)
+    }
+
+    // Initialize and return the storage
+    // ...
+
+    return &Storage{db: db}, nil
+}
+```
+
+## 5. Methods and Receivers
+
+Methods are functions attached to a type:
+
+### Value Receivers
+
+```go
+// Value receiver - operates on a copy
+func (p Person) FullName() string {
+    return p.FirstName + " " + p.LastName
+}
+```
+
+### Pointer Receivers
+
+```go
+// Pointer receiver - can modify the original
+func (p *Person) SetAge(age int) {
+    if age >= 0 {
+        p.Age = age
+    }
+}
+```
+
+### When to Use Each Receiver Type
+
+- **Value receivers**: When you don't need to modify the receiver and it's a small struct
+- **Pointer receivers**: When you need to modify the receiver, or when the struct is large
+
+In the `envtamer` tool, pointer receivers were used for the database methods:
+
+```go
+// Pointer receiver to modify the database
+func (s *Storage) SaveEnvVars(directory string, envVars map[string]string) error {
+    // Implementation...
+}
+```
+
+## 6. Interfaces
+
+Interfaces in Go are implemented implicitly:
+
+```go
+// Define an interface
+type Logger interface {
+    Log(message string)
+    LogError(message string, err error)
+}
+
+// Implement the interface
+type ConsoleLogger struct {
+    Prefix string
+}
+
+// Implementation method
+func (l ConsoleLogger) Log(message string) {
+    fmt.Println(l.Prefix + ": " + message)
+}
+
+// Implementation method
+func (l ConsoleLogger) LogError(message string, err error) {
+    fmt.Printf("%s: ERROR - %s: %v\n", l.Prefix, message, err)
+}
+
+// Function that accepts the interface
+func ProcessWithLogging(logger Logger) {
+    logger.Log("Processing started")
+    // Do work...
+    logger.Log("Processing complete")
+}
+
+// Usage
+logger := ConsoleLogger{Prefix: "APP"}
+ProcessWithLogging(logger)
+```
+
+### Empty Interface
+
+The empty interface `interface{}` (or `any` in newer Go versions) can hold values of any type:
+
+```go
+func PrintAnything(v interface{}) {
+    fmt.Printf("Value: %v, Type: %T\n", v, v)
+}
+```
+
+## 7. Error Handling
+
+Go uses explicit error handling with the `error` interface:
+
+```go
+// Basic error handling
+file, err := os.Open("file.txt")
+if err != nil {
+    return fmt.Errorf("failed to open file: %w", err) // Wrap the error
+}
+defer file.Close()
+```
+
+### Creating Errors
+
+```go
+// Simple error
+err := errors.New("something went wrong")
+
+// Formatted error
+err := fmt.Errorf("invalid value: %d", value)
+```
+
+### Error Wrapping (Go 1.13+)
+
+```go
+// Wrap an error to add context
+if err != nil {
+    return fmt.Errorf("failed to process data: %w", err)
+}
+
+// Unwrap to check the original error
+if errors.Is(err, os.ErrNotExist) {
+    // Handle file not found
+}
+```
+
+## 8. Defer, Panic, and Recover
+
+### Defer
+
+`defer` schedules a function call to be executed when the surrounding function returns:
+
+```go
+func processFile(path string) error {
+    file, err := os.Open(path)
+    if err != nil {
+        return err
+    }
+    defer file.Close() // Will be executed when function returns
+
+    // Process file...
+    return nil
+}
+```
+
+### Panic and Recover
+
+`panic` causes immediate termination unless `recover` is called:
+
+```go
+func doSomething() (err error) {
+    defer func() {
+        if r := recover(); r != nil {
+            err = fmt.Errorf("recovered from panic: %v", r)
+        }
+    }()
+
+    // This will cause a panic
+    var p *int = nil
+    fmt.Println(*p) // Nil pointer dereference
+
+    return nil
+}
+```
+
+## 9. Slices and Maps
+
+### Slices
+
+Slices are dynamic arrays:
+
+```go
+// Create a slice
+names := []string{"Alice", "Bob", "Charlie"}
+
+// Append to a slice
+names = append(names, "Dave")
+
+// Slice operations
+subset := names[1:3] // [Bob, Charlie]
+
+// Make with capacity
+numbers := make([]int, 0, 10) // Length 0, capacity 10
+```
+
+### Maps
+
+Maps are key-value stores:
+
+```go
+// Create a map
+ages := map[string]int{
+    "Alice": 25,
+    "Bob":   30,
+}
+
+// Add/update
+ages["Charlie"] = 22
+
+// Check if key exists
+age, exists := ages["Dave"]
+if !exists {
+    fmt.Println("Dave not found")
+}
+
+// Delete
+delete(ages, "Bob")
+```
+
+## 10. Concurrency with Goroutines and Channels
+
+### Goroutines
+
+Goroutines are lightweight threads:
+
+```go
+func process(id int) {
+    fmt.Printf("Processing %d\n", id)
+    time.Sleep(time.Second)
+    fmt.Printf("Done %d\n", id)
+}
+
+func main() {
+    // Start concurrent execution
+    go process(1)
+    go process(2)
+
+    // Wait to see results
+    time.Sleep(2 * time.Second)
+}
+```
+
+### Channels
+
+Channels allow communication between goroutines:
+
+```go
+func worker(id int, jobs <-chan int, results chan<- int) {
+    for j := range jobs {
+        fmt.Printf("Worker %d processing job %d\n", id, j)
+        time.Sleep(time.Second)
+        results <- j * 2
+    }
+}
+
+func main() {
+    jobs := make(chan int, 100)
+    results := make(chan int, 100)
+
+    // Start workers
+    for w := 1; w <= 3; w++ {
+        go worker(w, jobs, results)
+    }
+
+    // Send jobs
+    for j := 1; j <= 5; j++ {
+        jobs <- j
+    }
+    close(jobs)
+
+    // Collect results
+    for a := 1; a <= 5; a++ {
+        <-results
+    }
+}
+```
+
+## 11. File Handling
+
+### Reading Files
+
+```go
+// Read entire file
+content, err := os.ReadFile("file.txt")
+if err != nil {
+    return err
+}
+fmt.Println(string(content))
+
+// Read line by line
+file, err := os.Open("file.txt")
+if err != nil {
+    return err
+}
+defer file.Close()
+
+scanner := bufio.NewScanner(file)
+for scanner.Scan() {
+    line := scanner.Text()
+    fmt.Println(line)
+}
+return scanner.Err()
+```
+
+### Writing Files
+
+```go
+// Write entire file
+data := []byte("Hello, World!")
+err := os.WriteFile("file.txt", data, 0644)
+if err != nil {
+    return err
+}
+
+// Write with more control
+file, err := os.Create("file.txt")
+if err != nil {
+    return err
+}
+defer file.Close()
+
+writer := bufio.NewWriter(file)
+fmt.Fprintln(writer, "Line 1")
+fmt.Fprintln(writer, "Line 2")
+return writer.Flush()
+```
+
+## 12. Working with JSON
+
+### Marshaling (Object to JSON)
+
+```go
+type Person struct {
+    Name    string `json:"name"`
+    Age     int    `json:"age"`
+    Address string `json:"address,omitempty"`
+}
+
+person := Person{
+    Name: "John",
+    Age:  30,
+}
+
+jsonData, err := json.Marshal(person)
+if err != nil {
+    return err
+}
+fmt.Println(string(jsonData)) // {"name":"John","age":30}
+```
+
+### Unmarshaling (JSON to Object)
+
+```go
+jsonData := []byte(`{"name":"Jane","age":25,"address":"123 Main St"}`)
+
+var person Person
+err := json.Unmarshal(jsonData, &person)
+if err != nil {
+    return err
+}
+fmt.Printf("%+v\n", person)
+```
+
+## 13. Context Package
+
+The `context` package helps manage deadlines, cancellation signals, and request-scoped values:
+
+```go
+func processWithTimeout(ctx context.Context) error {
+    // Create a derived context with timeout
+    ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+    defer cancel()
+
+    select {
+    case <-time.After(5 * time.Second):
+        return fmt.Errorf("process completed")
+    case <-ctx.Done():
+        return ctx.Err() // This will be "context deadline exceeded"
+    }
+}
+
+func main() {
+    ctx := context.Background()
+    err := processWithTimeout(ctx)
+    fmt.Println(err)
+}
+```
+
+## 14. Testing
+
+Go has built-in testing:
+
+```go
+// In file: math_test.go
+package math
+
+import "testing"
+
+func TestAdd(t *testing.T) {
+    result := Add(2, 3)
+    expected := 5
+
+    if result != expected {
+        t.Errorf("Add(2, 3) = %d; want %d", result, expected)
+    }
+}
+
+// Table-driven tests
+func TestMultiply(t *testing.T) {
+    tests := []struct {
+        a, b, want int
+    }{
+        {2, 3, 6},
+        {-1, 5, -5},
+        {0, 10, 0},
+    }
+
+    for _, tt := range tests {
+        if got := Multiply(tt.a, tt.b); got != tt.want {
+            t.Errorf("Multiply(%d, %d) = %d; want %d", tt.a, tt.b, got, tt.want)
+        }
+    }
+}
+```
+
+Run tests with:
+```
+go test ./...
+```
+
+## 15. Struct Embedding
+
+Go supports composition through struct embedding:
+
+```go
+type Address struct {
+    Street  string
+    City    string
+    ZipCode string
+}
+
+type Person struct {
+    Name    string
+    Age     int
+    Address // Embedded struct
+}
+
+// Usage
+p := Person{
+    Name: "John",
+    Age:  30,
+    Address: Address{
+        Street:  "123 Main St",
+        City:    "Anytown",
+        ZipCode: "12345",
+    },
+}
+
+// Fields from Address are promoted to Person
+fmt.Println(p.City) // "Anytown"
+```
+
+## 16. Visibility Rules
+
+In Go, visibility is determined by capitalization:
+
+```go
+package data
+
+// Public - accessible from other packages
+type User struct {
+    Name  string // Public field
+    email string // Private field
+}
+
+// Public function
+func NewUser(name, email string) *User {
+    return &User{
+        Name:  name,
+        email: email,
+    }
+}
+
+// Private function
+func validateEmail(email string) bool {
+    // Implementation
+    return true
+}
+```
+
+## 17. Type Assertions and Type Switches
+
+### Type Assertions
+
+```go
+var i interface{} = "hello"
+
+// Type assertion with check
+s, ok := i.(string)
+if ok {
+    fmt.Println(s) // "hello"
+}
+
+// Type assertion without check (will panic if wrong)
+n := i.(int) // This will panic
+```
+
+### Type Switches
+
+```go
+func describe(i interface{}) {
+    switch v := i.(type) {
+    case int:
+        fmt.Printf("Integer: %d\n", v)
+    case string:
+        fmt.Printf("String: %s\n", v)
+    case bool:
+        fmt.Printf("Boolean: %v\n", v)
+    default:
+        fmt.Printf("Unknown type: %T\n", v)
+    }
+}
+```
+
+## Practical Examples from envtamer
+
+Let's see how these concepts apply to our `envtamer` CLI tool:
+
+### Constructor Pattern
+
+```go
+// Storage constructor
+func New() (*Storage, error) {
+    home, err := os.UserHomeDir()
+    if err != nil {
+        return nil, fmt.Errorf("failed to get user home directory: %w", err)
+    }
+
+    // Create directory if it doesn't exist
+    dbDir := filepath.Join(home, ".envtamer")
+    if err := os.MkdirAll(dbDir, 0755); err != nil {
+        return nil, fmt.Errorf("failed to create database directory: %w", err)
+    }
+
+    // Open database
+    dbPath := filepath.Join(dbDir, "envtamer.db")
+    db, err := sql.Open("sqlite", dbPath)
+    if err != nil {
+        return nil, fmt.Errorf("failed to open database: %w", err)
+    }
+
+    return &Storage{db: db}, nil
+}
+```
+
+### Method Receivers
+
+```go
+// Storage struct with methods
+type Storage struct {
+    db *sql.DB
+}
+
+// Method with pointer receiver
+func (s *Storage) Init() error {
+    _, err := s.db.Exec(`
+        CREATE TABLE IF NOT EXISTS "EnvVariables" (
+            "Directory" TEXT NOT NULL,
+            "Key" TEXT NOT NULL,
+            "Value" TEXT NOT NULL,
+            CONSTRAINT "PK_EnvVariables" PRIMARY KEY ("Directory", "Key")
+        );
+    `)
+    if err != nil {
+        return fmt.Errorf("failed to initialize database table: %w", err)
+    }
+    return nil
+}
+```
+
+### Error Handling
+
+```go
+func (s *Storage) GetEnvVars(directory string) (map[string]string, error) {
+    rows, err := s.db.Query("SELECT Key, Value FROM EnvVariables WHERE Directory = ?", directory)
+    if err != nil {
+        return nil, fmt.Errorf("failed to query env vars: %w", err)
+    }
+    defer rows.Close()
+
+    // Process results...
+    if len(envVars) == 0 {
+        return nil, fmt.Errorf("directory not found: %s", directory)
+    }
+
+    return envVars, nil
+}
+```
+
+### Parsing Environment Files
+
+```go
+func ParseEnvFile(path string) (map[string]string, error) {
+    file, err := os.Open(path)
+    if err != nil {
+        return nil, fmt.Errorf("failed to open file: %w", err)
+    }
+    defer file.Close()
+
+    envVars := make(map[string]string)
+    scanner := bufio.NewScanner(file)
+
+    for scanner.Scan() {
+        line := strings.TrimSpace(scanner.Text())
+        if line == "" || strings.HasPrefix(line, "#") {
+            continue
+        }
+
+        parts := strings.SplitN(line, "=", 2)
+        if len(parts) != 2 {
+            continue
+        }
+
+        key := strings.TrimSpace(parts[0])
+        value := strings.TrimSpace(parts[1])
+
+        // Handle quoted values
+        if len(value) > 1 && (value[0] == '"' || value[0] == '\'') && value[0] == value[len(value)-1] {
+            value = value[1 : len(value)-1]
+        }
+
+        envVars[key] = value
+    }
+
+    if err := scanner.Err(); err != nil {
+        return nil, fmt.Errorf("error reading file: %w", err)
+    }
+
+    return envVars, nil
+}
+```
+
+## Conclusion
+
+This guide covered the essential Go language features needed to build the `envtamer` CLI application. Go's philosophy encourages simplicity, explicitness, and readability. Its standard library is comprehensive and well-designed, making it possible to build useful applications with minimal external dependencies.
+
+Key takeaways:
+1. Go uses explicit error handling with the `error` type
+2. Pointers provide control over whether data is passed by value or reference
+3. Methods can use value or pointer receivers depending on whether they need to modify the receiver
+4. Constructors are implemented as factory functions
+5. The standard library provides robust support for common tasks like file I/O and database access
+6. Defer provides a clean way to handle resource cleanup
+
+Remember that Go favors convention over configuration, so following the standard practices outlined in this guide will help you write idiomatic Go code that other Go developers can easily understand and maintain.
+
+## References
+
+- [Official Go Documentation](https://go.dev/doc/)
+- [A Tour of Go](https://go.dev/tour/welcome/1) - Interactive introduction
+- [Effective Go](https://go.dev/doc/effective_go) - Best practices
+- [Go by Example](https://gobyexample.com/) - Practical examples
