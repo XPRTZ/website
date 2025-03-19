@@ -1,0 +1,440 @@
+---
+title: "Python language basics"
+description: "Learn the basics of the Python programming language."
+section: "🏃‍♂️ Getting started"
+order: 2
+languages: ["python"]
+---
+
+# Getting Started with Python: Core Language Features
+
+This guide covers the fundamental features of Python you need to start building applications. Whether you're coming from another language or new to programming, these concepts will help you understand how Python works and how to use its powerful standard library.
+
+## 1. Python Basics
+
+### Modules and Packages
+
+In Python, every file is a module, and folders with an `__init__.py` file are packages. Modules allow you to organize your code into reusable components.
+
+```python
+# greeting.py
+def say_hello(name):
+    print(f"Hello, {name}!")
+```
+
+```python
+# main.py
+import greeting
+
+greeting.say_hello("Alice")
+```
+
+### Importing Modules
+
+You can import individual functions, entire modules, or specific classes:
+
+```python
+import math                   # Import the whole module
+from math import sqrt          # Import specific function
+import os, sys                # Multiple modules can be imported on one line
+```
+
+## 2. Variables and Types
+
+### Dynamic Typing
+
+Python is dynamically typed; you don’t need to declare variable types explicitly.
+
+```python
+i = 10              # Integer
+f = 3.14            # Float
+s = "hello"         # String
+b = True            # Boolean
+```
+
+### Constants
+
+Python doesn't have built-in constants, but by convention, variables written in all uppercase are treated as constants:
+
+```python
+STATUS_OK = 0
+STATUS_ERROR = 1
+```
+
+### Zero Values and None
+
+In Python, variables that are not initialized are typically set to `None`:
+
+```python
+x = None   # Represents the absence of a value
+```
+
+## 3. References (No Pointers)
+
+Python uses references to manage objects. Variables are names bound to objects rather than explicit pointers.
+
+```python
+x = 10
+y = x        # y refers to the same immutable integer 10
+lst1 = [1, 2, 3]
+lst2 = lst1  # Both lst1 and lst2 refer to the same list
+lst2.append(4)
+print(lst1)  # Output: [1, 2, 3, 4]
+```
+
+## 4. Classes and Constructors
+
+### Defining Classes
+
+Python uses classes to define custom data types and encapsulate behavior. The constructor is defined by the `__init__` method.
+
+```python
+class Person:
+    def __init__(self, first_name, last_name, age):
+        if age < 0:
+            age = 0  # Simple validation
+        self.first_name = first_name
+        self.last_name = last_name
+        self.age = age
+
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def set_age(self, age):
+        if age >= 0:
+            self.age = age
+
+# Usage
+person = Person("John", "Doe", 30)
+print(person.full_name())  # "John Doe"
+```
+
+### Class Methods vs. Instance Methods
+
+In Python, methods always receive the instance (`self`) as the first argument.
+
+## 5. Interfaces and Abstract Base Classes
+
+Python uses duck typing, but you can also define interfaces using the `abc` module.
+
+```python
+from abc import ABC, abstractmethod
+
+class Logger(ABC):
+    @abstractmethod
+    def log(self, message: str):
+        pass
+
+    @abstractmethod
+    def log_error(self, message: str, err: Exception):
+        pass
+
+class ConsoleLogger(Logger):
+    def log(self, message: str):
+        print(f"INFO: {message}")
+
+    def log_error(self, message: str, err: Exception):
+        print(f"ERROR: {message}: {err}")
+
+def process_with_logging(logger: Logger):
+    logger.log("Processing started")
+    # Do work...
+    logger.log("Processing complete")
+
+# Usage
+logger = ConsoleLogger()
+process_with_logging(logger)
+```
+
+## 6. Error Handling
+
+Python uses exceptions for error handling.
+
+```python
+try:
+    file = open("file.txt", "r")
+    content = file.read()
+except FileNotFoundError as err:
+    print(f"Error: {err}")
+finally:
+    if 'file' in locals():
+        file.close()
+```
+
+### Raising Exceptions
+
+```python
+def divide(a, b):
+    if b == 0:
+        raise ValueError("Cannot divide by zero")
+    return a / b
+
+try:
+    result = divide(10, 0)
+except ValueError as err:
+    print(err)
+```
+
+## 7. Context Managers
+
+Use the `with` statement to manage resources like files. It ensures proper cleanup, similar to Go's `defer`.
+
+```python
+with open("file.txt", "r") as file:
+    for line in file:
+        print(line.strip())
+```
+
+## 8. Lists (Slices) and Dictionaries (Maps)
+
+### Lists
+
+Lists in Python are dynamic arrays.
+
+```python
+names = ["Alice", "Bob", "Charlie"]
+names.append("Dave")
+subset = names[1:3]  # ['Bob', 'Charlie']
+```
+
+### Dictionaries
+
+Dictionaries are key-value stores.
+
+```python
+ages = {"Alice": 25, "Bob": 30}
+ages["Charlie"] = 22
+
+if "Dave" not in ages:
+    print("Dave not found")
+
+del ages["Bob"]
+```
+
+## 9. Concurrency
+
+Python supports concurrency with threads, processes, and asynchronous programming.
+
+### Using Threads
+
+```python
+import threading
+import time
+
+def process(id):
+    print(f"Processing {id}")
+    time.sleep(1)
+    print(f"Done {id}")
+
+threads = []
+for i in range(1, 3):
+    t = threading.Thread(target=process, args=(i,))
+    threads.append(t)
+    t.start()
+
+for t in threads:
+    t.join()
+```
+
+### Asynchronous Programming
+
+Python's `asyncio` library enables concurrent code using async/await syntax.
+
+```python
+import asyncio
+
+async def process(id):
+    print(f"Async processing {id}")
+    await asyncio.sleep(1)
+    print(f"Async done {id}")
+
+async def main():
+    await asyncio.gather(process(1), process(2))
+
+asyncio.run(main())
+```
+
+## 10. File Handling
+
+### Reading Files
+
+```python
+# Read the entire file
+with open("file.txt", "r") as file:
+    content = file.read()
+    print(content)
+
+# Read line by line
+with open("file.txt", "r") as file:
+    for line in file:
+        print(line.strip())
+```
+
+### Writing Files
+
+```python
+data = "Hello, World!"
+with open("file.txt", "w") as file:
+    file.write(data)
+
+# Writing multiple lines
+lines = ["Line 1", "Line 2"]
+with open("file.txt", "w") as file:
+    for line in lines:
+        file.write(line + "\n")
+```
+
+## 11. Working with JSON
+
+Python provides the `json` module to work with JSON data.
+
+### Serializing (Object to JSON)
+
+```python
+import json
+
+person = {
+    "name": "John",
+    "age": 30,
+    "address": None  # Omitted or set to None if not provided
+}
+
+json_data = json.dumps(person)
+print(json_data)  # {"name": "John", "age": 30, "address": null}
+```
+
+### Deserializing (JSON to Object)
+
+```python
+json_data = '{"name": "Jane", "age": 25, "address": "123 Main St"}'
+person = json.loads(json_data)
+print(person)
+```
+
+## 12. Testing
+
+Python includes built-in support for testing with the `unittest` module.
+
+```python
+# In file: test_math.py
+import unittest
+
+def add(a, b):
+    return a + b
+
+def multiply(a, b):
+    return a * b
+
+class TestMath(unittest.TestCase):
+    def test_add(self):
+        self.assertEqual(add(2, 3), 5)
+
+    def test_multiply(self):
+        test_cases = [
+            (2, 3, 6),
+            (-1, 5, -5),
+            (0, 10, 0),
+        ]
+        for a, b, expected in test_cases:
+            self.assertEqual(multiply(a, b), expected)
+
+if __name__ == '__main__':
+    unittest.main()
+```
+
+Run tests with:
+```
+python -m unittest discover
+```
+
+## 13. Composition and Inheritance
+
+Python supports composition and inheritance. Use inheritance to share common functionality.
+
+```python
+class Address:
+    def __init__(self, street, city, zipcode):
+        self.street = street
+        self.city = city
+        self.zipcode = zipcode
+
+class Person:
+    def __init__(self, name, age, address: Address):
+        self.name = name
+        self.age = age
+        self.address = address
+
+# Usage
+address = Address("123 Main St", "Anytown", "12345")
+person = Person("John Doe", 30, address)
+print(person.address.city)  # "Anytown"
+```
+
+## 14. Visibility Rules
+
+In Python, a single underscore prefix (e.g., `_variable`) indicates that an attribute is intended for internal use. There is no strict enforcement like in other languages.
+
+```python
+class User:
+    def __init__(self, name, email):
+        self.name = name      # Public attribute
+        self._email = email   # Private attribute by convention
+
+    def get_email(self):
+        return self._email
+
+user = User("Alice", "alice@example.com")
+print(user.name)
+print(user.get_email())
+```
+
+## 15. Type Checks and Dynamic Typing
+
+Although Python is dynamically typed, you can check types using `isinstance` and use type hints for better readability.
+
+```python
+def process(value: object):
+    if isinstance(value, int):
+        print("Integer:", value)
+    elif isinstance(value, str):
+        print("String:", value)
+    else:
+        print("Unknown type:", type(value))
+
+process("hello")
+```
+
+## Conclusion
+
+This guide has covered essential Python features needed to build robust applications. Python emphasizes simplicity and readability while providing powerful tools such as:
+
+1. A flexible module system to organize code.
+2. Dynamic typing and built-in data types (lists, dictionaries, etc.).
+3. Robust error handling using exceptions and context managers.
+4. Object-oriented programming with classes and inheritance.
+5. Concurrency through threads and asynchronous programming.
+6. Comprehensive standard libraries for file I/O, JSON handling, and testing.
+
+These core concepts lay the foundation for writing clear, maintainable, and efficient Python code. Explore the language further by building projects and reviewing the extensive Python documentation.
+
+## References
+
+- **Python For Beginners on python.org**
+  This is the official “Getting Started” page from python.org, where you’ll find an introduction to Python, installation guidelines, and beginner-friendly resources.
+  https://www.python.org/about/gettingstarted/
+
+- **Python Getting Started on W3Schools**
+  W3Schools offers a concise introduction covering the basics of Python syntax, variables, data types, and simple examples to help you quickly start writing code.
+  https://www.w3schools.com/python/python_getstarted.asp
+
+- **Getting Started with Python Programming from GeeksforGeeks**
+  GeeksforGeeks provides a step-by-step guide that covers installation, your first Python program, and essential concepts in a clear and practical manner.
+  https://www.geeksforgeeks.org/getting-started-with-python-programming/
+
+- **The Python Tutorial from the Official Python Documentation**
+  The official tutorial is an in-depth introduction to Python. It covers everything from basic syntax and data types to control flow and modules, making it a great resource for both beginners and experienced programmers.
+  https://docs.python.org/3/tutorial/index.html
+
+- **The Ultimate Python Beginner’s Handbook on freeCodeCamp**
+  This comprehensive guide is written for beginners and provides an overview of core Python concepts along with practical tips and downloadable content to kickstart your learning journey.
+  https://www.freecodecamp.org/news/the-python-guide-for-beginners/

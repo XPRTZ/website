@@ -1,0 +1,192 @@
+---
+title: "Exercise 2"
+description: "Learn the basics of the Python and Go programming languages with exercises."
+section: "🏃‍♂️ Getting started"
+order: 4
+languages: ["python", "go"]
+---
+
+In this challenge you are given a two‐dimensional “engine schematic” (a grid of characters). Some groups of consecutive digits (a “number”) are scattered throughout the grid. However, you should only count a number if at least one of the cells occupied by that number has at least one neighbor (in one of the 8 directions) that is a “symbol.” Here a symbol is any character that is not a digit and is not a period ("."). In the sample schematic below, the numbers 114 (in the top‐right) and 58 (in the middle‐right) are not adjacent to any symbol, while every other number is. (As in the example, the sum of the valid numbers is 4361.)
+
+For example, given this schematic:
+
+```text
+467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..
+```
+
+The numbers with at least one adjacent (including diagonally) symbol are:
+
+- “467” (adjacent to “*”)
+- “35”, “633”, “617”, “592”, “755”, “664”, “598” (each touches a neighboring symbol)
+- “114” and “58” are ignored because none of their individual digit positions touches any symbol.
+
+## Python
+
+<Collapsible title="Solution">
+```python
+import re
+
+def is_symbol(ch: str) -> bool:
+    """Return True if the character is a symbol (non-digit and not a period)."""
+    return not ch.isdigit() and ch != '.'
+
+def main():
+    # Read the input file as a list of lines.
+    with open("input.txt") as f:
+        grid = [line.rstrip("\n") for line in f]
+
+    total = 0
+    rows = len(grid)
+
+    # Process each row; use regex to find contiguous digit groups.
+    for r, line in enumerate(grid):
+        # Find all digit groups in this line.
+        for match in re.finditer(r"\d+", line):
+            num_str = match.group(0)
+            start, end = match.start(), match.end()  # [start, end) positions in this row
+
+            # Build a list of coordinate tuples (r, c) for every cell belonging to this number.
+            group_cells = [(r, c) for c in range(start, end)]
+            qualifies = False
+            for (gr, gc) in group_cells:
+                # Check all eight neighbors around this cell.
+                for dr in (-1, 0, 1):
+                    for dc in (-1, 0, 1):
+                        # Skip the cell itself.
+                        if dr == 0 and dc == 0:
+                            continue
+                        nr, nc = gr + dr, gc + dc
+                        # Make sure the neighbor is within grid bounds.
+                        if nr < 0 or nr >= rows:
+                            continue
+                        if nc < 0 or nc >= len(grid[nr]):
+                            continue
+                        # If the neighbor is in the same number group (same row and within [start,end))
+                        # skip it.
+                        if nr == r and (start <= nc < end):
+                            continue
+                        # If the neighbor is a symbol, mark this number as qualifying.
+                        if is_symbol(grid[nr][nc]):
+                            qualifies = True
+                            break
+                    if qualifies:
+                        break
+                if qualifies:
+                    break
+            if qualifies:
+                total += int(num_str)
+
+    print("Sum of part numbers:", total)
+
+if __name__ == "__main__":
+    main()
+```
+</Collapsible>
+
+## Go
+
+<Collapsible title="Solution">
+```go
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+	"regexp"
+	"strconv"
+	"unicode"
+)
+
+// isSymbol returns true if ch is considered a symbol (non-digit and not a period).
+func isSymbol(ch rune) bool {
+	return !unicode.IsDigit(ch) && ch != '.'
+}
+
+func main() {
+	// Read the input file into a slice of rune slices (one for each row).
+	file, err := os.Open("input.txt")
+	if err != nil {
+		log.Fatalf("Failed to open input.txt: %v", err)
+	}
+	defer file.Close()
+
+	var grid [][]rune
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		// Convert each line into a slice of runes.
+		grid = append(grid, []rune(scanner.Text()))
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatalf("Error reading input.txt: %v", err)
+	}
+
+	total := 0
+	rows := len(grid)
+
+	// Prepare a regex to find one or more consecutive digits.
+	re := regexp.MustCompile(`\d+`)
+
+	// For each row...
+	for r, row := range grid {
+		// Convert the row (slice of runes) to a string.
+		line := string(row)
+		// Find all matches and their indices.
+		matches := re.FindAllStringIndex(line, -1)
+		for _, match := range matches {
+			start, end := match[0], match[1]
+			numStr := line[start:end]
+			qualifies := false
+
+			// For every cell position that is part of the current number.
+			for c := start; c < end && !qualifies; c++ {
+				// Check the eight neighbors.
+				for dr := -1; dr <= 1 && !qualifies; dr++ {
+					for dc := -1; dc <= 1; dc++ {
+						if dr == 0 && dc == 0 {
+							continue
+						}
+						nr, nc := r+dr, c+dc
+						// Ensure neighbor is within bounds.
+						if nr < 0 || nr >= rows {
+							continue
+						}
+						if nc < 0 || nc >= len(grid[nr]) {
+							continue
+						}
+						// If neighbor is on the same row and part of the same number, skip it.
+						if nr == r && nc >= start && nc < end {
+							continue
+						}
+						if isSymbol(grid[nr][nc]) {
+							qualifies = true
+							break
+						}
+					}
+				}
+			}
+
+			if qualifies {
+				val, err := strconv.Atoi(numStr)
+				if err != nil {
+					log.Fatalf("Error converting %s to integer: %v", numStr, err)
+				}
+				total += val
+			}
+		}
+	}
+
+	fmt.Println("Sum of part numbers:", total)
+}
+```
+</Collapsible>
