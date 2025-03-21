@@ -1,5 +1,5 @@
 name: "[Reusable workflow] Apply Bicep infrastructure"
-concurrency: apply-infrastructure-${{ github.ref_name }}-${{ github.event_name }}
+concurrency: apply-infrastructure-${{ inputs.application }}-${{ github.ref_name }}-${{ github.event_name }}
 
 on:
   workflow_call:
