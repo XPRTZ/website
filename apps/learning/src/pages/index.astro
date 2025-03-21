@@ -1,8 +1,8 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import CsharpLogo from '../assets/logo_csharp.svg';
-import PythonLogo from '../assets/logo_python.svg';
-import GoLogo from '../assets/logo_go.svg';
+import Layout from "../layouts/Layout.astro";
+import CsharpLogo from "../assets/logo_csharp.svg";
+import PythonLogo from "../assets/logo_python.svg";
+import GoLogo from "../assets/logo_go.svg";
 ---
 
 <Layout title="Polyglot Programming - Learn C#, Python, and Go">
@@ -10,7 +10,9 @@ import GoLogo from '../assets/logo_go.svg';
     <h1 class="text-4xl font-bold mb-6">Welcome to Polyglot Programming</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-center">
-      <div class="bg-blue-100 dark:bg-blue-900 p-6 rounded-lg transition-colors flex flex-col items-center">
+      <div
+        class="bg-blue-100 dark:bg-blue-900 p-6 rounded-lg flex flex-col items-center"
+      >
         <h2 class="text-2xl font-semibold mb-2">C#</h2>
         <div class="p-4">
           <CsharpLogo size={128} />
@@ -18,7 +20,9 @@ import GoLogo from '../assets/logo_go.svg';
         <p>A modern, object-oriented language from Microsoft</p>
       </div>
 
-      <div class="bg-green-100 dark:bg-green-900 p-6 rounded-lg transition-colors flex flex-col items-center">
+      <div
+        class="bg-green-100 dark:bg-green-900 p-6 rounded-lg flex flex-col items-center"
+      >
         <h2 class="text-2xl font-semibold mb-2">Python</h2>
         <div class="p-4">
           <PythonLogo />
@@ -26,7 +30,9 @@ import GoLogo from '../assets/logo_go.svg';
         <p>A versatile, readable language for many purposes</p>
       </div>
 
-      <div class="bg-cyan-100 dark:bg-cyan-900 p-6 rounded-lg transition-colors flex flex-col items-center">
+      <div
+        class="bg-cyan-100 dark:bg-cyan-900 p-6 rounded-lg flex flex-col items-center"
+      >
         <h2 class="text-2xl font-semibold mb-2">Go</h2>
         <div class="p-4">
           <GoLogo size={128} />
@@ -38,9 +44,10 @@ import GoLogo from '../assets/logo_go.svg';
     <div class="prose dark:prose-invert max-w-none">
       <h2 class="text-2xl font-semibold mb-4">About This Course</h2>
       <p class="mb-4">
-        Learn three powerful programming languages side by side through practical examples.
-        Each step of the course covers the same concept across all three languages,
-        helping you understand the similarities and differences between them.
+        Learn three powerful programming languages side by side through
+        practical examples. Each step of the course covers the same concept
+        across all three languages, helping you understand the similarities and
+        differences between them.
       </p>
 
       <h3 class="text-xl font-semibold mb-2">How It Works</h3>
@@ -51,9 +58,12 @@ import GoLogo from '../assets/logo_go.svg';
         <li>Try the examples yourself</li>
       </ol>
 
-      <div class="bg-yellow-50 dark:bg-yellow-900/50 p-4 rounded-lg transition-colors">
+      <div class="bg-yellow-50 dark:bg-yellow-900/50 p-4 rounded-lg">
         <p class="font-semibold">Ready to start?</p>
-        <p>Click on "Getting Started" in the navigation menu to begin your polyglot programming journey!</p>
+        <p>
+          Click on "Getting Started" in the navigation menu to begin your
+          polyglot programming journey!
+        </p>
       </div>
     </div>
   </div>
