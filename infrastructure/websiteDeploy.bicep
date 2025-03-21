@@ -25,7 +25,7 @@ resource websiteResourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = 
 
 module storageAccountModule 'modules/storageAccount.bicep' = {
   scope: websiteResourceGroup
-  name: 'storageAccountDeploy'
+  name: 'StorageAccountDeploy-${application}'
   params: {
     app: application
   }
@@ -33,7 +33,7 @@ module storageAccountModule 'modules/storageAccount.bicep' = {
 
 module frontDoorSettings 'modules/frontdoor.bicep' = if (deployDns) {
   scope: infrastructureResourceGroup
-  name: 'frontDoorSettingsDeploy'
+  name: 'frontDoorSettingsDeploy-${application}'
   params: {
     frontDoorOriginHost: storageAccountModule.outputs.storageAccountHost
     frontDoorProfileName: frontDoorProfileName
@@ -45,7 +45,7 @@ module frontDoorSettings 'modules/frontdoor.bicep' = if (deployDns) {
 
 module dnsSettings 'modules/dns.bicep' = if (deployDns) {
   scope: managementResourceGroup
-  name: 'dnsSettingsDeploy'
+  name: 'dnsSettingsDeploy-${application}'
   params: {
     origin: frontDoorSettings.outputs.frontDoorCustomDomainHost
     rootDomain: rootDomain
@@ -53,8 +53,6 @@ module dnsSettings 'modules/dns.bicep' = if (deployDns) {
     validationToken: frontDoorSettings.outputs.frontDoorCustomDomainValidationToken
   }
 }
-
-
 
 output storageAccountName string = storageAccountModule.outputs.storageAccountName
 output resourceGroupName string = websiteResourceGroup.name
