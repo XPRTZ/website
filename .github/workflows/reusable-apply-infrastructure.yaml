@@ -1,5 +1,5 @@
 name: "[Reusable workflow] Apply Bicep infrastructure"
-concurrency: apply-infrastructure-${{ github.ref_name }}-${{ github.event_name }}
+concurrency: apply-infrastructure-${{ inputs.application }}-${{ github.ref_name }}-${{ github.event_name }}
 
 on:
   workflow_call:
@@ -10,15 +10,12 @@ on:
       deployDns:
         required: true
         type: boolean
+      application:
+        required: true
+        type: string
     outputs:
-      cloudStorageAccount:
-        value: ${{ jobs.apply-infrastructure.outputs.cloudStorageAccount }}
-      dotnetStorageAccount:
-        value: ${{ jobs.apply-infrastructure.outputs.dotnetStorageAccount }}
-      landingStorageAccount:
-        value: ${{ jobs.apply-infrastructure.outputs.landingStorageAccount }}
-      learningStorageAccount:
-        value: ${{ jobs.apply-infrastructure.outputs.learningStorageAccount }}
+      storageAccount:
+        value: ${{ jobs.apply-infrastructure.outputs.storageAccount }}
       resourceGroup:
         value: ${{ jobs.apply-infrastructure.outputs.resourceGroup }}
 
@@ -28,10 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     outputs:
-      cloudStorageAccount: ${{ steps.deploybicep.outputs.cloudStorageAccountName }}
-      dotnetStorageAccount: ${{ steps.deploybicep.outputs.dotnetStorageAccountName }}
-      landingStorageAccount: ${{ steps.deploybicep.outputs.landingStorageAccountName }}
-      learningStorageAccount: ${{ steps.deploybicep.outputs.learningStorageAccountName }}
+      storageAccount: ${{ steps.deploybicep.outputs.storageAccountName }}
       resourceGroup: ${{ steps.deploybicep.outputs.resourceGroupName }}
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +49,8 @@ jobs:
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./infrastructure/websiteDeploy.bicep
-          parameters: "resourceGroupSuffix=${{ env.GITHUB_REF_NAME_SLUG }} deployDns=${{ inputs.deployDns }}"
+          deploymentName: deploy-${{ inputs.application }}
+          parameters: "resourceGroupSuffix=${{ env.GITHUB_REF_NAME_SLUG }} deployDns=${{ inputs.deployDns }} application=${{ inputs.application }}"
           region: westeurope
 
       - name: Comment Website FQDNs on Pull Requests
@@ -67,22 +62,10 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `# Preview environment URLs
+              body: `# Preview environment URL
 
-              ## Cloud
+              ## ${{inputs.application}}
 
-              ${{ steps.deploybicep.outputs.cloudFqdn }}
-
-              ## Dotnet
-
-              ${{ steps.deploybicep.outputs.dotnetFqdn }}
-
-              ## Landing
-
-              ${{ steps.deploybicep.outputs.landingFqdn }}
-
-              ## Learning
-
-              ${{ steps.deploybicep.outputs.learningFqdn }}
+              ${{ steps.deploybicep.outputs.applicationFqdn }}
               `
             })

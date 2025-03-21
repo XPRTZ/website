@@ -1,10 +1,13 @@
 name: "[Reusable workflow] Destroy infrastructure"
-concurrency: destroy-infrastructure-${{ github.ref_name }}-${{ github.event_name }}
+concurrency: destroy-infrastructure-${{ inputs.application }}-${{ github.ref_name }}-${{ github.event_name }}
 
 on:
   workflow_call:
     inputs:
       environment:
+        required: true
+        type: string
+      application:
         required: true
         type: string
 
@@ -32,4 +35,4 @@ jobs:
         uses: azure/cli@v2
         with:
           azcliversion: latest
-          inlineScript: az group delete --name rg-xprtzbv-website-${{ env.GITHUB_REF_NAME_SLUG }} --yes
+          inlineScript: az group delete --name rg-xprtzbv-website-${{ inputs.application }}-${{ env.GITHUB_REF_NAME_SLUG }} --yes

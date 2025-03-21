@@ -1,0 +1,57 @@
+name: Pull request Cloud workflow
+run-name: Running pull request flow for Cloud for branch ${{ github.head_ref }}
+concurrency: pull-request-cloud-${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'apps/cloud/**'
+      - 'libs/**'
+      - 'infrastructure/**'
+      - '.github/**'
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  apply-infrastructure:
+    name: Apply infrastructure
+    if: github.event.action != 'closed'
+    uses: ./.github/workflows/reusable-apply-infrastructure.yaml
+    with:
+      environment: preview
+      deployDns: false
+      application: cloud
+    secrets: inherit
+
+  build-cloud-application:
+      name: Build XPRTZ Cloud application
+      if: github.event.action != 'closed'
+      uses: ./.github/workflows/reusable-build-application.yaml
+      with:
+        application: cloud
+      needs: [apply-infrastructure]
+
+  deploy-cloud-application:
+      name: Deploy XPRTZ Cloud application
+      if: github.event.action != 'closed'
+      uses: ./.github/workflows/reusable-deploy-application.yaml
+      with:
+        application: cloud
+        storageAccount: ${{ needs.apply-infrastructure.outputs.storageAccount }}
+        environment: preview
+      needs: [apply-infrastructure, build-cloud-application]
+      secrets: inherit
+
+  remove-infrastructure:
+    name: Remove preview environment infrastructure
+    if: github.event.action == 'closed'
+    uses: ./.github/workflows/reusable-destroy-infrastructure.yaml
+    with:
+      environment: preview
+      application: cloud
+    secrets: inherit

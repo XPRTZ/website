@@ -1,0 +1,57 @@
+name: Pull request Learning workflow
+run-name: Running pull request flow for learning for branch ${{ github.head_ref }}
+concurrency: pull-request-learning-${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'apps/learning/**'
+      - 'libs/**'
+      - 'infrastructure/**'
+      - '.github/**'
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  apply-infrastructure:
+    name: Apply infrastructure
+    if: github.event.action != 'closed'
+    uses: ./.github/workflows/reusable-apply-infrastructure.yaml
+    with:
+      environment: preview
+      deployDns: false
+      application: learning
+    secrets: inherit
+
+  build-learning-application:
+      name: Build XPRTZ Learning application
+      if: github.event.action != 'closed'
+      uses: ./.github/workflows/reusable-build-application.yaml
+      with:
+        application: learning
+      needs: [apply-infrastructure]
+
+  deploy-learning-application:
+      name: Deploy XPRTZ Learning application
+      if: github.event.action != 'closed'
+      uses: ./.github/workflows/reusable-deploy-application.yaml
+      with:
+        application: learning
+        storageAccount: ${{ needs.apply-infrastructure.outputs.storageAccount }}
+        environment: preview
+      needs: [apply-infrastructure, build-learning-application]
+      secrets: inherit
+
+  remove-infrastructure:
+    name: Remove preview environment infrastructure
+    if: github.event.action == 'closed'
+    uses: ./.github/workflows/reusable-destroy-infrastructure.yaml
+    with:
+      environment: preview
+      application: learning
+    secrets: inherit

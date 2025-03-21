@@ -1,0 +1,57 @@
+name: Pull request Dotnet workflow
+run-name: Running pull request flow for Dotnet for branch ${{ github.head_ref }}
+concurrency: pull-request-dotnet-${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'apps/dotnet/**'
+      - 'libs/**'
+      - 'infrastructure/**'
+      - '.github/**'
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  apply-infrastructure:
+    name: Apply infrastructure
+    if: github.event.action != 'closed'
+    uses: ./.github/workflows/reusable-apply-infrastructure.yaml
+    with:
+      environment: preview
+      deployDns: false
+      application: dotnet
+    secrets: inherit
+
+  build-dotnet-application:
+      name: Build XPRTZ Dotnet application
+      if: github.event.action != 'closed'
+      uses: ./.github/workflows/reusable-build-application.yaml
+      with:
+        application: dotnet
+      needs: [apply-infrastructure]
+
+  deploy-dotnet-application:
+      name: Deploy XPRTZ Dotnet application
+      if: github.event.action != 'closed'
+      uses: ./.github/workflows/reusable-deploy-application.yaml
+      with:
+        application: dotnet
+        storageAccount: ${{ needs.apply-infrastructure.outputs.storageAccount }}
+        environment: preview
+      needs: [apply-infrastructure, build-dotnet-application]
+      secrets: inherit
+
+  remove-infrastructure:
+    name: Remove preview environment infrastructure
+    if: github.event.action == 'closed'
+    uses: ./.github/workflows/reusable-destroy-infrastructure.yaml
+    with:
+      environment: preview
+      application: dotnet
+    secrets: inherit
