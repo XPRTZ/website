@@ -1,0 +1,44 @@
+name: Continuous delivery Learning workflow
+run-name: Deploying learning to the production environment
+concurrency: continuous-delivery-learning-${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/learning/**'
+      - 'libs/**'
+      - 'infrastructure/**'
+      - '.github/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  apply-infrastructure:
+    name: Apply infrastructure
+    uses: ./.github/workflows/reusable-apply-infrastructure.yaml
+    with:
+      environment: production
+      deployDns: true
+      application: learning
+    secrets: inherit
+
+  build-learning-application:
+    name: Build XPRTZ Learning application
+    uses: ./.github/workflows/reusable-build-application.yaml
+    with:
+      application: learning
+    needs: [apply-infrastructure]
+
+  deploy-learning-application:
+    name: Deploy XPRTZ Learning application
+    uses: ./.github/workflows/reusable-deploy-application.yaml
+    with:
+      application: learning
+      storageAccount: ${{ needs.apply-infrastructure.outputs.storageAccount }}
+      environment: production
+    needs: [apply-infrastructure, build-learning-application]
+    secrets: inherit

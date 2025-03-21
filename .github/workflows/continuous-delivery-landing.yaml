@@ -1,0 +1,44 @@
+name: Continuous delivery Landing workflow
+run-name: Deploying Landing to the production environment
+concurrency: continuous-delivery-landing-${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/landing/**'
+      - 'libs/**'
+      - 'infrastructure/**'
+      - '.github/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  apply-infrastructure:
+    name: Apply infrastructure
+    uses: ./.github/workflows/reusable-apply-infrastructure.yaml
+    with:
+      environment: production
+      deployDns: true
+      application: landing
+    secrets: inherit
+
+  build-landing-application:
+    name: Build XPRTZ Landing application
+    uses: ./.github/workflows/reusable-build-application.yaml
+    with:
+      application: landing
+    needs: [apply-infrastructure]
+
+  deploy-landing-application:
+    name: Deploy XPRTZ Landing application
+    uses: ./.github/workflows/reusable-deploy-application.yaml
+    with:
+      application: landing
+      storageAccount: ${{ needs.apply-infrastructure.outputs.storageAccount }}
+      environment: production
+    needs: [apply-infrastructure, build-landing-application]
+    secrets: inherit

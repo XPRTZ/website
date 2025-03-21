@@ -1,0 +1,44 @@
+name: Continuous delivery Dotnet workflow
+run-name: Deploying Dotnet to the production environment
+concurrency: continuous-delivery-dotnet-${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/dotnet/**'
+      - 'libs/**'
+      - 'infrastructure/**'
+      - '.github/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  apply-infrastructure:
+    name: Apply infrastructure
+    uses: ./.github/workflows/reusable-apply-infrastructure.yaml
+    with:
+      environment: production
+      deployDns: true
+      application: dotnet
+    secrets: inherit
+
+  build-dotnet-application:
+    name: Build XPRTZ Dotnet application
+    uses: ./.github/workflows/reusable-build-application.yaml
+    with:
+      application: dotnet
+    needs: [apply-infrastructure]
+
+  deploy-dotnet-application:
+    name: Deploy XPRTZ Dotnet application
+    uses: ./.github/workflows/reusable-deploy-application.yaml
+    with:
+      application: dotnet
+      storageAccount: ${{ needs.apply-infrastructure.outputs.storageAccount }}
+      environment: production
+    needs: [apply-infrastructure, build-dotnet-application]
+    secrets: inherit

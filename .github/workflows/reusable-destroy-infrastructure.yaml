@@ -7,6 +7,9 @@ on:
       environment:
         required: true
         type: string
+      application:
+        required: true
+        type: string
 
 jobs:
   destroy-infrastructure:
@@ -32,4 +35,4 @@ jobs:
         uses: azure/cli@v2
         with:
           azcliversion: latest
-          inlineScript: az group delete --name rg-xprtzbv-website-${{ env.GITHUB_REF_NAME_SLUG }} --yes
+          inlineScript: az group delete --name rg-xprtzbv-website-${{ inputs.application }}-${{ env.GITHUB_REF_NAME_SLUG }} --yes
