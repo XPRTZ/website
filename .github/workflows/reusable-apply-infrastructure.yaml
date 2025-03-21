@@ -49,6 +49,7 @@ jobs:
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./infrastructure/websiteDeploy.bicep
+          deploymentName: deploy-${{ inputs.application }}
           parameters: "resourceGroupSuffix=${{ env.GITHUB_REF_NAME_SLUG }} deployDns=${{ inputs.deployDns }} application=${{ inputs.application }}"
           region: westeurope
 
