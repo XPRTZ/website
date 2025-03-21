@@ -3,7 +3,6 @@ param frontDoorOriginHost string
 param application string
 param rootDomain string
 param subDomain string
-param isLandingSite bool = false
 
 var frontDoorOriginName = 'afd-origin-${application}'
 var frontDoorEndpointName = 'fde-${application}-${uniqueString(resourceGroup().id)}'
@@ -55,7 +54,7 @@ resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2024-02-01
   }
 }
 
-resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = if (!isLandingSite) {
+resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = if (application != 'landing') {
   name: frontDoorRouteName
   parent: frontDoorEndpoint
   dependsOn: [
@@ -83,7 +82,7 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
   }
 }
 
-resource frontDoorRouteLandingSite 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = if (isLandingSite) {
+resource frontDoorRouteLandingSite 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = if (application == 'landing') {
   name: frontDoorRouteName
   parent: frontDoorEndpoint
   dependsOn: [
