@@ -59,7 +59,9 @@ function isSectionActive(sectionLessons) {
 }
 ---
 
-<nav class="w-64 bg-gray-100 dark:bg-gray-800 p-4 transition-colors border-r border-primary-900 dark:border-gray-400">
+<nav
+  class="w-64 bg-gray-100 dark:bg-gray-800 p-4 border-r border-primary-900 dark:border-gray-400"
+>
   <div class="flex justify-between items-center mb-4 lg:hidden">
     <h2 class="font-bold text-gray-800 dark:text-gray-200">Navigation</h2>
     <button
@@ -92,7 +94,7 @@ function isSectionActive(sectionLessons) {
         return (
           <div class="section-container">
             <button
-              class="section-toggle w-full flex justify-between items-center py-2 px-1 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
+              class="section-toggle w-full flex justify-between items-center py-2 px-1 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md"
               aria-expanded={isActive ? "true" : "false"}
             >
               <span>{cleanSectionName(section)}</span>
@@ -141,8 +143,7 @@ function isSectionActive(sectionLessons) {
 </nav>
 
 <script>
-  // Handle section toggle clicks
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("astro:page-load", () => {
     // Mobile navigation toggle
     const mobileToggle = document.getElementById("mobile-nav-toggle");
     const navContent = document.getElementById("navigation-content");
@@ -175,15 +176,15 @@ function isSectionActive(sectionLessons) {
         }
       });
     });
-  });
 
-  // Automatically expand the section when the window is resized to desktop
-  window.addEventListener("resize", () => {
-    const navContent = document.getElementById("navigation-content");
-    if (window.innerWidth >= 1024 && navContent) {
-      // 1024px is the 'lg' breakpoint in Tailwind
-      navContent.classList.remove("hidden");
-    }
+    // Automatically expand the section when the window is resized to desktop
+    window.addEventListener("resize", () => {
+      const navContent = document.getElementById("navigation-content");
+      if (window.innerWidth >= 1024 && navContent) {
+        // 1024px is the 'lg' breakpoint in Tailwind
+        navContent.classList.remove("hidden");
+      }
+    });
   });
 </script>
 

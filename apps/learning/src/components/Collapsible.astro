@@ -9,21 +9,46 @@ const { title = "Solution", defaultOpen = false } = Astro.props;
 
 <div class="my-4 border dark:border-primary-700 rounded-lg">
   <details class="group" open={defaultOpen}>
-    <summary class="flex justify-between items-center p-4 cursor-pointer bg-primary-400 dark:bg-primary-900 rounded-t-lg ">
+    <summary
+      class="flex justify-between items-center p-4 cursor-pointer bg-primary-400 dark:bg-primary-900 rounded-t-lg"
+    >
       <span class="font-medium">{title}</span>
       <div class="flex items-center">
         <button
-          class="copy-button mr-3 hover:bg-primary-500 dark:hover:bg-primary-800 p-1.5 rounded-md transition-colors"
+          class="copy-button mr-3 hover:bg-primary-500 dark:hover:bg-primary-800 p-1.5 rounded-md"
           aria-label="Copy to clipboard"
           title="Copy to clipboard"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+            ></path>
           </svg>
         </button>
-        <span class="transform group-open:rotate-180 transition-transform duration-200">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <span
+          class="transform group-open:rotate-180 transition-transform duration-200"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </span>
@@ -37,24 +62,25 @@ const { title = "Solution", defaultOpen = false } = Astro.props;
 
 <script>
   // Initialize the copy functionality
-  document.addEventListener('DOMContentLoaded', () => {
-    const copyButtons = document.querySelectorAll('.copy-button');
+  document.addEventListener("astro:page-load", () => {
+    const copyButtons = document.querySelectorAll(".copy-button");
 
-    copyButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
+    copyButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation(); // Prevent the details element from toggling
 
         // Find the parent details element and then the content div
-        const details = button.closest('details');
-        const contentDiv = details?.querySelector('.collapsible-content');
+        const details = button.closest("details");
+        const contentDiv = details?.querySelector(".collapsible-content");
 
         if (contentDiv) {
           // Get the text content to copy
-          const textToCopy = contentDiv.textContent || '';
+          const textToCopy = contentDiv.textContent || "";
 
           // Copy to clipboard
-          navigator.clipboard.writeText(textToCopy.trim())
+          navigator.clipboard
+            .writeText(textToCopy.trim())
             .then(() => {
               // Visual feedback for successful copy
               const originalSvg = button.innerHTML;
@@ -71,8 +97,8 @@ const { title = "Solution", defaultOpen = false } = Astro.props;
                 button.innerHTML = originalSvg;
               }, 2000);
             })
-            .catch(err => {
-              console.error('Failed to copy: ', err);
+            .catch((err) => {
+              console.error("Failed to copy: ", err);
             });
         }
       });

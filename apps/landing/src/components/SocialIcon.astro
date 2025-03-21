@@ -7,11 +7,12 @@ interface Props {
 
 const { href, icon, label } = Astro.props;
 ---
-<a 
+
+<a
   href={href}
   target="_blank"
   rel="noopener noreferrer"
-  class="text-white hover:text-gray-300 transition-colors"
+  class="text-white hover:text-gray-300"
   aria-label={label}
 >
   <i class={`fab fa-${icon} text-xl`}></i>
