@@ -1,0 +1,58 @@
+---
+title: "Project setup"
+description: "Learn how to setup a project and add the necessary dependencies and packages"
+section: "🚀 Basics"
+order: 1
+languages: ["go", "python"]
+---
+
+## Project setup
+
+Clone the reference C# implementation. This will be used to guide us on creating the Go and Python versions of the CLI tool.
+
+```
+git clone https://github.com/XPRTZ/envtamer
+```
+
+Create a new Git repository locally and push it on your own GitHub account. This will be the repository where we will work on.
+
+```
+github.com/username/envtamer-workshop
+```
+
+```
+├── go
+│   └── .gitkeep
+└── python
+    └── .gitkeep
+```
+
+### Go
+
+Make sure you are in the go directory of the project
+
+```bash
+npx gitignore go
+go mod init github.com/username/envtamer
+go get -u github.com/spf13/cobra@latest
+go get -u modernc.org/sqlite
+```
+
+In the root of the go folder there should now be a go.mod file. This file lists all the dependencies.
+
+Create the following folder structure. The structure is based on the [recommended way](https://github.com/golang-standards/project-layout) to setup a Go project
+
+```bash
+├── LICENSE
+├── README.md
+├── cmd
+│   └── envtamer-go
+├── go.mod
+├── go.sum
+└── internal
+    ├── command
+    ├── storage
+    └── util
+```
+
+### Python
