@@ -3,8 +3,60 @@ title: "Multiple commands"
 description: "Learn how to add multiple commands"
 section: "🕹️ Implement commands"
 order: 1
-languages: ["csharp", "python", "go"]
+languages: ["go", "python"]
 ---
 
-Exercise: Add "init", "push", "pull", and "list" commands (without functionality)
-Solution: Add command classes for each command and register them with CommandApp
+## Exercise
+
+Add the "init", "push", "pull", and "list" commands without functionality. Take however the possible arguments and options into account and display them.
+
+### init
+
+Initializes an empty database in the user's home folder.
+
+```envtamer init```
+
+This command creates an empty SQLite database file named `envtamer.db` in the `.envtamer` directory of the user's home folder. If the file already exists, the command will not overwrite it.
+
+### push
+
+Pushes the contents of a local .env file to the database.
+
+```envtamer push [DIRECTORY_NAME] [-f|--filename <FILENAME>]```
+
+- `DIRECTORY_NAME`: Optional. The directory containing the .env file. Defaults to the current working directory.
+- `-f|--filename`: Optional. The name of the env file. Defaults to '.env'.
+
+This command reads the specified .env file and stores its contents in the database, associated with the given directory.
+
+### pull
+
+Pulls environment variables from the database to a local .env file.
+
+```envtamer pull [DIRECTORY_NAME] [-f|--filename <FILENAME>]```
+
+
+- `DIRECTORY_NAME`: Required. The directory in the database to pull env variables from.
+- `-f|--filename`: Optional. The name of the env file to create or update. Defaults to '.env'.
+
+This command retrieves stored environment variables for the specified directory from the database and writes them to a local .env file. If the file already exists, it will prompt for confirmation before overwriting.
+
+### list
+
+Lists stored directories or environment variables.
+
+```envtamer list [DIRECTORY_NAME]```
+
+
+- `DIRECTORY_NAME`: Optional. The directory to list env variables for.
+
+If no directory is specified, this command lists all directories stored in the database. If a directory is provided, it lists all environment variables stored for that directory.
+
+
+## Solution
+
+<Collapsible>
+```
+git clone --branch 03-multiple-commands --single-branch https://github.com/XPRTZ/envtamer.git
+```
+</Collapsible>
