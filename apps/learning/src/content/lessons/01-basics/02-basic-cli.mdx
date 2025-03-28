@@ -6,10 +6,10 @@ order: 2
 languages: ["go", "python"]
 ---
 
-# Exercise
+## Exercise
 To test out the the CLI let's get the CLI returning the ASCII art logo of envtamer and the tagline when invoking the CLI without any arguments.
 
-## ASCI-art
+### ASCI-art
 ```bash
 
    ___   _ __   __   __ | |_    __ _   _ __ ___     ___   _ __
@@ -19,24 +19,24 @@ To test out the the CLI let's get the CLI returning the ASCII art logo of envtam
 
 ```
 
-## Tagline short
+### Tagline short
 ```
 Taming digital environment files chaos with elegant simplicity
 ```
 
-## Tagline long
+### Tagline long
 ```
 A command-line tool for managing environment variables across different projects and directories.
 ```
 
-## Go
+### Go
 [Documentation](https://cobra.dev/)
 
-## Python
+### Python
 [Documentation](https://cobra.dev/)
 
-# Solution
-## Go
+## Solution
+### Go
 <Collapsible title="cmd/envtamer/main.go">
 ```go
 package main
@@ -91,7 +91,7 @@ func NewRootCmd() *cobra.Command {
 ```
 </Collapsible>
 
-## Python
+### Python
 <Collapsible title="main.py">
 ```python
 <code>
