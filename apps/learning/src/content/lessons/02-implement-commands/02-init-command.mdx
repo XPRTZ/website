@@ -12,6 +12,16 @@ We will implement the functionality of the init command. The init is responsible
 If a database is already exists, the init command should not do anything. The database should be created in a hidden folder called **.envtamer** in the users's home directory.
 The database should be calles **envtamer.db**.
 
+### SQL
+```sql
+CREATE TABLE IF NOT EXISTS "EnvVariables" (
+  "Directory" TEXT NOT NULL,
+  "Key" TEXT NOT NULL,
+  "Value" TEXT NOT NULL,
+  CONSTRAINT "PK_EnvVariables" PRIMARY KEY ("Directory", "Key")
+);
+```
+
 ### Messages
 ```
 🛑 Database file already exists. Initialization skipped.
