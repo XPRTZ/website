@@ -3,8 +3,85 @@ title: "Init command"
 description: "Implement the init command"
 section: "🕹️ Implement commands"
 order: 2
-languages: ["csharp", "python", "go"]
+languages: ["go", "python"]
 ---
 
-Exercise: Add basic functionality to the Init command
-Solution: Implement InitCommand class with Execute method
+## Exercise
+
+We will implement the functionality of the init command. The init is responsible of creating the SQLite database if it does not exists and to create the tables in the database.
+If a database is already exists, the init command should not do anything. The database should be created in a hidden folder called **.envtamer** in the users's home directory.
+The database should be calles **envtamer.db**.
+
+### SQL
+```sql
+CREATE TABLE IF NOT EXISTS "EnvVariables" (
+  "Directory" TEXT NOT NULL,
+  "Key" TEXT NOT NULL,
+  "Value" TEXT NOT NULL,
+  CONSTRAINT "PK_EnvVariables" PRIMARY KEY ("Directory", "Key")
+);
+```
+
+### Messages
+```
+🛑 Database file already exists. Initialization skipped
+```
+
+```
+🗄️ Empty database file created successfully
+⏳ Running migrations...
+```
+
+```
+✅ Migrations applied successfully
+🚀 Ready to push and pull env files
+```
+
+```
+🛑 Error creating database:
+```
+
+### Go
+For the interaction with the SQLite database we will need a driver. Add it to the project as follows. The command should be executed in the root of the Go project, where the go.mod file is.
+
+```
+go get -u modernc.org/sqlite
+```
+
+The code for interacting with the database should be added to the **sqlite.go** file in the storage folder
+
+```
+├── LICENSE
+├── README.md
+├── cmd
+│   └── envtamer-go
+│       └── main.go
+├── go.mod
+├── go.sum
+└── internal
+    ├── command
+    │   └── ...
+    ├── storage
+    │   └── sqlite.go
+    └── util
+```
+
+To implement the init command, we need a constructor in the sqlite.go and an Init function. That function should be implemented as a method receiver on the Storage struct.
+
+```go
+type Storage struct {
+	db *sql.DB
+}
+```
+
+The type sql.DB comes from the standard library and is a struct you can use to interact with the database.
+
+### Python
+
+## Solution
+
+<Collapsible>
+```
+git clone --branch 04-init-command --single-branch https://github.com/XPRTZ/envtamer.git
+```
+</Collapsible>
