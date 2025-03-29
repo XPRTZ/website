@@ -3,8 +3,46 @@ title: "Push command"
 description: "Implement the push command"
 section: "🕹️ Implement commands"
 order: 3
-languages: ["csharp", "python", "go"]
+languages: ["go", "python"]
 ---
 
-Exercise: Add basic functionality to the push command
-Solution: Implement PushCommand class with Execute method
+## Exercise
+
+We will implement the functionality of the push command. When run, it will read the contents of an **.env** file in the current directory and save it to the database.
+Optionally, you can pass a directory as argument to the command and it will read from that directory instead of the current one. You can also pass the --filename option to specify a different filename than the default **.env**.
+
+### Go
+
+To store the environment variables as key-value pairs you can use a map in Go. Both keys and values are strings. The keys represent the environment variable names, and the values represent their associated values.
+```go
+envVars := make(map[string]string)
+```
+
+The **bufio.Scanner** is utilized to read the file line-by-line efficiently. This is particularly useful for processing text files like .env files, which contain environment variables listed line by line.
+
+```go
+import (
+	"bufio"
+)
+
+scanner := bufio.NewScanner(file)
+```
+
+The strings package's functions are essential for text processing and manipulation in Go. They are highly optimized and provide robust support for handling UTF-8 encoded strings, making them indispensable tools for working with string data.
+
+```go
+import (
+	"strings"
+)
+
+strings.TrimSpace(...)
+strings.SplitN(...)
+```
+
+## Solution
+
+<Collapsible>
+```
+git clone --branch 05-push-command --single-branch https://github.com/XPRTZ/envtamer.git
+```
+</Collapsible>
