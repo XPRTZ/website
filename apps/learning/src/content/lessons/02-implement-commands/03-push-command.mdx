@@ -11,6 +11,17 @@ languages: ["go", "python"]
 We will implement the functionality of the push command. When run, it will read the contents of an **.env** file in the current directory and save it to the database.
 Optionally, you can pass a directory as argument to the command and it will read from that directory instead of the current one. You can also pass the --filename option to specify a different filename than the default **.env**.
 
+### push
+
+Pushes the contents of a local .env file to the database.
+
+```envtamer push [DIRECTORY_NAME] [-f|--filename <FILENAME>]```
+
+- `DIRECTORY_NAME`: Optional. The directory containing the .env file. Defaults to the current working directory.
+- `-f|--filename`: Optional. The name of the env file. Defaults to '.env'.
+
+This command reads the specified .env file and stores its contents in the database, associated with the given directory.
+
 ### Go
 
 To store the environment variables as key-value pairs you can use a map in Go. Both keys and values are strings. The keys represent the environment variable names, and the values represent their associated values.
@@ -38,6 +49,8 @@ import (
 strings.TrimSpace(...)
 strings.SplitN(...)
 ```
+
+### Python
 
 ## Solution
 

@@ -3,8 +3,47 @@ title: "Pull command"
 description: "Implement the pull command"
 section: "🕹️ Implement commands"
 order: 4
-languages: ["csharp", "python", "go"]
+languages: ["go", "python"]
 ---
 
-Exercise: Add basic functionality to the pull command
-Solution: Implement PullCommand class with Execute method
+## Exercise
+
+We will implement the functionality of the pull command. The pull command will accept an argument for the directory to pull and optionally a filename to write the environment variables to.
+
+### pull
+
+Pulls environment variables from the database to a local .env file.
+
+```envtamer pull [DIRECTORY_NAME] [-f|--filename <FILENAME>]```
+
+
+- `DIRECTORY_NAME`: Required. The directory in the database to pull env variables from.
+- `-f|--filename`: Optional. The name of the env file to create or update. Defaults to '.env'.
+
+This command retrieves stored environment variables for the specified directory from the database and writes them to a local .env file. If the file already exists, it will prompt for confirmation before overwriting.
+
+### Go
+
+We will need a new method on the database to get the environment variables for a given directory. It will return a map of key-value pairs for the given directory.
+
+To write a file on disk, we can use the bufio package together with the os package to create a file.
+
+```go
+import (
+  "os"
+	"bufio"
+)
+
+file, err := os.Create(path)
+writer := bufio.NewWriter(file)
+```
+
+### Python
+
+## Solution
+
+<Collapsible>
+```
+git clone --branch 06-pull-command --single-branch https://github.com/XPRTZ/envtamer.git
+```
+</Collapsible>
