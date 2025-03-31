@@ -3,8 +3,31 @@ title: "Refactoring"
 description: "Learn the basic of refactoring"
 section: "🧑‍💻 Refactoring"
 order: 1
-languages: ["csharp", "python", "go"]
+languages: ["go"]
 ---
 
-Exercise: Refactor code into separate files and organize the project structure
-Solution: Create separate files for each command and organize into folders
+## Exercise
+
+### Go
+
+In the Go implementation we can apply some refactoring. Some functions are not placed in a logical place because they are used in multiple places.
+
+Create an util folder and create a file named env.go to contain the functions that have to do with working writing, reading and parsing environment variables.
+
+```go
+func ParseEnvFile(path string) (map[string]string, error)
+
+func WriteEnvFile(path string, envVars map[string]string) error
+
+func ResolvePath(path string) (string, error)
+```
+
+Update the files which use these functions.
+
+## Solution
+
+<Collapsible>
+```
+git clone --branch 08-refactoring --single-branch https://github.com/XPRTZ/envtamer.git
+```
+</Collapsible>
