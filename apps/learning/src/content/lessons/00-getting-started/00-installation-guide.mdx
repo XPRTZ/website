@@ -1,0 +1,146 @@
+---
+title: "Installation guide"
+description: "Learn how to install Go and Python."
+section: "🏃‍♂️ Getting started"
+order: 0
+languages: ["go", "python"]
+---
+
+## Installation guide
+
+This guide provides step-by-step instructions to install Go and Python on WSL 2 with Ubuntu 24.04 as the default distribution.
+
+### **Prerequisites (if necessary)**
+
+1. **Enable WSL 2**
+   - Open PowerShell as Administrator and run
+     ```bash
+     dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+     dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+     ```
+   - Restart your system.
+
+2. **Install WSL 2 and Ubuntu 24.04**
+   - Run the following commands in PowerShell
+     ```bash
+     wsl --set-default-version 2
+     wsl --install -d Ubuntu-24.04
+     ```
+   - Set up a username and password when prompted.
+
+3. **Update Ubuntu**
+   - Open the Ubuntu terminal and run
+     ```bash
+     sudo apt update && sudo apt upgrade -y
+     ```
+4. **Install necessary tools**
+   - Open the Ubuntu terminal and run
+     ```bash
+     sudo apt install git
+     ```
+
+### **Installing Go**
+
+#### **Step 1: Download Go**
+1. Visit the [official Go download page](https://go.dev/dl/) to get the latest version.
+2. Alternatively, download it directly in the terminal
+
+```bash
+curl -OL https://go.dev/dl/go1.24.2.linux-amd64.tar.gz
+```
+
+#### **Step 2: Install Go**
+
+Remove any previous Go installation:
+
+```bash
+sudo rm -rf /usr/local/go
+```
+
+Extract the downloaded tarball to /usr/local
+
+```bash
+sudo tar -C /usr/local -xzf go1.24.2.linux-amd64.tar.gz
+```
+
+#### **Step 3: Configure environment variables**
+
+Open the .profile file:
+
+```bash
+vi ~/.profile
+```
+Add the following lines
+
+```bash
+export PATH=$PATH:/usr/local/go/bin
+export GOPATH=$HOME/go
+```
+
+Save and apply the changes
+```bash
+source ~/.profile
+```
+
+#### **Step 4: Verify installation**
+
+Run the following command to check the Go version
+
+```bash
+go version
+```
+
+### **Installing Python**
+
+#### **Step 1: Verify and optionally install Python 3**
+
+Python 3 should already be installed in Ubuntu. Verify with the following command
+
+```bash
+python3 --version
+```
+
+If the command fails install with
+
+```bash
+sudo apt install python3
+```
+
+Verify again
+
+```bash
+python3 --version
+```
+
+#### **Step 2: Install pip**
+
+Install Pip, the Python package manager
+
+```bash
+sudo apt install -y python3-pip
+```
+
+Verify the pip installation
+
+```bash
+pip3 --version
+```
+
+#### **Step 3: Set up virtual environments**
+
+Install the `venv` module
+
+```bash
+sudo apt install python3-venv
+```
+
+Create a virtual environment
+
+```bash
+python3 -m venv myenv
+```
+
+Activate the virtual environment
+```bash
+source myenv/bin/activate
+```
