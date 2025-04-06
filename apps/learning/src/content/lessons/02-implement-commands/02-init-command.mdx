@@ -78,6 +78,123 @@ The type sql.DB comes from the standard library and is a struct you can use to i
 
 ### Python
 
+To implement the init command we will need to create a SQLite database and a table in it. The database should be created in a hidden folder called **.envtamer** in the users's home directory.
+The commands of the cli will be implemented in the **cli.py** file. The cli.py file will be the entry point of the project. The cli.py file will import the init command and call it when the user runs the init command.
+We will us the click package to implement the cli. The click package is a package that makes it easy to create command line interfaces in Python. You can find the documentation here: [Documentation](https://click.palletsprojects.com/en/8.0.x/).
+The click package is already added to the project. The code for the init command should be added to the **init_command.py** file in the envtamer folder. The init_command.py file will contain the code for the init command. The init command will be imported in the cli.py file and called when the user runs the init command.
+
+I found it best to use a group command for the cli. This way we can add subcommands to the cli. The group command is a command that can have subcommands. The group command will be the entry point of the project, and provide the configuration for the options. The group command will be imported in the cli.py file and called when the user runs the init command.
+
+For the interaction with the SQLite database we will be using an ORM. It is called SQLAlchemy and you can find the implementation details here: [Documentation] (https://www.sqlalchemy.org/). It will be added in the project in it's own package.
+Add the package by creating a new folder in the root of the project and name it **envtamer_db** and place a **__init__.py** file in it. The **__init__.py** file is required to make the folder a package. The **__init__.py** file should be empty.
+The code for interacting with the database should be added to the **envtamer_db** folder.
+
+add the following packages to the project.
+```
+poetry add sqlalchemy
+poetry add sqlalchemy-utils
+```
+
+create a new file in the **envtamer_db** folder and name it **envtamer_db.py**. This file will contain the code for interacting with the database.
+
+The **envtamer_db.py** file will be using the following:
+
+```python
+create_engine(f"sqlite:///{self.db_file}")
+
+#create DB
+if not database_exists(engine.url):
+    create_database(engine.url)
+    Base.metadata.create_all(engine)
+
+with Session(self.engine) as env_session:
+    #do stuff
+
+    #commit the changes
+    env_session.commit()
+```
+
+The table will be created the first tima you save data to the database.
+
+create a new file in the **envtamer_db** folder and name it **env_variable.py**. This file will contain the code for the EnvVariable model.
+
+the **env_variable.py** file should contain the code for the EnvVariable model. The EnvVariable model will be used to interact with the database. The EnvVariable model will be used to create the table in the database.
+it will look something like this:
+
+```python
+from sqlalchemy import UniqueConstraint
+from sqlalchemy import String
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+
+class Base(DeclarativeBase):
+    pass
+
+class EnvVariable(Base):
+    #your implementation here
+```
+
+your project structure should look like this:
+
+```
+├── envtamer
+│   └── __init__.py
+│   ├── cli.py
+│   └── init_command.py
+├── envtamer_db
+│   └── __init__.py
+│   ├── env_variable.py
+│   └── envtamer_db.py
+├── tests
+│   └── __init__.py
+├── poetry.lock
+├── pyproject.toml
+└── README.md
+```
+
+To use the cli we must add the following to the **pyproject.toml** file:
+
+```toml
+packages = [
+    { include = "*.py" },
+    { include = "envtamer" },
+    { include = "envtamer/*.py" },
+    { include = "envtamer_db" },
+    { include = "envtamer_db/*.py" },
+]
+
+[tool.poetry.scripts]
+envtamer = "envtamer.cli:cli"
+```
+
+the packages section is used to include the packages in the project. The scripts section is used to add the cli command to the project. The cli command will be used to run the cli.
+
+To help you along, this is a snippet of my cli.py file:
+
+```python
+
+@click.group()
+@click.option('--directory', '-d', help='Name of the directory to push. Defaults to current working directory if not specified.')
+@click.option('--file_name', '-f', default='.env', help='file name of the env file. Defaults to \'.env\' in the specified or current directory.')
+@click.pass_context
+def cli(ctx, directory, file_name):
+    # ensure that ctx.obj exists and is a dict (in case `cli()` is called
+    # by means other than the `if` block below)
+    ctx.ensure_object(dict)
+    ctx.obj['DIRECTORY'] = directory
+    ctx.obj['FILE_NAME'] = file_name
+
+@cli.command('init')
+def do_init():
+  pass
+
+if __name__ == '__main__':
+    cli(obj={})
+
+```
+
+The **@click.pass_context** is important, it's used to make the context available to the command. The context is used to pass the options to the command. The context is passed to the command as an argument. The context is a dictionary that contains the options and arguments passed to the command. The context is created by the click package and passed to the command.
 ## Solution
 
 <Collapsible>
