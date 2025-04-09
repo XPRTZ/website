@@ -32,20 +32,8 @@ export async function getStaticPaths() {
 }
 
 const article: Article = Astro.props;
-const formattedDate = new Date(article.date).toLocaleDateString("nl-NL", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
 ---
 
 <Layout title={article.title} description={article.title}>
-  <Content
-    title_website={article.title}
-    description={article.title}
-    content={article.content}
-    firstname={article.authors[0].firstname}
-    lastname={article.authors[0].lastname}
-    date={formattedDate}
-  />
+  <Content article={article} />
 </Layout>

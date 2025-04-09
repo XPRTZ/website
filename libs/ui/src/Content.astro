@@ -2,14 +2,18 @@
 import { marked } from "marked";
 import Container from "./Container.astro";
 const {
-  title_website: title,
-  description,
-  content,
-  firstname,
-  lastname,
-  date,
+  article
 } = Astro.props;
-const htmlContent = await marked.parse(content);
+
+const date = new Date(article.date).toLocaleDateString("nl-NL", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+const htmlContent = await marked.parse(article.content);
+
+const site = import.meta.env.PUBLIC_STRAPI_URL
 ---
 
 <Container>
@@ -64,21 +68,21 @@ const htmlContent = await marked.parse(content);
           <h1
             class="mt-2 text-pretty text-4xl font-semibold tracking-tight text-primary-800 sm:text-5xl"
           >
-            {title}
+            {article.title}
           </h1>
           <div class="relative mt-8 flex items-center gap-x-4">
             <img
-              src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+              src=`${site}${article.authors[0].avatar.url}`
               alt=""
               class="size-10 rounded-full bg-gray-100"
             />
             <div class="text-sm/6">
               <p class="font-semibold text-gray-900">
                 <span class="absolute inset-0"></span>
-                {firstname}
-                {lastname}
+                {article.authors[0].firstname}
+                {article.authors[0].lastname}
               </p>
-              <p class="text-gray-600">Co-Founder / CTO</p>
+              <p class="text-gray-600">{article.authors[0].jobTitle}</p>
             </div>
           </div>
         </div>
@@ -87,6 +91,23 @@ const htmlContent = await marked.parse(content);
           class="mx-auto text-base/7 text-gray-700 mt-6 prose max-w-none"
           set:html={htmlContent}
         />
+
+        <div class="relative mt-8 flex items-center gap-x-4">
+          <img
+            src=`${site}${article.authors[0].avatar.url}`
+            alt=""
+            class="size-10 rounded-full bg-gray-100"
+          />
+          <div class="text-sm/6">
+            <p class="font-semibold text-gray-900">
+              <span class="absolute inset-0"></span>
+              {article.authors[0].firstname}
+              {article.authors[0].lastname}
+            </p>
+            <p class="text-gray-600">{article.authors[0].biography}</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

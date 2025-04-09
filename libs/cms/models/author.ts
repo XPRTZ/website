@@ -7,4 +7,5 @@ export type Author = {
   gitHub: string;
   bio: string;
   avatar: Image;
+  jobTitle: string;
 }
