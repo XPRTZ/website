@@ -6,7 +6,7 @@ const formattedDate = new Date(article.date).toLocaleDateString("nl-NL", {
   day: "numeric",
 });
 
-const site = import.meta.env.PUBLIC_STRAPI_URL
+const site = import.meta.env.PUBLIC_STRAPI_URL;
 ---
 
 <article
@@ -35,7 +35,7 @@ const site = import.meta.env.PUBLIC_STRAPI_URL
       </svg>
       <div class="flex gap-x-2.5">
         <img
-        src=`${site}${article.authors[0].avatar.url}`
+          src=`${site}${article.authors[0].avatar.url}`
           alt=""
           class="size-6 flex-none rounded-full bg-white/10"
         />
