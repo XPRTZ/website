@@ -29,12 +29,13 @@ const articles = await fetchData<Array<Article>>({
     "populate[authors][fields][1]": "lastname",
     "populate[authors][populate][avatar][fields][0]": "url",
     "populate[image][fields][0]": "url",
-    "pagination[page]":"1",
+    "pagination[page]": "1",
     "pagination[pageSize]": "3",
     status: "published",
   },
 });
 ---
+
 <div class="mx-auto mt-32 max-w-7xl px-6 lg:px-8">
   <div class="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
     <h2
@@ -54,5 +55,10 @@ const articles = await fetchData<Array<Article>>({
         <BlogCard key={article.documentId} article={article} />
       ))
     }
+  </div>
+  <div class="mt-8 grid grid-flow-col justify-items-start gap-x-6">
+    <a href="/artikelen" class="text-sm font-semibold leading-6 text-primary-900">
+      Lees meer <span aria-hidden="true"> &rarr;</span>
+    </a>
   </div>
 </div>
