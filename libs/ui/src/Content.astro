@@ -62,7 +62,6 @@ const site = import.meta.env.PUBLIC_STRAPI_URL
         class="mx-auto max-w-2xl gap-x-14 lg:mx-0 lg:max-w-none lg:items-center"
       >
         <div class="mx-auto lg:mx-0">
-
           <p class="text-base/7 font-semibold text-primary-600">
             {date}
           </p>
@@ -75,7 +74,7 @@ const site = import.meta.env.PUBLIC_STRAPI_URL
             <img
               src=`${site}${article.authors[0].avatar.url}`
               alt=""
-              class="size-10 rounded-full bg-gray-100"
+              class="size-14 rounded-full bg-gray-100"
             />
             <div class="text-sm/6">
               <p class="font-semibold text-gray-900">
@@ -85,6 +84,9 @@ const site = import.meta.env.PUBLIC_STRAPI_URL
               </p>
               <p class="text-gray-600">{article.authors[0].jobTitle}</p>
             </div>
+          </div>
+          <div class="mt-8">
+            {article.tags && article.tags.map(t => <div class="mr-4 inline-flex"><span class="inline-flex items-center rounded-xl bg-primary-100 px-4 py-1 text-sm/6 font-medium text-primary-700">#{t.title}</span></div>)}
           </div>
         </div>
         <figure class="mt-8">

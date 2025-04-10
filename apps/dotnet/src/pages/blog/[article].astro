@@ -21,6 +21,7 @@ export async function getStaticPaths() {
       "populate[authors][fields]": "*",
       "populate[authors][populate][avatar][fields][0]=url": "url",
       "populate[image][fields][0]": "url",
+      "populate[tags][fields][0]":"title",
       status: "published",
     },
   });

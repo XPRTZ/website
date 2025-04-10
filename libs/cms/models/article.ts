@@ -1,5 +1,6 @@
 import { Author } from "./author.js";
 import { Image } from "./image.js";
+import { Tag } from "./tag.js";
 
 export type Article = {
   title: string;
@@ -8,7 +9,7 @@ export type Article = {
   date: string;
   slug: string;
   image: Image;
-  tags: string[];
+  tags: Tag[];
   site: string;
   locale: string;
   documentId: string;
