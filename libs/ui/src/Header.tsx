@@ -49,7 +49,7 @@ export default function Hero({ Logo }: HeaderProps) {
           <div className="flex lg:hidden">
             <button
               type="button"
-              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-primary-800"
               onClick={() => setMobileMenuOpen(true)}
             >
               <span className="sr-only">Open menu</span>
@@ -61,7 +61,7 @@ export default function Hero({ Logo }: HeaderProps) {
               <a
                 key={item.name}
                 href={item.href}
-                className="text-sm font-semibold leading-6 text-gray-900"
+                className="text-sm font-semibold leading-6 text-primary-800"
               >
                 {item.name}
               </a>
@@ -86,7 +86,7 @@ export default function Hero({ Logo }: HeaderProps) {
               </a>
               <button
                 type="button"
-                className="-m-2.5 rounded-md p-2.5 text-gray-700"
+                className="-m-2.5 rounded-md p-2.5 text-primary-800"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="sr-only">Sluit menu</span>

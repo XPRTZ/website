@@ -1,0 +1,53 @@
+---
+const { article } = Astro.props;
+const formattedDate = new Date(article.date).toLocaleDateString("nl-NL", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+const site = import.meta.env.PUBLIC_STRAPI_URL;
+---
+
+<article
+  class="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pt-80 pb-8 sm:pt-48 lg:pt-80"
+>
+  <img
+    src=`${site}${article.image.url}`
+    alt=""
+    class="absolute inset-0 -z-10 size-full object-cover"
+  />
+  <div
+    class="absolute inset-0 -z-10 bg-gradient-to-t from-gray-900 via-gray-900/40"
+  >
+  </div>
+  <div
+    class="absolute inset-0 -z-10 rounded-2xl ring-1 ring-inset ring-gray-900/10"
+  >
+  </div>
+  <div
+    class="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm/6 text-gray-300"
+  >
+    <time datetime="2020-03-16" class="mr-8">{formattedDate}</time>
+    <div class="-ml-4 flex items-center gap-x-4">
+      <svg viewBox="0 0 2 2" class="-ml-0.5 size-0.5 flex-none fill-white/50">
+        <circle cx="1" cy="1" r="1"></circle>
+      </svg>
+      <div class="flex gap-x-2.5">
+        <img
+          src=`${site}${article.authors[0].avatar.url}`
+          alt=""
+          class="size-6 flex-none rounded-full bg-white/10"
+        />
+        {article.authors[0].firstname}
+        {article.authors[0].lastname}
+      </div>
+    </div>
+  </div>
+  <h3 class="mt-3 text-lg/6 font-semibold text-white">
+    <a href=`/blog/${article.slug}`>
+      <span class="absolute inset-0"></span>
+      {article.title}
+    </a>
+  </h3>
+</article>
