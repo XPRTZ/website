@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { SunIcon, MoonIcon } from "@heroicons/react/24/outline";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { fetchData, type GlobalSettings, type Page } from "@xprtz/cms";
@@ -27,7 +28,40 @@ interface HeaderProps {
 }
 
 export default function Hero({ Logo }: HeaderProps) {
+  // Theme state: light or dark
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    // On server, default to light
+    if (typeof window === 'undefined') {
+      return 'light';
+    }
+    // Check local storage
+    const stored = window.localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') {
+      return stored;
+    }
+    // Fallback to system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Apply theme to document and persist
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    window.localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  // Toggle between light and dark
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   return (
       <header className="absolute inset-x-0 top-0 z-50">
@@ -61,6 +95,17 @@ export default function Hero({ Logo }: HeaderProps) {
                 {item.name}
               </a>
             ))}
+            {/* Dark mode toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-md text-primary-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              {theme === 'dark' ? (
+                <SunIcon className="h-6 w-6" aria-hidden="true" />
+              ) : (
+                <MoonIcon className="h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
           </div>
         </nav>
         <Dialog
@@ -102,6 +147,19 @@ export default function Hero({ Logo }: HeaderProps) {
                   ))}
                 </div>
               </div>
+            </div>
+            {/* Mobile dark mode toggle */}
+            <div className="mt-6 flex items-center justify-center">
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-md text-primary-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                {theme === 'dark' ? (
+                  <SunIcon className="h-6 w-6" aria-hidden="true" />
+                ) : (
+                  <MoonIcon className="h-6 w-6" aria-hidden="true" />
+                )}
+              </button>
             </div>
           </DialogPanel>
         </Dialog>

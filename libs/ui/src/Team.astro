@@ -1,4 +1,34 @@
-<div class="mx-auto mt-32 max-w-7xl px-6 lg:px-8">
+<div class="relative isolate">
+  <svg
+    class="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 dark:stroke-gray-700 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]"
+    aria-hidden="true"
+  >
+    <defs>
+    <pattern
+        id="team-pattern"
+        width="200"
+        height="200"
+        x="0"
+        y="0"
+        patternUnits="userSpaceOnUse"
+      >
+        <path d="M.5 200V.5H200" fill="none" />
+      </pattern>
+    </defs>
+    <svg x="0" y="0" class="overflow-visible fill-gray-50 dark:fill-gray-700">
+      <path
+        d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z"
+        stroke-width="0"
+      />
+    </svg>
+    <rect
+      width="100%"
+      height="100%"
+      stroke-width="0"
+      fill="url(#team-pattern)"
+    />
+  </svg>
+  <div class="mx-auto mt-32 max-w-7xl px-6 lg:px-8">
   <div class="mx-auto max-w-2xl lg:mx-0">
     <h2 class="text-pretty text-4xl font-semibold tracking-tight text-primary-800 sm:text-5xl">Ons team</h2>
     <p class="mt-6 text-lg/8 text-gray-600">We’re a dynamic group of individuals who are passionate about what we do and dedicated to delivering the best results for our clients.</p>
@@ -65,4 +95,5 @@
       <p class="text-sm/6 text-gray-600">Junior Copywriter</p>
     </li>
   </ul>
+  </div>
 </div>
