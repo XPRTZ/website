@@ -3,12 +3,6 @@ import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { fetchData, type GlobalSettings, type Page } from "@xprtz/cms";
 
-function slugify(title: string): string {
-  const normalized = title.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
-  const slug = normalized.toLowerCase().replace(/[^a-z0-9\s-]/g, "");
-  return slug.trim().replace(/[-\s]+/g, "-");
-}
-
 const site = import.meta.env.PUBLIC_SITE || "no-site-found";
 
 const pageData = await fetchData<Array<GlobalSettings>>({
@@ -18,13 +12,14 @@ const pageData = await fetchData<Array<GlobalSettings>>({
     "filters[site][$eq]": site,
     "populate[pages][fields][0]": "title_website",
     "populate[pages][fields][1]": "description",
+    "populate[pages][fields][2]": "slug",
     status: "published",
   },
 });
 
 const navigation = pageData[0]?.pages?.map((data: Page) => ({
   name: data.title_website,
-  href: `/${slugify(data.title_website)}`,
+  href: `/${data.slug}`,
 }));
 
 interface HeaderProps {

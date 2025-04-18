@@ -5,4 +5,5 @@ export type Page = {
   site: string;
   locale: string;
   documentId: string;
+  slug: string;
 }

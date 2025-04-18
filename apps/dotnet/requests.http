@@ -7,3 +7,64 @@ GET http://localhost:1337/api/articles?sort[0]=date:desc&filters[site][$eq]=dotn
 ###
 
 GET http://localhost:1337/api/tags?fields=title
+
+###
+
+GET http://localhost:1337/api/homepages?filters[site][$eq]=dotnet&populate[components][on][ui.missie-met-statistieken][populate]=*
+
+###
+
+GET http://localhost:1337/api/homepages?filters[site][$eq]=dotnet&populate[components][on][ui.hero][populate][CTO][populate][page][fields][0]=title_website&populate[components][on][ui.hero][populate][link][populate]=*&populate[components][on][ui.hero][populate][images][fields][0]=url&fields[0]=title&status=published
+
+###
+
+GET http://localhost:1337//api/homepages?filters[site][$eq]=dotnet&populate[components][on][ui.hero][populate][CTO][populate][page][fields][0]=title_website&populate[components][on][ui.hero][populate][link][populate]=*&populate[components][on][ui.hero][populate][images][fields][0]=url&populate[components][on][ui.missie-met-statistieken][populate]=*&fields[0]=title&status=published
+
+
+{
+  filters: {
+    site: {
+      $eq: 'dotnet',
+    },
+  },
+  populate: {
+    components: {
+      on: {
+        "ui.hero": {
+          populate: {
+            CTO: {
+              populate: {
+                page: {
+                  fields: ['title_website']
+                }
+              }
+            },
+            link: {
+              populate: '*'
+            },
+            images: {
+              fields: ['url']
+            }
+          }
+        },
+        "ui.missie-met-statistieken": {
+          fields: ['title', 'description', 'extraDescription']
+        }
+      }
+    }
+  },
+  fields: ['title', 'description'],
+  status: 'published'
+  }
+
+###
+
+GET http://localhost:1337/api/homepages?filters[site][$eq]=dotnet&populate[components][on][ui.hero][populate][CTO][populate][page][fields][0]=title_website&populate[components][on][ui.hero][populate][link][populate]=*&populate[components][on][ui.hero][populate][images][fields][0]=url&populate[components][on][ui.missie-met-statistieken][populate]=*&fields[0]=title&fields[1]=description&status=published
+
+###
+
+GET http://localhost:1337/api/homepages?filters[site][$eq]=dotnet&populate[components][on][ui.hero][populate][CTO][populate][page][fields][0]=title_website&populate[components][on][ui.hero][populate][CTO][populate][page][fields][1]=slug&populate[components][on][ui.hero][populate][link][populate]=*&populate[components][on][ui.hero][populate][images][fields][0]=url&populate[components][on][ui.missie-met-statistieken][populate]=*&fields[0]=title&fields[1]=description&status=published
+
+###
+
+GET http://localhost:1337/api/homepages?filters[site][$eq]=dotnet
