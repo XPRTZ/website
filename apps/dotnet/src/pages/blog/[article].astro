@@ -12,12 +12,14 @@ export async function getStaticPaths() {
   // populate[image][fields][0]=url&
   // status=published
 
+  const site = import.meta.env.PUBLIC_SITE || "no-site-found";
+
   const pageData = await fetchData<Array<Article>>({
     endpoint: "articles",
     wrappedByKey: "data",
     query: {
       "sort[0]": "date:desc",
-      "filters[site][$eq]": "dotnet",
+      "filters[site][$eq]": site,
       "populate[authors][fields]": "*",
       "populate[authors][populate][avatar][fields][0]=url": "url",
       "populate[image][fields][0]": "url",
