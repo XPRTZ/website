@@ -1,17 +1,31 @@
 ---
+import { fetchData, type HomePage } from "@xprtz/cms";
 import Layout from "../layouts/layout.astro";
-import { fetchData, type GlobalSettings } from "@xprtz/cms";
-import { Hero, Mission, Image, ImageWithTitle, Values, LogoCloud, Team, BlogListing } from "@xprtz/ui";
+import { HeroAstro as Hero, Mission, Image, ImageWithTitle, Values, LogoCloud, Team, BlogListing } from "@xprtz/ui";
+import type { Mission as MissionType, Hero as HeroType } from "@xprtz/cms";
 
-const title_website = "XPRTZ.net";
-const description = "Dé plek voor .NET experts!";
+const site = import.meta.env.PUBLIC_SITE || "no-site-found";
 
-const page = { title_website, description };
+const homepages = await fetchData<Array<HomePage>>({
+  endpoint: "homepages",
+  wrappedByKey: "data",
+  query: {
+    "filters[site][$eq]": site,
+    status: "published",
+  },
+});
+
+const homepage = homepages[0];
+
+const title = homepage.title;
+const description = homepage.description;
+const hero = homepage.components[0] as HeroType;
+const mission = (homepage.components[1]) as MissionType;
 ---
 
-<Layout title={title_website} description={description}>
-  <Hero />
-  <Mission />
+<Layout title={title} description={description}>
+  <Hero hero={hero} />
+  <Mission mission={mission} />
   <Image />
   <Values />
   <LogoCloud />

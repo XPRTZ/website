@@ -4,24 +4,19 @@ import { fetchData, type Page } from "@xprtz/cms";
 import { Content } from "@xprtz/ui";
 
 export async function getStaticPaths() {
-  function slugify(title: string): string {
-    const normalized = title.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
-    let slug = normalized.toLowerCase().replace(/[^a-z0-9\s-]/g, "");
-    return slug.trim().replace(/[-\s]+/g, "-");
-  }
 
-  const site = process.env.PUBLIC_SITE || "cloud";
+
   const pageData = await fetchData<Array<Page>>({
     endpoint: "pages",
     wrappedByKey: "data",
     query: {
-      "filters[site][$eq]": site,
+      "filters[site][$eq]": "cloud",
       "status": "published"
     },
   });
 
   return pageData.map((data: Page) => ({
-    params: { slug: slugify(data.title_website) },
+    params: { slug: data.slug },
     props: data,
   }));
 }
