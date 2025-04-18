@@ -2,6 +2,7 @@ import BaseHead from "./src/BaseHead.astro";
 import Page from "./src/Page.astro";
 import Footer from "./src/Footer.astro";
 import Hero from "./src/Hero.tsx";
+import HeroAstro from "./src/Hero.astro";
 import Header from "./src/Header.tsx";
 import Container from "./src/Container.tsx";
 import ContainerAstro from "./src/Container.astro";
@@ -21,6 +22,7 @@ export {
   BaseHead,
   Footer,
   Hero,
+  HeroAstro,
   Header,
   Container,
   ContainerAstro,
