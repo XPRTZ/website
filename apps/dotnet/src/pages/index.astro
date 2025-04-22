@@ -17,6 +17,7 @@ import type {
   ImageComponent as ImageType,
   ImageWithTitle as ImageWithTitleType,
   Kernwaarden as KernwaardenType,
+  LogoCloud as LogoCloudType,
 } from "@xprtz/cms";
 
 const site = import.meta.env.PUBLIC_SITE || "no-site-found";
@@ -39,6 +40,7 @@ const mission = homepage.components[1] as MissionType;
 const image = homepage.components[2] as ImageType;
 const imageWithTitle = homepage.components[3] as ImageWithTitleType;
 const kernwaarden = homepage.components[4] as KernwaardenType;
+const logoCloud = homepage.components[5] as LogoCloudType;
 ---
 
 <Layout title={title} description={description}>
@@ -46,7 +48,7 @@ const kernwaarden = homepage.components[4] as KernwaardenType;
   <Mission mission={mission} />
   <Image image={image} />
   <Values kernwaarden={kernwaarden} />
-  <LogoCloud />
+  <LogoCloud logoCloud={logoCloud} />
   <BlogListing />
   <Team />
   <ImageWithTitle imageWithTitle={imageWithTitle} />
