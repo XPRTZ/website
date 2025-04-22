@@ -12,6 +12,7 @@ import { ListItemWithImage } from "./models/listItemWithImage.js";
 import { Mission } from "./models/mission.js";
 import { Link } from "./models/link.js";
 import { Hero } from "./models/hero.js";
+import { LogoCloud } from "./models/logoCloud.js"
 
 import { HomePage } from "./models/homePage.js";
 
@@ -33,6 +34,7 @@ export {
   type Mission,
   type Link,
   type Hero,
+  type LogoCloud,
 
   type HomePage
 };
