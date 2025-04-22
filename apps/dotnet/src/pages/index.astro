@@ -2,7 +2,7 @@
 import { fetchData, type HomePage } from "@xprtz/cms";
 import Layout from "../layouts/layout.astro";
 import { HeroAstro as Hero, Mission, Image, ImageWithTitle, Values, LogoCloud, Team, BlogListing } from "@xprtz/ui";
-import type { Mission as MissionType, Hero as HeroType } from "@xprtz/cms";
+import type { Mission as MissionType, Hero as HeroType, ImageComponent as ImageType, ImageWithTitle as ImageWithTitleType } from "@xprtz/cms";
 
 const site = import.meta.env.PUBLIC_SITE || "no-site-found";
 
@@ -21,15 +21,17 @@ const title = homepage.title;
 const description = homepage.description;
 const hero = homepage.components[0] as HeroType;
 const mission = (homepage.components[1]) as MissionType;
+const image = (homepage.components[2]) as ImageType;
+const imageWithTitle = (homepage.components[3]) as ImageWithTitleType;
 ---
 
 <Layout title={title} description={description}>
   <Hero hero={hero} />
   <Mission mission={mission} />
-  <Image />
+  <Image image={image}/>
   <Values />
   <LogoCloud />
   <BlogListing />
   <Team />
-  <ImageWithTitle />
+  <ImageWithTitle imageWithTitle={imageWithTitle} />
 </Layout>

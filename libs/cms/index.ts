@@ -2,6 +2,8 @@ import { Page } from "./models/page.js";
 import { Author } from "./models/author.js";
 import { Article } from "./models/article.js";
 import { Image } from "./models/image.js";
+import { ImageWithTitle } from "./models/imageWithTitle.js";
+import { ImageComponent } from "./models/imageComponent.js";
 import { Tag } from "./models/tag.js";
 import { GlobalSettings } from "./models/globalSettings.js";
 import { ListItem } from "./models/listItem.js";
@@ -20,6 +22,8 @@ export {
   type Article,
   type Author,
   type Image,
+  type ImageWithTitle,
+  type ImageComponent,
   type Tag,
   type ListItem,
   type Mission,
