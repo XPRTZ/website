@@ -8,4 +8,5 @@ export type Author = {
   bio: string;
   avatar: Image;
   jobTitle: string;
+  realTitle: string;
 }
