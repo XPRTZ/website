@@ -1,0 +1,27 @@
+---
+import Image from './Image.astro';
+import ImageWithTitle from './ImageWithTitle.astro';
+import Text from './Text.astro';
+
+interface Component {
+  __component: string;
+  id: number;
+  [key: string]: any;
+}
+
+interface ComponentRendererProps {
+  components: Component[];
+}
+const { components } = Astro.props as ComponentRendererProps;
+
+const componentMap: Record<string, any> = {
+  'ui.image': Image,
+  'ui.image-met-titel': ImageWithTitle,
+  'ui.text': Text,
+};
+---
+
+{components.map((block) => {
+  const Component = componentMap[block.__component];
+  return Component ? <Component {...block} /> : null;
+})}

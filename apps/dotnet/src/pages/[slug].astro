@@ -1,17 +1,15 @@
 ---
 import Layout from "../layouts/layout.astro";
 import { fetchData, type Page } from "@xprtz/cms";
-import { Content } from "@xprtz/ui";
+import { ContentAstro as Content, Container, ComponentRenderer } from "@xprtz/ui";
 
 export async function getStaticPaths() {
-
-
   const pageData = await fetchData<Array<Page>>({
     endpoint: "pages",
     wrappedByKey: "data",
     query: {
       "filters[site][$eq]": "dotnet",
-      "status": "published"
+      status: "published",
     },
   });
 
@@ -23,7 +21,6 @@ export async function getStaticPaths() {
 
 const page: Page = Astro.props;
 ---
-
 <Layout title={page.title_website} description={page.description}>
-  <Content {...page} />
+  <Content article={article} />
 </Layout>

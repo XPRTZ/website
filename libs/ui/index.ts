@@ -17,6 +17,9 @@ import Image from "./src/Image.astro";
 import ImageWithTitle from "./src/ImageWithTitle.astro";
 import Values from "./src/Values.astro";
 import LogoCloud from "./src/LogoCloud.astro";
+import Text from "./src/Text.astro";
+
+import ComponentRenderer from "./src/ComponentRenderer.astro";
 
 export {
   BaseHead,
@@ -37,5 +40,8 @@ export {
   Image,
   ImageWithTitle,
   Values,
-  LogoCloud
+  LogoCloud,
+  Text,
+
+  ComponentRenderer
 };
