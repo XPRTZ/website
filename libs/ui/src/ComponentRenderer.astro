@@ -1,7 +1,9 @@
 ---
-import Image from './Image.astro';
-import ImageWithTitle from './ImageWithTitle.astro';
 import Text from './Text.astro';
+import Listing from './Listing.astro';
+import SubtitleWithText from './SubtitleWithText.astro';
+import Quote from './Quote.astro';
+import PageImage from './PageImage.astro';
 
 interface Component {
   __component: string;
@@ -15,9 +17,11 @@ interface ComponentRendererProps {
 const { components } = Astro.props as ComponentRendererProps;
 
 const componentMap: Record<string, any> = {
-  'ui.image': Image,
-  'ui.image-met-titel': ImageWithTitle,
   'ui.text': Text,
+  'ui.opsomming': Listing,
+  'ui.titel': SubtitleWithText,
+  'ui.quote': Quote,
+  'ui.image': PageImage,
 };
 ---
 

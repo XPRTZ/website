@@ -1,0 +1,24 @@
+---
+interface QuoteProps {
+  __component: "ui.quote";
+  id: number;
+  quote: string;
+  name: string;
+  jobTitle: string;
+}
+
+const { quote, name, jobTitle } = Astro.props as QuoteProps;
+---
+<figure class="mt-10 border-l border-primary-600 pl-9">
+  <blockquote class="font-semibold text-gray-900">
+    <p>
+      “{quote}”
+    </p>
+  </blockquote>
+  <figcaption class="mt-6 flex gap-x-4">
+    <div class="text-sm/6">
+      <strong class="font-semibold text-gray-900">{name}</strong> –
+      {jobTitle}
+    </div>
+  </figcaption>
+</figure>
