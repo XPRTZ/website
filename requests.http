@@ -5,3 +5,5 @@ GET http://localhost:1337/api/global-settings?filters[site][$eq]=dotnet&populate
 GET http://localhost:1337/api/homepages?filters[site][$eq]=dotnet
 ###
 GET http://localhost:1337/api/pages/c238qp5ivwwvs6ws2f1ys9v3?filters[site][$eq]=dotnet
+###
+GET http://localhost:1337/api/articles?filters[site][$eq]=dotnet&pagination[pageSize]=2&pagination[page]=2
