@@ -7,4 +7,5 @@ export type Page = {
   documentId: string;
   slug: string;
   tagline: string;
+  components: any[];
 }
