@@ -3,15 +3,8 @@ import Layout from "../../layouts/layout.astro";
 import { fetchData, type Article } from "@xprtz/cms";
 import { ContentAstro as Content } from "@xprtz/ui";
 
-export async function getStaticPaths() {
-  ///api/articles?
-  // sort[0]=date:desc&
-  // filters[site][$eq]=dotnet&
-  // populate[authors][fields]=*&
-  // populate[authors][populate][avatar][fields][0]=url&
-  // populate[image][fields][0]=url&
-  // status=published
 
+export async function getStaticPaths() {
   const site = import.meta.env.PUBLIC_SITE || "no-site-found";
 
   const pageData = await fetchData<Array<Article>>({

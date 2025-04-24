@@ -4,6 +4,7 @@ import Listing from './Listing.astro';
 import SubtitleWithText from './SubtitleWithText.astro';
 import Quote from './Quote.astro';
 import PageImage from './PageImage.astro';
+import Blogs from './Blogs.astro';
 
 interface Component {
   __component: string;
@@ -23,6 +24,7 @@ const componentMap: Record<string, any> = {
   'ui.quote': Quote,
   'ui.image': PageImage,
   'ui.image-met-titel': PageImage,
+  'ui.artikelen': Blogs,
 };
 ---
 

@@ -1,0 +1,71 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { fetchData, type Article, type Page as PageType } from "@xprtz/cms";
+import { Page as PageComponent } from "@xprtz/ui";
+import Layout from "../../../layouts/layout.astro";
+
+interface PageData {
+  data: Article[];
+  start: Number;
+  end: Number;
+  size: Number;
+  total: Number;
+  currentPage: Number;
+  lastPage: Number;
+  url: Url;
+}
+
+interface Url {
+  current: string;
+  next: string;
+  prev: string;
+  first: string;
+  last: string;
+}
+
+export const getStaticPaths: GetStaticPaths = async ({ paginate }) => { 
+  const site = import.meta.env.PUBLIC_SITE || "no-site-found";
+
+  const articles = await fetchData<Array<Article>>({
+    endpoint: "articles",
+    wrappedByKey: "data",
+    query: {
+      "sort[0]": "date:desc",
+      "filters[site][$eq]": site,
+      "populate[authors][fields]": "*",
+      "populate[authors][populate][avatar][fields][0]=url": "url",
+      "populate[image][fields][0]": "url",
+      "populate[tags][fields][0]": "title",
+      status: "published",
+    },
+  });
+
+  return paginate(articles, { pageSize: 10 });
+}
+
+const site = import.meta.env.PUBLIC_SITE || "no-site-found";
+const articlesPages = await fetchData<Array<PageType>>({
+  endpoint: "pages",
+  wrappedByKey: "data",
+  query: {
+    "filters[site][$eq]": site,
+    "filters[slug][$eq]": "artikelen",
+    status: "published",
+  },
+});
+
+const { page } = Astro.props as { page: PageData };
+
+const articlesPage = articlesPages[0];
+articlesPage.components = [
+  {
+    __component: "ui.artikelen",
+    page
+  }
+]
+---
+
+<Layout title={articlesPage.title_website} description={articlesPage.description}>
+  <PageComponent page={articlesPage}>
+  </PageComponent>
+</Layout>

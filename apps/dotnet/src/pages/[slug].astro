@@ -3,6 +3,17 @@ import Layout from "../layouts/layout.astro";
 import { fetchData, type Page as PageType } from "@xprtz/cms";
 import { Page } from "@xprtz/ui";
 
+// Get the slug parameter from the URL
+const { slug } = Astro.params;
+
+// Check if the slug is exactly 'artikelen'
+if (slug === 'artikelen') {
+  // If it is, redirect to the first page of the articles listing.
+  // A 301 redirect (Moved Permanently) is usually appropriate here
+  // as you likely always want /artikelen to point to the paginated view.
+  return Astro.redirect('/artikelen/page/1', 301);
+}
+
 export async function getStaticPaths() {
   const pageData = await fetchData<Array<PageType>>({
     endpoint: "pages",

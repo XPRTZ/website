@@ -1,8 +1,28 @@
 ---
-import { type Page } from "@xprtz/cms";
+import { type Page, type Article } from "@xprtz/cms";
 import Container from "./Container.astro";
 import ComponentRenderer from "./ComponentRenderer.astro";
-const { page } = Astro.props as { page: Page };
+
+interface PageData {
+  data: Article[];
+  start: Number;
+  end: Number;
+  size: Number;
+  total: Number;
+  currentPage: Number;
+  lastPage: Number;
+  url: Url;
+}
+
+interface Url {
+  current: string;
+  next: string;
+  prev: string;
+  first: string;
+  last: string;
+}
+
+const { page, pagination } = Astro.props as { page: Page, pagination: PageData};
 ---
 
 <Container>
