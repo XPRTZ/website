@@ -3,9 +3,10 @@ import Layout from "../../layouts/layout.astro";
 import { fetchData, type Article } from "@xprtz/cms";
 import { ContentAstro as Content } from "@xprtz/ui";
 
-const site = import.meta.env.PUBLIC_SITE || "no-site-found";
 
 export async function getStaticPaths() {
+  const site = import.meta.env.PUBLIC_SITE || "no-site-found";
+
   const pageData = await fetchData<Array<Article>>({
     endpoint: "articles",
     wrappedByKey: "data",

@@ -1,7 +1,7 @@
 ---
 import { fetchData, type Article, type Page as PageType } from "@xprtz/cms";
 import { Page as PageComponent } from "@xprtz/ui";
-import Layout from "../../layouts/layout.astro";
+import Layout from "../../../layouts/layout.astro";
 
 interface PageData {
   data: Article[];
@@ -39,7 +39,7 @@ export async function getStaticPaths({ paginate }) {
     },
   });
 
-  return paginate(articles, { pageSize: 1 });
+  return paginate(articles, { pageSize: 10 });
 }
 
 const site = import.meta.env.PUBLIC_SITE || "no-site-found";
