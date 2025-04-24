@@ -1,0 +1,32 @@
+---
+import Text from './Text.astro';
+import Listing from './Listing.astro';
+import SubtitleWithText from './SubtitleWithText.astro';
+import Quote from './Quote.astro';
+import PageImage from './PageImage.astro';
+
+interface Component {
+  __component: string;
+  id: number;
+  [key: string]: any;
+}
+
+interface ComponentRendererProps {
+  components: Component[];
+}
+const { components } = Astro.props as ComponentRendererProps;
+
+const componentMap: Record<string, any> = {
+  'ui.text': Text,
+  'ui.opsomming': Listing,
+  'ui.titel': SubtitleWithText,
+  'ui.quote': Quote,
+  'ui.image': PageImage,
+  'ui.image-met-titel': PageImage,
+};
+---
+
+{components.map((block) => {
+  const Component = componentMap[block.__component];
+  return Component ? <Component {...block} /> : null;
+})}

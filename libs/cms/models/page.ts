@@ -6,4 +6,6 @@ export type Page = {
   locale: string;
   documentId: string;
   slug: string;
+  tagline: string;
+  components: any[];
 }

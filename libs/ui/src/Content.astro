@@ -1,9 +1,7 @@
 ---
 import { marked } from "marked";
 import Container from "./Container.astro";
-const {
-  article
-} = Astro.props;
+const { article } = Astro.props;
 
 const date = new Date(article.date).toLocaleDateString("nl-NL", {
   year: "numeric",
@@ -13,7 +11,7 @@ const date = new Date(article.date).toLocaleDateString("nl-NL", {
 
 const htmlContent = await marked.parse(article.content);
 
-const site = import.meta.env.PUBLIC_STRAPI_URL
+const site = import.meta.env.PUBLIC_STRAPI_URL;
 ---
 
 <Container>
@@ -86,14 +84,36 @@ const site = import.meta.env.PUBLIC_STRAPI_URL
             </div>
           </div>
           <div class="mt-8">
-            {article.tags && article.tags.map(t => <div class="mr-4 inline-flex"><span class="inline-flex items-center rounded-xl bg-primary-100 px-4 py-1 text-sm/6 font-medium text-primary-700">#{t.title}</span></div>)}
+            {
+              article.tags &&
+                article.tags.map((t) => (
+                  <div class="mr-4 inline-flex">
+                    <span class="inline-flex items-center rounded-xl bg-primary-100 px-4 py-1 text-sm/6 font-medium text-primary-700">
+                      #{t.title}
+                    </span>
+                  </div>
+                ))
+            }
           </div>
         </div>
         <figure class="mt-8">
-          <img class="aspect-video rounded-xl bg-gray-50 object-cover" src=`${site}${article.image.url}` alt="">
+          <img
+            class="aspect-video rounded-xl bg-gray-50 object-cover"
+            src=`${site}${article.image.url}`
+            alt=""
+          />
           <figcaption class="mt-4 flex gap-x-2 text-sm/6 text-gray-500">
-            <svg class="mt-0.5 size-5 flex-none text-gray-300" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clip-rule="evenodd" />
+            <svg
+              class="mt-0.5 size-5 flex-none text-gray-300"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z"
+                clip-rule="evenodd"></path>
             </svg>
             Afbeelding is gegenereerd met behulp van A.I.
           </figcaption>

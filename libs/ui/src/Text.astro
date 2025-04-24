@@ -1,0 +1,13 @@
+---
+import { marked } from "marked";
+
+interface RichTextProps {
+  __component: "ui.text";
+  id: number;
+  content: string;
+}
+
+const { content } = Astro.props as RichTextProps;
+const htmlContent = marked.parse(content);
+---
+<div class="mt-8" set:html={htmlContent}></div>
