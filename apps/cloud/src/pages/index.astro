@@ -2,8 +2,6 @@
 import { fetchData, type HomePage } from "@xprtz/cms";
 import Layout from "../layouts/layout.astro";
 
-import type { Mission as MissionType, Hero as HeroType } from "@xprtz/cms";
-
 const site = import.meta.env.PUBLIC_SITE || "no-site-found";
 
 const homepages = await fetchData<Array<HomePage>>({
