@@ -1,4 +1,5 @@
 ---
+import removeMarkdown from 'remove-markdown';
 import { type Article } from "@xprtz/cms";
 const site = import.meta.env.PUBLIC_STRAPI_URL || "no-site-found";
 
@@ -28,6 +29,27 @@ function formatDate(unformattedDate) {
     day: "numeric",
   })
 }
+export function createExcerpt(markdownContent, maxLength = 256) {
+  if (!markdownContent) {
+    return '';
+  }
+
+  const plainText = removeMarkdown(markdownContent);
+  const cleanedText = plainText.replace(/\s+/g, ' ').trim();
+  if (cleanedText.length <= maxLength) {
+    return cleanedText;
+  }
+
+  let truncatedText = cleanedText.slice(0, maxLength);
+
+  const lastSpaceIndex = truncatedText.lastIndexOf(' ');
+
+  if (lastSpaceIndex > 0) {
+    truncatedText = truncatedText.slice(0, lastSpaceIndex);
+  }
+
+  return truncatedText + '...';
+}
 
 const { page } = Astro.props as { page: PageData };
 ---
@@ -51,10 +73,18 @@ const { page } = Astro.props as { page: PageData };
       <div>
         <div class="flex items-center gap-x-4 text-xs">
           <time datetime="2020-03-16" class="text-gray-500">{formatDate(article.date)}</time>
-          <span
-            class="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
-            >Marketing</span
-          >
+          <div>
+            {
+              article.tags &&
+                article.tags.map((t) => (
+                  <div class="mr-4 inline-flex">
+                    <span class="inline-flex items-center rounded-xl bg-primary-100 px-4 py-1 text-sm/6 font-medium text-primary-700">
+                      #{t.title}
+                    </span>
+                  </div>
+                ))
+            }
+          </div>
         </div>
         <div class="group relative max-w-xl">
           <h3
@@ -66,10 +96,7 @@ const { page } = Astro.props as { page: PageData };
             </a>
           </h3>
           <p class="mt-5 text-sm/6 text-gray-600">
-            Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam
-            vitae illo. Non aliquid explicabo necessitatibus unde. Sed
-            exercitationem placeat consectetur nulla deserunt vel iusto corrupti
-            dicta laboris incididunt.
+            {createExcerpt(article.content)}
           </p>
         </div>
         <div class="mt-6 flex border-t border-gray-900/5 pt-6">

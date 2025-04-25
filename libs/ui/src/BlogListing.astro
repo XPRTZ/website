@@ -21,6 +21,15 @@ const articles = await fetchData<Array<Article>>({
     status: "published",
   },
 });
+
+interface BlogListingProps {
+  __component: "ui.artikelen-overzicht";
+  id: number;
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props as BlogListingProps;
 ---
 
 <div class="mx-auto mt-32 max-w-7xl px-6 lg:px-8">
@@ -28,14 +37,14 @@ const articles = await fetchData<Array<Article>>({
     <h2
       class="text-balance text-4xl font-semibold tracking-tight text-primary-800 sm:text-5xl"
     >
-      Artikelen
+      {title}
     </h2>
-    <p class="mt-2 text-lg/8 text-gray-600">
-      Learn how to grow your business with our expert advice.
+    <p class="mt-6 text-lg/8 text-gray-600">
+      {description}
     </p>
   </div>
   <div
-    class="mx-auto mt-16 grid max-w-2xl auto-rows-fr grid-cols-1 gap-8 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3"
+    class="mx-auto mt-16 grid max-w-2xl auto-rows-fr grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3"
   >
     {
       articles.map((article) => (
@@ -44,7 +53,7 @@ const articles = await fetchData<Array<Article>>({
     }
   </div>
   <div class="mt-8 grid grid-flow-col justify-items-start gap-x-6">
-    <a href="/artikelen/page/1" class="text-sm font-semibold leading-6 text-primary-900">
+    <a href="/artikelen" class="text-sm font-semibold leading-6 text-primary-900">
       Lees meer <span aria-hidden="true"> &rarr;</span>
     </a>
   </div>
