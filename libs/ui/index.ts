@@ -1,8 +1,7 @@
 import BaseHead from "./src/BaseHead.astro";
 import Page from "./src/Page.astro";
 import Footer from "./src/Footer.astro";
-import Hero from "./src/Hero.tsx";
-import HeroAstro from "./src/Hero.astro";
+import Hero from "./src/Hero.astro";
 import Header from "./src/Header.tsx";
 import Container from "./src/Container.tsx";
 import ContainerAstro from "./src/Container.astro";
@@ -13,15 +12,15 @@ import Team from "./src/Team.astro";
 import Content from "./src/Content.tsx";
 import ContentAstro from "./src/Content.astro";
 import Mission from "./src/Mission.astro";
-import Image from "./src/Image.astro";
-import ImageWithTitle from "./src/ImageWithTitle.astro";
+import HomePageImage from "./src/HomePageImage.astro";
+import HomePageImageWithTitle from "./src/HomePageImageWithTitle.astro";
+import PageImage from "./src/PageImage.astro";
 import Values from "./src/Values.astro";
 import LogoCloud from "./src/LogoCloud.astro";
 import Text from "./src/Text.astro";
 import Listing from "./src/Listing.astro";
 import SubtitleWithText from "./src/SubtitleWithText.astro";
 import Quote from "./src/Quote.astro";
-import PageImage from "./src/PageImage.astro";
 import Blogs from "./src/Blogs.astro";
 
 import ComponentRenderer from "./src/ComponentRenderer.astro";
@@ -30,7 +29,6 @@ export {
   BaseHead,
   Footer,
   Hero,
-  HeroAstro,
   Header,
   Container,
   ContainerAstro,
@@ -42,15 +40,15 @@ export {
   ContentAstro,
   Page,
   Mission,
-  Image,
-  ImageWithTitle,
+  HomePageImage,
+  HomePageImageWithTitle,
+  PageImage,
   Values,
   LogoCloud,
   Text,
   Listing,
   SubtitleWithText,
   Quote,
-  PageImage,
   Blogs,
 
   ComponentRenderer
