@@ -1,6 +1,6 @@
 ---
-import { type Kernwaarden as KernwaardenType } from "@xprtz/cms";
-const { kernwaarden } = Astro.props as { kernwaarden: KernwaardenType };
+import { type Kernwaarden } from "@xprtz/cms";
+const kernwaarden = Astro.props as Kernwaarden;
 const site = import.meta.env.PUBLIC_STRAPI_URL;
 ---
 

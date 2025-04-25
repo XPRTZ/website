@@ -1,6 +1,6 @@
 ---
-import { type Team as TeamType } from "@xprtz/cms";
-const { team } = Astro.props as { team: TeamType };
+import { type Team } from "@xprtz/cms";
+const team = Astro.props as Team;
 const site = import.meta.env.PUBLIC_STRAPI_URL;
 ---
 <div class="mx-auto mt-32 max-w-7xl px-6 lg:px-8">

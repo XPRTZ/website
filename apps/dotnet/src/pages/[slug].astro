@@ -8,10 +8,7 @@ const { slug } = Astro.params;
 
 // Check if the slug is exactly 'artikelen'
 if (slug === 'artikelen') {
-  // If it is, redirect to the first page of the articles listing.
-  // A 301 redirect (Moved Permanently) is usually appropriate here
-  // as you likely always want /artikelen to point to the paginated view.
-  return Astro.redirect('/artikelen/page/1', 301);
+  return Astro.rewrite('/artikelen/page/1');
 }
 
 export async function getStaticPaths() {

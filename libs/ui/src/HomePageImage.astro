@@ -1,6 +1,6 @@
 ---
 import { type ImageComponent as ImageType } from "@xprtz/cms";
-const { image } = Astro.props as { image: ImageType };
+const image = Astro.props as ImageType;
 
 const site = import.meta.env.PUBLIC_STRAPI_URL;
 ---

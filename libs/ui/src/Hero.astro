@@ -1,6 +1,6 @@
 ---
-import { type Hero as HeroType } from "@xprtz/cms";
-const { hero } = Astro.props as { hero: HeroType };
+import { type Hero } from "@xprtz/cms";
+const hero = Astro.props as Hero;
 
 const site = import.meta.env.PUBLIC_STRAPI_URL;
 ---

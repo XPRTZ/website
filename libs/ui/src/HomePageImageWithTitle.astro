@@ -1,6 +1,6 @@
 ---
-import { type ImageWithTitle as ImageWithTitleType } from "@xprtz/cms";
-const { imageWithTitle } = Astro.props as { imageWithTitle: ImageWithTitleType };
+import { type ImageWithTitle } from "@xprtz/cms";
+const imageWithTitle = Astro.props as ImageWithTitle;
 
 const site = import.meta.env.PUBLIC_STRAPI_URL;
 ---

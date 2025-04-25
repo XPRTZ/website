@@ -4,7 +4,15 @@ import Listing from './Listing.astro';
 import SubtitleWithText from './SubtitleWithText.astro';
 import Quote from './Quote.astro';
 import PageImage from './PageImage.astro';
-import Blogs from './Blogs.astro';
+import HomePageImage from './HomePageImage.astro';
+import HomePageImageWithTitle from './HomePageImageWithTitle.astro';
+import Artikelen from './Blogs.astro';
+import ArtikelenOverzicht from './BlogListing.astro';
+import Hero from './Hero.astro';
+import Mission from './Mission.astro';
+import Values from './Values.astro';
+import LogoCloud from './LogoCloud.astro';
+import Team from './Team.astro';
 
 interface Component {
   __component: string;
@@ -22,9 +30,16 @@ const componentMap: Record<string, any> = {
   'ui.opsomming': Listing,
   'ui.titel': SubtitleWithText,
   'ui.quote': Quote,
-  'ui.image': PageImage,
-  'ui.image-met-titel': PageImage,
-  'ui.artikelen': Blogs,
+  'ui.image': HomePageImage,
+  'ui.image-met-titel': HomePageImageWithTitle,
+  'ui.page-image': PageImage,
+  'ui.artikelen': Artikelen,
+  'ui.artikelen-overzicht': ArtikelenOverzicht,
+  'ui.hero': Hero,
+  'ui.missie-met-statistieken': Mission,
+  'ui.kernwaarden': Values,
+  'ui.klant-logo-s': LogoCloud,
+  'ui.team': Team,
 };
 ---
 
