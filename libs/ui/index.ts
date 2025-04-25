@@ -3,13 +3,10 @@ import Page from "./src/Page.astro";
 import Footer from "./src/Footer.astro";
 import Hero from "./src/Hero.astro";
 import Header from "./src/Header.tsx";
-import Container from "./src/Container.tsx";
-import ContainerAstro from "./src/Container.astro";
-import Features from "./src/Features.tsx";
+import Container from "./src/Container.astro";
 import BlogListing from "./src/BlogListing.astro";
 import BlogCard from "./src/BlogCard.astro";
 import Team from "./src/Team.astro";
-import Content from "./src/Content.tsx";
 import ContentAstro from "./src/Content.astro";
 import Mission from "./src/Mission.astro";
 import HomePageImage from "./src/HomePageImage.astro";
@@ -31,12 +28,9 @@ export {
   Hero,
   Header,
   Container,
-  ContainerAstro,
-  Features,
   BlogListing,
   BlogCard,
   Team,
-  Content,
   ContentAstro,
   Page,
   Mission,
