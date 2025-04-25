@@ -40,7 +40,7 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
     },
   });
 
-  return paginate(articles, { pageSize: 1 });
+  return paginate(articles, { pageSize: 10 });
 };
 
 const site = import.meta.env.PUBLIC_SITE || "no-site-found";
