@@ -13,7 +13,9 @@ import { Mission } from "./models/mission.js";
 import { Link } from "./models/link.js";
 import { Hero } from "./models/hero.js";
 import { LogoCloud } from "./models/logoCloud.js"
-import { Team } from "./models/team.js"
+import { Team } from "./models/team.js";
+import { Social } from "./models/social.js";
+import { AlgemeneVoorwaarden } from "./models/algemeneVoorwaarden.js";
 
 import { HomePage } from "./models/homePage.js";
 
@@ -37,6 +39,8 @@ export {
   type Hero,
   type LogoCloud,
   type Team,
+  type Social,
+  type AlgemeneVoorwaarden,
 
   type HomePage
 };

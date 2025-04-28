@@ -10,9 +10,6 @@ const pageData = await fetchData<Array<GlobalSettings>>({
   wrappedByKey: "data",
   query: {
     "filters[site][$eq]": site,
-    "populate[pages][fields][0]": "title_website",
-    "populate[pages][fields][1]": "description",
-    "populate[pages][fields][2]": "slug",
     status: "published",
   },
 });
