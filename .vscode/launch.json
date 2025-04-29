@@ -13,5 +13,11 @@
     "request": "launch",
     "type": "node-terminal"
    },
+   {
+    "command": "npm run develop:stratus",
+    "name": "Development server stratus",
+    "request": "launch",
+    "type": "node-terminal"
+   },
  ]
 }

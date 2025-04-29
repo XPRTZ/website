@@ -1,10 +1,10 @@
 {
-  "name": "@xprtz/dotnet",
+  "name": "@xprtz/stratus",
   "type": "module",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "develop": "astro dev --port 3001",
+    "develop": "astro dev --port 3005",
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview"
@@ -25,7 +25,7 @@
     "react-dom": "^18.3.1",
     "tailwindcss": "^3.4.3"
   },
-  "author": "Alex Schouls",
+  "author": "Maarten Louage",
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16"
   }
