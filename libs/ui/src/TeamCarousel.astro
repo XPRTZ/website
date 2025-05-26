@@ -143,17 +143,6 @@ const slidesMembers = Array.from({ length: totalSlides }).map((_, slideIndex) =>
         goToSlide(currentSlide + 1);
       }, 5000);
     };
-
-    // Pause auto-rotation when hovering over carousel
-    if (container) {
-      container.addEventListener('mouseenter', () => {
-        clearInterval(interval);
-      });
-
-      container.addEventListener('mouseleave', () => {
-        resetAutoRotation();
-      });
-    }
   };
 
   // Run on initial load
