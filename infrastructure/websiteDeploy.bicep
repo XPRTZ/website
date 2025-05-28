@@ -12,7 +12,6 @@ var resourceGroupName = endsWith(resourceGroupSuffix, 'main')
   : '${resourceGroupPrefix}-${resourceGroupSuffix}'
 
 var sharedValues = json(loadTextContent('shared-values.json'))
-var managementResourceGroup = resourceGroup(sharedValues.subscriptionIds.xprtz, sharedValues.resourceGroups.management)
 var infrastructureResourceGroup = resourceGroup(
   sharedValues.subscriptionIds.xprtz,
   sharedValues.resourceGroups.infrastructure
@@ -44,7 +43,7 @@ module frontDoorSettings 'modules/frontdoor.bicep' = if (deployDns) {
 }
 
 module dnsSettings 'modules/dns.bicep' = if (deployDns) {
-  scope: managementResourceGroup
+  scope: infrastructureResourceGroup
   name: 'dnsSettingsDeploy-${application}'
   params: {
     origin: frontDoorSettings.outputs.frontDoorCustomDomainHost

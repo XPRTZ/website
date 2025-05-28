@@ -3,7 +3,6 @@
     "xprtz": "92f4e2a9-8f0a-4ecc-90fc-6c77c24a1b31"
   },
   "resourceGroups": {
-    "infrastructure": "rg-xprtzbv-infrastructure",
-    "management": "xprtz-mgmt"
+    "infrastructure": "rg-xprtzbv-infrastructure"
   }
 }
