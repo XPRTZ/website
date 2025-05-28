@@ -9,4 +9,5 @@ export type Author = {
   avatar: Image;
   jobTitle: string;
   realTitle: string;
+  phoneNumber: string;
 }

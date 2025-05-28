@@ -1,19 +1,19 @@
 ---
-import Text from './Text.astro';
-import Listing from './Listing.astro';
-import SubtitleWithText from './SubtitleWithText.astro';
-import Quote from './Quote.astro';
-import PageImage from './PageImage.astro';
-import HomePageImage from './HomePageImage.astro';
-import HomePageImageWithTitle from './HomePageImageWithTitle.astro';
-import Artikelen from './Blogs.astro';
-import ArtikelenOverzicht from './BlogListing.astro';
-import Hero from './Hero.astro';
-import Mission from './Mission.astro';
-import Values from './Values.astro';
-import LogoCloud from './LogoCloud.astro';
-import Team from './Team.astro';
-import TeamCarousel from './TeamCarousel.astro';
+import Text from "./Text.astro";
+import Listing from "./Listing.astro";
+import SubtitleWithText from "./SubtitleWithText.astro";
+import Quote from "./Quote.astro";
+import PageImage from "./PageImage.astro";
+import HomePageImage from "./HomePageImage.astro";
+import HomePageImageWithTitle from "./HomePageImageWithTitle.astro";
+import Artikelen from "./Blogs.astro";
+import ArtikelenOverzicht from "./BlogListing.astro";
+import Hero from "./Hero.astro";
+import Mission from "./Mission.astro";
+import Values from "./Values.astro";
+import LogoCloud from "./LogoCloud.astro";
+import Directors from "./Directors.astro";
+import TeamCarousel from "./TeamCarousel.astro";
 
 interface Component {
   __component: string;
@@ -27,24 +27,27 @@ interface ComponentRendererProps {
 const { components } = Astro.props as ComponentRendererProps;
 
 const componentMap: Record<string, any> = {
-  'ui.text': Text,
-  'ui.opsomming': Listing,
-  'ui.titel': SubtitleWithText,
-  'ui.quote': Quote,
-  'ui.image': HomePageImage,
-  'ui.image-met-titel': HomePageImageWithTitle,
-  'ui.page-image': PageImage,
-  'ui.artikelen': Artikelen,
-  'ui.artikelen-overzicht': ArtikelenOverzicht,
-  'ui.hero': Hero,
-  'ui.missie-met-statistieken': Mission,
-  'ui.kernwaarden': Values,
-  'ui.klant-logo-s': LogoCloud,
-  'ui.team': TeamCarousel,
+  "ui.text": Text,
+  "ui.opsomming": Listing,
+  "ui.titel": SubtitleWithText,
+  "ui.quote": Quote,
+  "ui.image": HomePageImage,
+  "ui.image-met-titel": HomePageImageWithTitle,
+  "ui.page-image": PageImage,
+  "ui.artikelen": Artikelen,
+  "ui.artikelen-overzicht": ArtikelenOverzicht,
+  "ui.hero": Hero,
+  "ui.missie-met-statistieken": Mission,
+  "ui.kernwaarden": Values,
+  "ui.klant-logo-s": LogoCloud,
+  "ui.team": TeamCarousel,
+  "ui.directeuren": Directors,
 };
 ---
 
-{components.map((block) => {
-  const Component = componentMap[block.__component];
-  return Component ? <Component {...block} /> : null;
-})}
+{
+  components.map((block) => {
+    const Component = componentMap[block.__component];
+    return Component ? <Component {...block} /> : null;
+  })
+}
