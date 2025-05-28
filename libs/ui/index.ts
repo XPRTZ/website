@@ -6,7 +6,7 @@ import Header from "./src/Header.tsx";
 import Container from "./src/Container.astro";
 import BlogListing from "./src/BlogListing.astro";
 import BlogCard from "./src/BlogCard.astro";
-import Team from "./src/Team.astro";
+import Directors from "./src/Directors.astro";
 import ContentAstro from "./src/Content.astro";
 import Mission from "./src/Mission.astro";
 import HomePageImage from "./src/HomePageImage.astro";
@@ -30,7 +30,7 @@ export {
   Container,
   BlogListing,
   BlogCard,
-  Team,
+  Directors,
   ContentAstro,
   Page,
   Mission,
@@ -44,6 +44,5 @@ export {
   SubtitleWithText,
   Quote,
   Blogs,
-
   ComponentRenderer
 };

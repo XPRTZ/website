@@ -14,6 +14,7 @@ import { Link } from "./models/link.js";
 import { Hero } from "./models/hero.js";
 import { LogoCloud } from "./models/logoCloud.js"
 import { Team } from "./models/team.js";
+import { Directors } from "./models/directors.js";
 import { Social } from "./models/social.js";
 import { AlgemeneVoorwaarden } from "./models/algemeneVoorwaarden.js";
 
@@ -41,7 +42,7 @@ export {
   type Team,
   type Social,
   type AlgemeneVoorwaarden,
-
+  type Directors,
   type HomePage
 };
 
