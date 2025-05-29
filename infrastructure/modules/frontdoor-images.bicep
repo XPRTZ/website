@@ -11,6 +11,7 @@ var frontDoorOriginGroupName = 'xprtz-images-${application}'
 var frontDoorRouteName = 'images-route'
 var customDomainHost = '${subDomain}.${rootDomain}'
 var customDomainResourceName = replace('${customDomainHost}', '.', '-')
+var ruleSetName = 'images-headers-${application}'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' existing = {
   name: storageAccountName
@@ -27,6 +28,187 @@ resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2024-02-01' = {
   location: 'global'
   properties: {
     enabledState: 'Enabled'
+  }
+}
+
+resource frontDoorRuleSet 'Microsoft.Cdn/profiles/ruleSets@2024-02-01' = {
+  name: ruleSetName
+  parent: frontDoorProfile
+}
+
+resource jpegRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
+  name: 'jpeg-content-type'
+  parent: frontDoorRuleSet
+  properties: {
+    order: 1
+    conditions: [
+      {
+        name: 'UrlFileExtension'
+        parameters: {
+          typeName: 'DeliveryRuleUrlFileExtensionMatchConditionParameters'
+          operator: 'Equal'
+          negateCondition: false
+          matchValues: [
+            'jpg'
+            'jpeg'
+          ]
+          transforms: [
+            'Lowercase'
+          ]
+        }
+      }
+    ]
+    actions: [
+      {
+        name: 'ModifyResponseHeader'
+        parameters: {
+          typeName: 'DeliveryRuleHeaderActionParameters'
+          headerAction: 'Overwrite'
+          headerName: 'Content-Type'
+          value: 'image/jpeg'
+        }
+      }
+    ]
+  }
+}
+
+resource pngRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
+  name: 'png-content-type'
+  parent: frontDoorRuleSet
+  properties: {
+    order: 2
+    conditions: [
+      {
+        name: 'UrlFileExtension'
+        parameters: {
+          typeName: 'DeliveryRuleUrlFileExtensionMatchConditionParameters'
+          operator: 'Equal'
+          negateCondition: false
+          matchValues: [
+            'png'
+          ]
+          transforms: [
+            'Lowercase'
+          ]
+        }
+      }
+    ]
+    actions: [
+      {
+        name: 'ModifyResponseHeader'
+        parameters: {
+          typeName: 'DeliveryRuleHeaderActionParameters'
+          headerAction: 'Overwrite'
+          headerName: 'Content-Type'
+          value: 'image/png'
+        }
+      }
+    ]
+  }
+}
+
+resource svgRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
+  name: 'svg-content-type'
+  parent: frontDoorRuleSet
+  properties: {
+    order: 3
+    conditions: [
+      {
+        name: 'UrlFileExtension'
+        parameters: {
+          typeName: 'DeliveryRuleUrlFileExtensionMatchConditionParameters'
+          operator: 'Equal'
+          negateCondition: false
+          matchValues: [
+            'svg'
+          ]
+          transforms: [
+            'Lowercase'
+          ]
+        }
+      }
+    ]
+    actions: [
+      {
+        name: 'ModifyResponseHeader'
+        parameters: {
+          typeName: 'DeliveryRuleHeaderActionParameters'
+          headerAction: 'Overwrite'
+          headerName: 'Content-Type'
+          value: 'image/svg+xml'
+        }
+      }
+    ]
+  }
+}
+
+resource gifRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
+  name: 'gif-content-type'
+  parent: frontDoorRuleSet
+  properties: {
+    order: 4
+    conditions: [
+      {
+        name: 'UrlFileExtension'
+        parameters: {
+          typeName: 'DeliveryRuleUrlFileExtensionMatchConditionParameters'
+          operator: 'Equal'
+          negateCondition: false
+          matchValues: [
+            'gif'
+          ]
+          transforms: [
+            'Lowercase'
+          ]
+        }
+      }
+    ]
+    actions: [
+      {
+        name: 'ModifyResponseHeader'
+        parameters: {
+          typeName: 'DeliveryRuleHeaderActionParameters'
+          headerAction: 'Overwrite'
+          headerName: 'Content-Type'
+          value: 'image/gif'
+        }
+      }
+    ]
+  }
+}
+
+resource webpRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
+  name: 'webp-content-type'
+  parent: frontDoorRuleSet
+  properties: {
+    order: 5
+    conditions: [
+      {
+        name: 'UrlFileExtension'
+        parameters: {
+          typeName: 'DeliveryRuleUrlFileExtensionMatchConditionParameters'
+          operator: 'Equal'
+          negateCondition: false
+          matchValues: [
+            'webp'
+          ]
+          transforms: [
+            'Lowercase'
+          ]
+        }
+      }
+    ]
+    actions: [
+      {
+        name: 'ModifyResponseHeader'
+        parameters: {
+          typeName: 'DeliveryRuleHeaderActionParameters'
+          headerAction: 'Overwrite'
+          headerName: 'Content-Type'
+          value: 'image/webp'
+        }
+      }
+    ]
   }
 }
 
@@ -75,6 +257,11 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
     originGroup: {
       id: frontDoorOriginGroup.id
     }
+    ruleSets: [
+      {
+        id: frontDoorRuleSet.id
+      }
+    ]
     supportedProtocols: [
       'Http'
       'Https'

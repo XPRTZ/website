@@ -3,7 +3,8 @@ const today = new Date();
 
 import { fetchData, type GlobalSettings } from "@xprtz/cms";
 
-const site = import.meta.env.PUBLIC_SITE || "no-site-found";
+const site = import.meta.env.PUBLIC_SITE;
+const imagesUrl = import.meta.env.PUBLIC_IMAGES_URL;
 const strapi = import.meta.env.PUBLIC_STRAPI_URL;
 
 const globalSettings = await fetchData<Array<GlobalSettings>>({
@@ -24,7 +25,7 @@ const settings = globalSettings[0];
       {settings.socials.map(s => (
         s.isEnabled && <a href={s.link} class="text-gray-400 hover:text-gray-500">
           <span class="sr-only">{s.title}</span>
-          <img class="pt-4" src=`${strapi}${s.icon.url}` />
+          <img class="pt-4" src=`${imagesUrl}${s.icon.url}` />
         </a>
       ))}
     </div>

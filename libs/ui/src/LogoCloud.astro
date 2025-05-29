@@ -1,7 +1,7 @@
 ---
 import { type LogoCloud } from "@xprtz/cms";
 const logoCloud = Astro.props as LogoCloud;
-const site = import.meta.env.PUBLIC_STRAPI_URL;
+const site = import.meta.env.PUBLIC_IMAGES_URL;
 ---
   <div class="mx-auto max-w-7xl px-6 lg:px-8 mt-32">
     <h2 class="text-center text-lg/8 font-semibold text-primary-800">{logoCloud.title}</h2>

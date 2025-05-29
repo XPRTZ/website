@@ -2,12 +2,13 @@
 import { type ImageComponent as ImageType } from "@xprtz/cms";
 const image = Astro.props as ImageType;
 
-const site = import.meta.env.PUBLIC_STRAPI_URL;
+const site = import.meta.env.PUBLIC_IMAGES_URL;
 ---
+
 <div class="mt-32 sm:mt-40 xl:mx-auto xl:max-w-7xl xl:px-8">
   <img
-  src=`${site}${image.image.url}`
-  alt={image.image.alternateText}
+    src=`${site}${image.image.url}`
+    alt={image.image.alternateText}
     class="aspect-[5/2] w-full object-cover xl:rounded-3xl"
   />
 </div>

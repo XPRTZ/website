@@ -14,6 +14,7 @@ on:
 
 env:
   PUBLIC_STRAPI_URL: ${{ vars.PUBLIC_STRAPI_URL }}
+  PUBLIC_IMAGES_URL: ${{ vars.PUBLIC_IMAGES_URL }}
   PUBLIC_SITE: ${{ inputs.application }}
 
 jobs:
