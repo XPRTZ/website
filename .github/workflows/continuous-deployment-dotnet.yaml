@@ -1,0 +1,29 @@
+name: Continuous deployment dotnet workflow
+run-name: Deploying XPRTZ website to production
+concurrency: continuous-deployment-dotnet-${{ github.ref_name }}
+
+on:
+  repository_dispatch:
+    types: [deployment]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-dotnet-application:
+    name: Build XPRTZ website
+    uses: ./.github/workflows/reusable-build-application.yaml
+    with:
+      application: dotnet
+
+  deploy-dotnet-application:
+    name: Deploy XPRTZ website
+    uses: ./.github/workflows/reusable-deploy-application.yaml
+    with:
+      environment: production
+      application: dotnet
+      storageAccount: stdotnetvgrpg42rkbdvo
+    needs: [build-dotnet-application]
+    secrets: inherit
