@@ -46,3 +46,17 @@ resource websiteStorageContainer 'Microsoft.Storage/storageAccounts/blobServices
     publicAccess: 'None'
   }
 }
+
+resource mediaStorageContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
+  parent: websiteStorageBlobServices
+  name: 'media'
+  properties: {
+    immutableStorageWithVersioning: {
+      enabled: false
+    }
+    defaultEncryptionScope: '$account-encryption-key'
+    denyEncryptionScopeOverride: false
+    publicAccess: 'Blob'
+  }
+}
+

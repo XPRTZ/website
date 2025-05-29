@@ -5,6 +5,7 @@ param deployDns bool
 param application string
 param frontDoorProfileName string = 'afd-xprtzbv-websites'
 param rootDomain string = 'xprtz.dev'
+param imagesDomain string = 'images'
 
 var resourceGroupPrefix = 'rg-xprtzbv-website-${application}'
 var resourceGroupName = endsWith(resourceGroupSuffix, 'main')
@@ -42,6 +43,19 @@ module frontDoorSettings 'modules/frontdoor.bicep' = if (deployDns) {
   }
 }
 
+module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = if (deployDns) {
+  scope: infrastructureResourceGroup
+  name: 'imagesFrontDoorSettingsDeploy-${application}'
+  params: {
+    storageAccountName: storageAccountModule.outputs.storageAccountName
+    storageAccountResourceGroup: websiteResourceGroup.name
+    frontDoorProfileName: frontDoorProfileName
+    application: application
+    rootDomain: rootDomain
+    subDomain: imagesDomain
+  }
+}
+
 module dnsSettings 'modules/dns.bicep' = if (deployDns) {
   scope: infrastructureResourceGroup
   name: 'dnsSettingsDeploy-${application}'
@@ -50,6 +64,17 @@ module dnsSettings 'modules/dns.bicep' = if (deployDns) {
     rootDomain: rootDomain
     subDomain: application
     validationToken: frontDoorSettings.outputs.frontDoorCustomDomainValidationToken
+  }
+}
+
+module imagesDnsSettings 'modules/dns.bicep' = if (deployDns) {
+  scope: infrastructureResourceGroup
+  name: 'imagesDnsSettingsDeploy-${application}'
+  params: {
+    origin: imagesFrontDoorSettings.outputs.frontDoorCustomDomainHost
+    rootDomain: rootDomain
+    subDomain: imagesDomain
+    validationToken: imagesFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
   }
 }
 

@@ -1,15 +1,21 @@
 param frontDoorProfileName string
-param frontDoorOriginHost string
+param storageAccountName string
+param storageAccountResourceGroup string
 param application string
 param rootDomain string
 param subDomain string
 
-var frontDoorOriginName = 'afd-origin-${application}'
-var frontDoorEndpointName = 'fde-${application}-${uniqueString(resourceGroup().id)}'
-var frontDoorOriginGroupName = 'xprtz-website-${application}'
-var frontDoorRouteName = 'inbound'
+var frontDoorOriginName = 'afd-origin-images-${application}'
+var frontDoorEndpointName = 'fde-images-${application}-${uniqueString(resourceGroup().id)}'
+var frontDoorOriginGroupName = 'xprtz-images-${application}'
+var frontDoorRouteName = 'images-route'
 var customDomainHost = '${subDomain}.${rootDomain}'
 var customDomainResourceName = replace('${customDomainHost}', '.', '-')
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' existing = {
+  name: storageAccountName
+  scope: resourceGroup(storageAccountResourceGroup)
+}
 
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2024-02-01' existing = {
   name: frontDoorProfileName
@@ -33,9 +39,9 @@ resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2024-02-01' =
       successfulSamplesRequired: 3
     }
     healthProbeSettings: {
-      probePath: '/'
+      probePath: '/media/'
       probeRequestType: 'HEAD'
-      probeProtocol: 'Http'
+      probeProtocol: 'Https'
       probeIntervalInSeconds: 100
     }
   }
@@ -45,10 +51,10 @@ resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2024-02-01
   name: frontDoorOriginName
   parent: frontDoorOriginGroup
   properties: {
-    hostName: frontDoorOriginHost
+    hostName: split(storageAccount.properties.primaryEndpoints.blob, '/')[2]
     httpPort: 80
     httpsPort: 443
-    originHostHeader: frontDoorOriginHost
+    originHostHeader: split(storageAccount.properties.primaryEndpoints.blob, '/')[2]
     priority: 1
     weight: 1000
   }
@@ -74,11 +80,12 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
       'Https'
     ]
     patternsToMatch: [
-      '/*'
+      '/uploads/*'
     ]
     forwardingProtocol: 'HttpsOnly'
     linkToDefaultDomain: 'Enabled'
     httpsRedirect: 'Enabled'
+    originPath: '/media'
   }
 }
 
