@@ -155,3 +155,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Private test files
+.requests.http

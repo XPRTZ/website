@@ -20,7 +20,7 @@ permissions:
 jobs:
   apply-infrastructure:
     name: Apply infrastructure
-    if: github.event.action != 'closed'
+    if: false
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
       environment: preview
@@ -38,7 +38,7 @@ jobs:
 
   deploy-learning-application:
       name: Deploy XPRTZ Learning application
-      if: github.event.action != 'closed'
+      if: false
       uses: ./.github/workflows/reusable-deploy-application.yaml
       with:
         application: learning
@@ -49,7 +49,7 @@ jobs:
 
   remove-infrastructure:
     name: Remove preview environment infrastructure
-    if: github.event.action == 'closed'
+    if: false
     uses: ./.github/workflows/reusable-destroy-infrastructure.yaml
     with:
       environment: preview

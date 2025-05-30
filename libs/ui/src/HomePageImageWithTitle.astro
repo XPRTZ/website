@@ -2,17 +2,23 @@
 import { type ImageWithTitle } from "@xprtz/cms";
 const imageWithTitle = Astro.props as ImageWithTitle;
 
-const site = import.meta.env.PUBLIC_STRAPI_URL;
+const site = import.meta.env.PUBLIC_IMAGES_URL;
 ---
+
 <div class="mx-auto mt-32 max-w-7xl px-6 lg:px-8">
   <div class="mx-auto max-w-2xl lg:mx-0">
-    <h2 class="text-pretty text-4xl font-semibold tracking-tight text-primary-800 sm:text-5xl">{imageWithTitle.title}</h2>
+    <h2
+      class="text-pretty text-4xl font-semibold tracking-tight text-primary-800 sm:text-5xl"
+    >
+      {imageWithTitle.title}
+    </h2>
     <p class="mt-6 text-lg/8 text-gray-600">{imageWithTitle.description}</p>
   </div>
   <div class="mt-20">
     <img
       src=`${site}${imageWithTitle.image.url}`
       alt={imageWithTitle.image.alternateText}
-      class="aspect-[5/2] w-full object-cover xl:rounded-3xl">
+      class="aspect-[5/2] w-full object-cover xl:rounded-3xl"
+    />
   </div>
 </div>

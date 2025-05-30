@@ -1,7 +1,7 @@
 ---
 import { type Directors } from "@xprtz/cms";
 const team = Astro.props as Directors;
-const site = import.meta.env.PUBLIC_STRAPI_URL;
+const site = import.meta.env.PUBLIC_IMAGES_URL;
 ---
 <div class="mx-auto mt-32 mb-32 max-w-7xl">
   <ul role="list" class="mx-auto mt-20 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 text-center sm:grid-cols-3 md:grid-cols-3 lg:mx-0 lg:max-w-none lg:grid-cols-3 xl:grid-cols-3">
@@ -11,7 +11,7 @@ const site = import.meta.env.PUBLIC_STRAPI_URL;
       <h3 class="mt-6 text-xl/7 font-semibold tracking-tight text-primary-800">{directeur.firstname} {directeur.lastname}</h3>
       <p class="text-base/6 text-gray-600">{directeur.realTitle}</p>
       <div class="mt-4 flex flex-col items-center space-y-2">
-      {directeur.phoneNumber && 
+      {directeur.phoneNumber &&
         <div class="flex items-center">
           <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.908.339 1.85.573 2.81.7A2 2 0 0122 16.92z"></path>
