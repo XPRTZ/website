@@ -34,6 +34,7 @@ jobs:
     needs: [apply-infrastructure]
 
   deploy-learning-application:
+    if: false
     name: Deploy XPRTZ Learning application
     uses: ./.github/workflows/reusable-deploy-application.yaml
     with:
