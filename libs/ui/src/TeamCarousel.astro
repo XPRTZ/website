@@ -3,22 +3,17 @@ import { type Team } from "@xprtz/cms";
 const team = Astro.props as Team;
 const site = import.meta.env.PUBLIC_IMAGES_URL;
 
-// Calculate the number of slides needed
 const membersPerSlide = 5;
 const totalMembers = team.members.length;
 const totalSlides = Math.max(1, Math.ceil(totalMembers / membersPerSlide));
-
-// Create an array of members for each slide, ensuring each slide has exactly 5 items
-// If the last slide has fewer than 5 items, fill in with items from the beginning
 const slidesMembers = Array.from({ length: totalSlides }).map(
   (_, slideIndex) => {
     const startIndex = slideIndex * membersPerSlide;
     const slideMembers = [];
 
-    // Add 5 members to each slide
     for (let i = 0; i < membersPerSlide; i++) {
-      // Calculate the actual index, wrapping around to the beginning if needed
-      const memberIndex = (startIndex + i) % totalMembers;
+      const memberIndex = (startIndex + i);
+      if (memberIndex >= totalMembers) break;
       slideMembers.push(team.members[memberIndex]);
     }
 
@@ -61,7 +56,7 @@ const slidesMembers = Array.from({ length: totalSlides }).map(
                 <h3 class="mt-4 md:mt-6 text-sm md:text-base/7 font-semibold tracking-tight text-primary-800">
                   {member.firstname} {member.lastname}
                 </h3>
-                <p class="text-xs md:text-sm/6 text-gray-600">
+                <p class="text-xs md:text-sm/6 text-gray-600 pl-4 pr-4">
                   {member.realTitle}
                 </p>
               </div>
@@ -98,10 +93,9 @@ const slidesMembers = Array.from({ length: totalSlides }).map(
     max-width: 100%;
   }
 
-  /* Responsive adjustments for carousel items */
-  @media (max-width: 640px) {
+  @media (min-width: 320px) and (max-width: 640px) {
     .carousel-item {
-      width: 50%; /* 2 items per row on small screens */
+      width: 75%; /* 3 items per row on medium-small screens */
     }
   }
 
