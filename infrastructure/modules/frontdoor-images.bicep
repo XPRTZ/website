@@ -11,7 +11,7 @@ var frontDoorOriginGroupName = 'xprtz-images-${application}'
 var frontDoorRouteName = 'images-route'
 var customDomainHost = '${subDomain}.${rootDomain}'
 var customDomainResourceName = replace('${customDomainHost}', '.', '-')
-var ruleSetName = 'images-headers-${application}'
+var ruleSetName = 'images'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' existing = {
   name: storageAccountName
@@ -37,7 +37,7 @@ resource frontDoorRuleSet 'Microsoft.Cdn/profiles/ruleSets@2024-02-01' = {
 }
 
 resource jpegRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
-  name: 'jpeg-content-type'
+  name: 'jpeg'
   parent: frontDoorRuleSet
   properties: {
     order: 1
@@ -73,7 +73,7 @@ resource jpegRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
 }
 
 resource pngRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
-  name: 'png-content-type'
+  name: 'png'
   parent: frontDoorRuleSet
   properties: {
     order: 2
@@ -108,7 +108,7 @@ resource pngRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
 }
 
 resource svgRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
-  name: 'svg-content-type'
+  name: 'svg'
   parent: frontDoorRuleSet
   properties: {
     order: 3
@@ -143,7 +143,7 @@ resource svgRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
 }
 
 resource gifRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
-  name: 'gif-content-type'
+  name: 'gif'
   parent: frontDoorRuleSet
   properties: {
     order: 4
@@ -178,7 +178,7 @@ resource gifRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
 }
 
 resource webpRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
-  name: 'webp-content-type'
+  name: 'webp'
   parent: frontDoorRuleSet
   properties: {
     order: 5
@@ -206,6 +206,41 @@ resource webpRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
           headerAction: 'Overwrite'
           headerName: 'Content-Type'
           value: 'image/webp'
+        }
+      }
+    ]
+  }
+}
+
+resource avifRule 'Microsoft.Cdn/profiles/ruleSets/rules@2024-02-01' = {
+  name: 'avif'
+  parent: frontDoorRuleSet
+  properties: {
+    order: 6
+    conditions: [
+      {
+        name: 'UrlFileExtension'
+        parameters: {
+          typeName: 'DeliveryRuleUrlFileExtensionMatchConditionParameters'
+          operator: 'Equal'
+          negateCondition: false
+          matchValues: [
+            'avif'
+          ]
+          transforms: [
+            'Lowercase'
+          ]
+        }
+      }
+    ]
+    actions: [
+      {
+        name: 'ModifyResponseHeader'
+        parameters: {
+          typeName: 'DeliveryRuleHeaderActionParameters'
+          headerAction: 'Overwrite'
+          headerName: 'Content-Type'
+          value: 'image/avif'
         }
       }
     ]
