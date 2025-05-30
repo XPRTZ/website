@@ -93,10 +93,9 @@ const slidesMembers = Array.from({ length: totalSlides }).map(
     max-width: 100%;
   }
 
-  /* Responsive adjustments for carousel items */
-  @media (max-width: 640px) {
+  @media (min-width: 320px) and (max-width: 640px) {
     .carousel-item {
-      width: 100%;
+      width: 75%; /* 3 items per row on medium-small screens */
     }
   }
 
