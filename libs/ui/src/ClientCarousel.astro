@@ -36,17 +36,17 @@ const slidesClients = Array.from({ length: totalSlides }).map(
     aria-roledescription="carousel"
     aria-label="klanten"
   >
-    <div class="carousel-track flex transition-transform duration-500">
+    <div class="client-carousel-track flex transition-transform duration-500">
       {
         slidesClients.map((clients, slideIndex) => (
           <div
-            class="carousel-slide flex-none w-full flex flex-nowrap justify-center gap-2 md:gap-4"
+            class="client-carousel-slide flex-none w-full flex flex-nowrap justify-center gap-2 md:gap-4"
             role="group"
             aria-roledescription="slide"
             aria-label={`Slide ${slideIndex + 1} of ${totalSlides}`}
           >
             {clients.map((klant) => (
-              <div class="carousel-item text-center px-2">
+              <div class="client-carousel-item text-center px-2">
                 <img
                   class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
                   src={`${site}${klant.image.url}`}
@@ -69,45 +69,45 @@ const slidesClients = Array.from({ length: totalSlides }).map(
     position: relative;
   }
 
-  .carousel-track {
+  .client-carousel-item {
     display: flex;
     width: 100%;
     transition: transform 0.5s ease-in-out;
   }
 
-  .carousel-slide {
+  .client-carousel-slide {
     min-width: 100%;
     display: flex;
     flex-wrap: nowrap;
     overflow-x: hidden;
   }
 
-  .carousel-item {
+  .client-carousel-item {
     transition: opacity 0.3s ease;
     flex-shrink: 0;
     max-width: 100%;
   }
 
   @media (min-width: 320px) and (max-width: 640px) {
-    .carousel-item {
+    .client-carousel-item {
       width: 75%; /* 3 items per row on medium-small screens */
     }
   }
 
   @media (min-width: 641px) and (max-width: 768px) {
-    .carousel-item {
+    .client-carousel-item {
       width: 33.333%; /* 3 items per row on medium-small screens */
     }
   }
 
   @media (min-width: 769px) and (max-width: 1024px) {
-    .carousel-item {
+    .client-carousel-item {
       width: 20%; /* 5 items per row on medium screens */
     }
   }
 
   @media (min-width: 1025px) {
-    .carousel-item {
+    .client-carousel-item {
       width: 20%; /* 5 items per row on large screens */
     }
   }
@@ -116,9 +116,8 @@ const slidesClients = Array.from({ length: totalSlides }).map(
 <script>
   // Initialize carousel functionality
   const initCarousel = () => {
-    const track = document.querySelector(".carousel-track");
-    const slides = document.querySelectorAll(".carousel-slide");
-    const container = document.querySelector(".carousel-container");
+    const track = document.querySelector(".client-carousel-track");
+    const slides = document.querySelectorAll(".client-carousel-slide");
 
     if (!track || !slides.length) return;
 
@@ -127,6 +126,7 @@ const slidesClients = Array.from({ length: totalSlides }).map(
 
     // Function to go to a specific slide
     const goToSlide = (index) => {
+      console.log(`Going to slide ${index} of ${totalSlides}`);
       if (index < 0) index = totalSlides - 1;
       if (index >= totalSlides) index = 0;
 
