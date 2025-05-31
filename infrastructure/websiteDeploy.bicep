@@ -1,11 +1,21 @@
 targetScope = 'subscription'
 
-param resourceGroupSuffix string
-param deployDns bool
-param application string
+param resourceGroupSuffix string = 'main'
+param deployDns bool = true
+param application string = 'dotnet'
 param frontDoorProfileName string = 'afd-xprtzbv-websites'
-param rootDomain string = 'xprtz.dev'
 param imagesDomain string = 'images'
+param rootDomain string = 'xprtz.dev'
+param domains array = [
+  {
+    rootDomain: 'xprtz.dev'
+    subDomain: ''
+  }
+  {
+    rootDomain: 'xprtz.dev'
+    subDomain: 'www'
+  }
+]
 
 var resourceGroupPrefix = 'rg-xprtzbv-website-${application}'
 var resourceGroupName = endsWith(resourceGroupSuffix, 'main')
@@ -31,17 +41,30 @@ module storageAccountModule 'modules/storageAccount.bicep' = {
   }
 }
 
-module frontDoorSettings 'modules/frontdoor.bicep' = if (deployDns) {
+@batchSize(1)
+module frontDoorSettings 'modules/frontdoor.bicep' = [for domain in domains: if (deployDns) {
   scope: infrastructureResourceGroup
-  name: 'frontDoorSettingsDeploy-${application}'
+    name: 'frontDoorSettingsDeploy-${application}-${domain.subDomain == '' ? 'root' : domain.subDomain}'
   params: {
     frontDoorOriginHost: storageAccountModule.outputs.storageAccountHost
     frontDoorProfileName: frontDoorProfileName
     application: application
-    rootDomain: rootDomain
-    subDomain: application
+    rootDomain: domain.rootDomain
+    subDomain: domain.subDomain
   }
-}
+}]
+
+@batchSize(1)
+module dnsSettings 'modules/dns.bicep' = [for (domain, i) in domains: if (deployDns) {
+  scope: infrastructureResourceGroup
+    name: 'dnsSettingsDeploy-${application}-${domain.subDomain == '' ? 'root' : domain.subDomain}'
+    params: {
+    origin: frontDoorSettings[i].outputs.frontDoorCustomDomainHost
+    rootDomain: domain.rootDomain
+    subDomain: domain.subDomain
+    validationToken: frontDoorSettings[i].outputs.frontDoorCustomDomainValidationToken
+  }
+}]
 
 module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = if (deployDns) {
   scope: infrastructureResourceGroup
@@ -53,17 +76,6 @@ module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = if (deployDns)
     application: application
     rootDomain: rootDomain
     subDomain: imagesDomain
-  }
-}
-
-module dnsSettings 'modules/dns.bicep' = if (deployDns) {
-  scope: infrastructureResourceGroup
-  name: 'dnsSettingsDeploy-${application}'
-  params: {
-    origin: frontDoorSettings.outputs.frontDoorCustomDomainHost
-    rootDomain: rootDomain
-    subDomain: application
-    validationToken: frontDoorSettings.outputs.frontDoorCustomDomainValidationToken
   }
 }
 
