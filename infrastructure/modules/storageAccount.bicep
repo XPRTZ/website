@@ -25,9 +25,6 @@ resource websiteStorageAccount 'Microsoft.Storage/storageAccounts@2023-04-01' = 
     minimumTlsVersion: 'TLS1_2'
   }
 }
-output storageAccountName string = websiteStorageAccount.name
-output storageAccountFqdn string = websiteStorageAccount.properties.primaryEndpoints.web
-output storageAccountHost string = split(websiteStorageAccount.properties.primaryEndpoints.web, '/')[2]
 
 resource websiteStorageBlobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' existing = {
   parent: websiteStorageAccount
@@ -60,3 +57,6 @@ resource mediaStorageContainer 'Microsoft.Storage/storageAccounts/blobServices/c
   }
 }
 
+output storageAccountName string = websiteStorageAccount.name
+output storageAccountFqdn string = websiteStorageAccount.properties.primaryEndpoints.web
+output storageAccountHost string = split(websiteStorageAccount.properties.primaryEndpoints.web, '/')[2]

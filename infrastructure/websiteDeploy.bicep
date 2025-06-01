@@ -1,3 +1,5 @@
+import { domainsType } from './types.bicep'
+
 targetScope = 'subscription'
 
 param resourceGroupSuffix string = 'main'
@@ -5,17 +7,25 @@ param deployDns bool = true
 param application string = 'dotnet'
 param frontDoorProfileName string = 'afd-xprtzbv-websites'
 param imagesDomain string = 'images'
-param rootDomain string = 'xprtz.dev'
-param domains array = [
+param domains domainsType[] = [
   {
     rootDomain: 'xprtz.dev'
     subDomain: ''
+    fullDomain: 'xprtz.dev'
   }
   {
     rootDomain: 'xprtz.dev'
     subDomain: 'www'
+    fullDomain: 'www.xprtz.dev'
+  }
+  {
+    rootDomain: 'xprtz.dev'
+    subDomain: 'dotnet'
+    fullDomain: 'dotnet.xprtz.dev'
   }
 ]
+
+var rootDomain = domains[0].rootDomain
 
 var resourceGroupPrefix = 'rg-xprtzbv-website-${application}'
 var resourceGroupName = endsWith(resourceGroupSuffix, 'main')
@@ -41,32 +51,29 @@ module storageAccountModule 'modules/storageAccount.bicep' = {
   }
 }
 
-@batchSize(1)
-module frontDoorSettings 'modules/frontdoor.bicep' = [for domain in domains: if (deployDns) {
+module frontDoorSettings 'modules/frontdoor.bicep' = {
   scope: infrastructureResourceGroup
-    name: 'frontDoorSettingsDeploy-${application}-${domain.subDomain == '' ? 'root' : domain.subDomain}'
+    name: 'frontDoorSettingsDeploy-${application}'
   params: {
     frontDoorOriginHost: storageAccountModule.outputs.storageAccountHost
     frontDoorProfileName: frontDoorProfileName
     application: application
-    rootDomain: domain.rootDomain
-    subDomain: domain.subDomain
+    domains: domains
   }
-}]
+}
 
-@batchSize(1)
-module dnsSettings 'modules/dns.bicep' = [for (domain, i) in domains: if (deployDns) {
+module dnsSettings 'modules/dns.bicep' = {
   scope: infrastructureResourceGroup
-    name: 'dnsSettingsDeploy-${application}-${domain.subDomain == '' ? 'root' : domain.subDomain}'
+    name: 'dnsSettingsDeploy-${application}'
     params: {
-    origin: frontDoorSettings[i].outputs.frontDoorCustomDomainHost
-    rootDomain: domain.rootDomain
-    subDomain: domain.subDomain
-    validationToken: frontDoorSettings[i].outputs.frontDoorCustomDomainValidationToken
+    origin: frontDoorSettings.outputs.frontDoorCustomDomainHost
+    frontDoorEndpointId: frontDoorSettings.outputs.frontDoorEndpointId
+    domains: domains
+    validationTokens: frontDoorSettings.outputs.frontDoorCustomDomainValidationTokens
   }
-}]
+}
 
-module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = if (deployDns) {
+module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = {
   scope: infrastructureResourceGroup
   name: 'imagesFrontDoorSettingsDeploy-${application}'
   params: {
@@ -79,14 +86,30 @@ module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = if (deployDns)
   }
 }
 
-module imagesDnsSettings 'modules/dns.bicep' = if (deployDns) {
+module imagesDnsSettings 'modules/dns.bicep' = {
   scope: infrastructureResourceGroup
   name: 'imagesDnsSettingsDeploy-${application}'
   params: {
     origin: imagesFrontDoorSettings.outputs.frontDoorCustomDomainHost
-    rootDomain: rootDomain
-    subDomain: imagesDomain
-    validationToken: imagesFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
+    frontDoorEndpointId: imagesFrontDoorSettings.outputs.frontDoorEndpointId
+    deployApexRecord: false
+    domains: [
+      {
+        rootDomain: rootDomain
+        subDomain: imagesDomain
+        fullDomain: '${imagesDomain}.${rootDomain}'
+      }
+    ]
+    validationTokens: [
+      {
+        domain: {
+          rootDomain: rootDomain
+          subDomain: imagesDomain
+          fullDomain: '${imagesDomain}.${rootDomain}'
+        }
+        validationToken: imagesFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
+      }
+    ]
   }
 }
 

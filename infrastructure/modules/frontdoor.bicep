@@ -1,15 +1,18 @@
+import { domainsType } from '../types.bicep'
+
 param frontDoorProfileName string
 param frontDoorOriginHost string
 param application string
-param rootDomain string
-param subDomain string
+param domains domainsType[]
 
 var frontDoorOriginName = 'afd-origin-${application}'
 var frontDoorEndpointName = 'fde-${application}-${uniqueString(resourceGroup().id)}'
 var frontDoorOriginGroupName = 'xprtz-website-${application}'
 var frontDoorRouteName = 'inbound'
-var customDomainHost = '${subDomain}.${rootDomain}'
-var customDomainResourceName = replace('${customDomainHost}', '.', '-')
+
+resource dnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
+  name: domains[0].rootDomain
+}
 
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2024-02-01' existing = {
   name: frontDoorProfileName
@@ -21,6 +24,7 @@ resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2024-02-01' = {
   location: 'global'
   properties: {
     enabledState: 'Enabled'
+
   }
 }
 
@@ -61,11 +65,9 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
     frontDoorOrigin
   ]
   properties: {
-    customDomains: [
-      {
-        id: frontDoorCustomDomain.id
-      }
-    ]
+    customDomains: [for (domain, index) in domains: {
+      id: frontDoorCustomDomains[index].id
+    }]
     originGroup: {
       id: frontDoorOriginGroup.id
     }
@@ -82,17 +84,24 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
   }
 }
 
-resource frontDoorCustomDomain 'Microsoft.Cdn/profiles/customDomains@2024-02-01' = {
-  name: customDomainResourceName
+resource frontDoorCustomDomains 'Microsoft.Cdn/profiles/customDomains@2024-02-01' = [for (domain, index) in domains: {
+  name: replace(domain.fullDomain, '.', '-')
   parent: frontDoorProfile
   properties: {
-    hostName: customDomainHost
+    hostName: domain.fullDomain
     tlsSettings: {
       certificateType: 'ManagedCertificate'
       minimumTlsVersion: 'TLS12'
     }
+    azureDnsZone: {
+        id: dnsZone.id
+    }
   }
-}
+}]
 
-output frontDoorCustomDomainValidationToken string = frontDoorCustomDomain.properties.validationProperties.validationToken
+output frontDoorCustomDomainValidationTokens array = [for (domain, index) in domains: {
+  domain: domain
+  validationToken: frontDoorCustomDomains[index].properties.validationProperties.validationToken
+}]
 output frontDoorCustomDomainHost string = frontDoorEndpoint.properties.hostName
+output frontDoorEndpointId string = frontDoorEndpoint.id
