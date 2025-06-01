@@ -87,7 +87,7 @@ module dnsSettings 'modules/dns.bicep' = {
   }
 }
 
-module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = {
+module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = if (isProd) {
   scope: infrastructureResourceGroup
   name: 'imagesFrontDoorSettingsDeploy-${application}'
   params: {
@@ -100,7 +100,7 @@ module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = {
   }
 }
 
-module imagesDnsSettings 'modules/dns.bicep' = {
+module imagesDnsSettings 'modules/dns.bicep' = if (isProd) {
   scope: infrastructureResourceGroup
   name: 'imagesDnsSettingsDeploy-${application}'
   params: {
@@ -129,4 +129,6 @@ module imagesDnsSettings 'modules/dns.bicep' = {
 
 output storageAccountName string = storageAccountModule.outputs.storageAccountName
 output resourceGroupName string = websiteResourceGroup.name
-output applicationFqdn string = 'https://${rootDomain}'
+output applicationFqdn string = isProd
+  ? 'https://${rootDomain}/'
+  : storageAccountModule.outputs.storageAccountFqdn
