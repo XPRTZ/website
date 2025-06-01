@@ -65,7 +65,7 @@ module storageAccountModule 'modules/storageAccount.bicep' = {
   }
 }
 
-module frontDoorSettings 'modules/frontdoor.bicep' = {
+module frontDoorSettings 'modules/frontdoor.bicep' = if (isProd) {
   scope: infrastructureResourceGroup
     name: 'frontDoorSettingsDeploy-${application}'
   params: {
@@ -76,7 +76,7 @@ module frontDoorSettings 'modules/frontdoor.bicep' = {
   }
 }
 
-module dnsSettings 'modules/dns.bicep' = {
+module dnsSettings 'modules/dns.bicep' = if (isProd) {
   scope: infrastructureResourceGroup
     name: 'dnsSettingsDeploy-${application}'
     params: {
