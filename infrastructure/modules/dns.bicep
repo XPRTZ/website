@@ -1,34 +1,56 @@
-param origin string
-param rootDomain string
-param subDomain string
-param validationToken string
+import { domainsType, validationTokenType } from '../types.bicep'
 
-resource dnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
-  name: rootDomain
+param frontDoorEndpointId string
+param origin string
+param domains domainsType[]
+param validationTokens validationTokenType[]
+param deployApexRecord bool = true
+
+var cnames = filter(domains, domain => domain.subDomain != '')
+var cnameValidations = filter(validationTokens, validation => validation.domain.subDomain != '')
+
+resource dnsZone 'Microsoft.Network/dnsZones@2023-07-01-preview' existing = {
+  name: domains[0].rootDomain
 }
 
-resource cnameRecord 'Microsoft.Network/dnsZones/CNAME@2018-05-01' = {
+resource apexRecord 'Microsoft.Network/dnszones/A@2023-07-01-preview' = if(deployApexRecord) {
   parent: dnsZone
-  name: subDomain
+  name: '@'
+  properties: {
+    TTL: 3600
+    targetResource: {
+      id: frontDoorEndpointId
+    }
+  }
+}
+
+@batchSize(1)
+resource cnameRecord 'Microsoft.Network/dnsZones/CNAME@2023-07-01-preview' = [for domain in cnames: {
+  parent: dnsZone
+  name: domain.subDomain
   properties: {
     TTL: 3600
     CNAMERecord: {
       cname: origin
     }
   }
-}
+  dependsOn: [
+    apexRecord
+  ]
+}]
 
-resource validationTxtRecord 'Microsoft.Network/dnsZones/TXT@2018-05-01' = {
+@batchSize(1)
+resource validationTxtRecord 'Microsoft.Network/dnsZones/TXT@2023-07-01-preview' = [for cnameValidation in cnameValidations: {
   parent: dnsZone
-  name: '_dnsauth.${subDomain}'
+  name: '_dnsauth.${cnameValidation.domain.subDomain}'
   properties: {
     TTL: 3600
     TXTRecords: [
       {
         value: [
-          validationToken
+          cnameValidation.validationToken
         ]
       }
     ]
   }
-}
+}]
