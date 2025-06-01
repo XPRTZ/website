@@ -1,5 +1,5 @@
-name: Pull request Dotnet workflow
-run-name: Running pull request flow for Dotnet for branch ${{ github.head_ref }}
+name: PR workflow XPRTZ website
+run-name: Running PR workflow for the XPRTZ website for branch ${{ github.head_ref }}
 concurrency: pull-request-dotnet-${{ github.ref_name }}
 
 on:
@@ -24,7 +24,6 @@ jobs:
     uses: ./.github/workflows/reusable-apply-infrastructure.yaml
     with:
       environment: preview
-      deployDns: false
       application: dotnet
     secrets: inherit
 

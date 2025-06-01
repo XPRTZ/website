@@ -7,17 +7,16 @@ on:
       environment:
         required: true
         type: string
-      deployDns:
-        required: true
-        type: boolean
       application:
         required: true
         type: string
     outputs:
       storageAccount:
         value: ${{ jobs.apply-infrastructure.outputs.storageAccount }}
+        description: The storage account where the website will be deployed to
       resourceGroup:
         value: ${{ jobs.apply-infrastructure.outputs.resourceGroup }}
+        description: The resourcegroup which holds the storage account for the website
 
 jobs:
   apply-infrastructure:
@@ -50,7 +49,7 @@ jobs:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template: ./infrastructure/websiteDeploy.bicep
           deploymentName: deploy-${{ inputs.application }}
-          parameters: "resourceGroupSuffix=${{ env.GITHUB_REF_NAME_SLUG }} deployDns=${{ inputs.deployDns }} application=${{ inputs.application }}"
+          parameters: "resourceGroupSuffix=${{ env.GITHUB_REF_NAME_SLUG }} application=${{ inputs.application }}"
           region: westeurope
 
       - name: Comment Website FQDNs on Pull Requests

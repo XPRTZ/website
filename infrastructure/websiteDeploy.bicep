@@ -2,12 +2,11 @@ import { domainsType } from './types.bicep'
 
 targetScope = 'subscription'
 
-param resourceGroupSuffix string = 'main'
-param deployDns bool = true
+param resourceGroupSuffix string
 param application string = 'dotnet'
-param frontDoorProfileName string = 'afd-xprtzbv-websites'
-param imagesDomain string = 'images'
-param domains domainsType[] = [
+
+var isProd = endsWith(resourceGroupSuffix, 'main')
+param previewDomains domainsType[] = [
   {
     rootDomain: 'xprtz.dev'
     subDomain: ''
@@ -24,11 +23,23 @@ param domains domainsType[] = [
     fullDomain: 'dotnet.xprtz.dev'
   }
 ]
+param prodDomains domainsType[] = [
+  {
+    rootDomain: 'xprtz.nl'
+    subDomain: ''
+    fullDomain: 'xprtz.nl'
+  }
+  {
+    rootDomain: 'xprtz.nl'
+    subDomain: 'www'
+    fullDomain: 'www.xprtz.nl'
+  }
+]
 
+var domains = isProd ? prodDomains : previewDomains
 var rootDomain = domains[0].rootDomain
-
 var resourceGroupPrefix = 'rg-xprtzbv-website-${application}'
-var resourceGroupName = endsWith(resourceGroupSuffix, 'main')
+var resourceGroupName = isProd
   ? resourceGroupPrefix
   : '${resourceGroupPrefix}-${resourceGroupSuffix}'
 
@@ -37,6 +48,9 @@ var infrastructureResourceGroup = resourceGroup(
   sharedValues.subscriptionIds.xprtz,
   sharedValues.resourceGroups.infrastructure
 )
+
+var frontDoorProfileName = 'afd-xprtzbv-websites'
+var imagesDomain = 'images'
 
 resource websiteResourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   location: deployment().location
@@ -115,6 +129,4 @@ module imagesDnsSettings 'modules/dns.bicep' = {
 
 output storageAccountName string = storageAccountModule.outputs.storageAccountName
 output resourceGroupName string = websiteResourceGroup.name
-output applicationFqdn string = deployDns
-  ? 'https://${application}.${rootDomain}/'
-  : storageAccountModule.outputs.storageAccountFqdn
+output applicationFqdn string = 'https://${rootDomain}'
