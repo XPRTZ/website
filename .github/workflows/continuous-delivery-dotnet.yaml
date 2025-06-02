@@ -17,27 +17,27 @@ permissions:
   contents: read
 
 jobs:
-  apply-infrastructure:
-    name: Apply infrastructure
-    uses: ./.github/workflows/reusable-apply-infrastructure.yaml
-    with:
-      environment: production
-      application: dotnet
-    secrets: inherit
-
   build-dotnet-application:
     name: Build XPRTZ website
     uses: ./.github/workflows/reusable-build-application.yaml
     with:
       application: dotnet
-    needs: [apply-infrastructure]
 
-  deploy-dotnet-application:
-    name: Deploy XPRTZ website
+  apply-infrastructure-preview:
+    name: Apply infrastructure on preview
+    uses: ./.github/workflows/reusable-apply-infrastructure.yaml
+    with:
+      environment: preview
+      application: dotnet
+    needs: [build-dotnet-application]
+    secrets: inherit
+
+  deploy-dotnet-application-preview:
+    name: Deploy XPRTZ website on preview
     uses: ./.github/workflows/reusable-deploy-application.yaml
     with:
       application: dotnet
       storageAccount: ${{ needs.apply-infrastructure.outputs.storageAccount }}
-      environment: production
-    needs: [apply-infrastructure, build-dotnet-application]
+      environment: preview
+    needs: [build-dotnet-application, apply-infrastructure-preview]
     secrets: inherit

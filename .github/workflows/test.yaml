@@ -1,0 +1,115 @@
+name: Build and Deploy Astro Site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+  deployments: write
+
+jobs:
+  build:
+    name: Build Astro Site
+    runs-on: ubuntu-latest
+    if: github.event.action != 'closed'
+    outputs:
+      preview-url: ${{ steps.preview-deploy.outputs.url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Site
+        run: npm run build
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: astro-build
+          path: dist/
+
+  preview-deploy:
+    name: Deploy to Preview
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    environment:
+      name: preview-${{ github.event.number }}
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: astro-build
+          path: dist/
+
+      - name: Deploy to Preview Environment
+        id: deploy
+        run: |
+          # Replace this with your actual preview deployment logic
+          # This could be deploying to Netlify, Vercel, or another service
+          echo "Deploying to preview environment..."
+          echo "url=https://preview-${{ github.event.number }}.your-domain.com" >> $GITHUB_OUTPUT
+
+      - name: Comment PR with Preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Preview deployment ready! View at: ${{ steps.deploy.outputs.url }}'
+            })
+
+  production-deploy:
+    name: Deploy to Production
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: astro-build
+          path: dist/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  cleanup-preview:
+    name: Cleanup Preview Environment
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    steps:
+      - name: Delete Preview Environment
+        run: |
+          echo "Cleaning up preview environment for PR #${{ github.event.number }}"
+          # Add your cleanup logic here
