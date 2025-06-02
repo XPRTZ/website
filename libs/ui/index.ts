@@ -19,6 +19,7 @@ import Listing from "./src/Listing.astro";
 import SubtitleWithText from "./src/SubtitleWithText.astro";
 import Quote from "./src/Quote.astro";
 import Blogs from "./src/Blogs.astro";
+import Carousel from "./src/Carousel";
 
 import ComponentRenderer from "./src/ComponentRenderer.astro";
 
@@ -44,5 +45,6 @@ export {
   SubtitleWithText,
   Quote,
   Blogs,
+  Carousel,
   ComponentRenderer
 };
