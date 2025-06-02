@@ -12,7 +12,7 @@ export default function EmblaCarousel() {
   }, [emblaApi])
 
   return (
-    <div className="embla" ref={emblaRef} client:load>
+    <div className="embla" ref={emblaRef}>
       <div className="embla__container">
         <div className="embla__slide">Slide 1</div>
         <div className="embla__slide">Slide 2</div>
