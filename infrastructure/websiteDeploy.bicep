@@ -5,7 +5,6 @@ targetScope = 'subscription'
 param resourceGroupSuffix string
 param application string = 'dotnet'
 
-var isProd = endsWith(resourceGroupSuffix, 'main')
 param previewDomains domainsType[] = [
   {
     rootDomain: 'xprtz.dev'
@@ -21,6 +20,16 @@ param previewDomains domainsType[] = [
     rootDomain: 'xprtz.dev'
     subDomain: 'dotnet'
     fullDomain: 'dotnet.xprtz.dev'
+  }
+  {
+    rootDomain: 'workwithxprtz.net'
+    subDomain: ''
+    fullDomain: 'workwithxprtz.net'
+  }
+  {
+    rootDomain: 'workwithxprtz.net'
+    subDomain: 'www'
+    fullDomain: 'www.workwithxprtz.net'
   }
 ]
 param prodDomains domainsType[] = [
@@ -39,23 +48,46 @@ param prodDomains domainsType[] = [
     subDomain: ''
     fullDomain: 'xprtz.cloud'
   }
+  {
+    rootDomain: 'xprtz.cloud'
+    subDomain: 'www'
+    fullDomain: 'www.xprtz.cloud'
+  }
+  {
+    rootDomain: 'xprtz.net'
+    subDomain: ''
+    fullDomain: 'xprtz.net'
+  }
+  {
+    rootDomain: 'xprtz.net'
+    subDomain: 'www'
+    fullDomain: 'www.xprtz.net'
+  }
 ]
+
+var sharedValues = json(loadTextContent('shared-values.json'))
+var isProd = endsWith(resourceGroupSuffix, 'main')
 
 var domains = isProd ? prodDomains : previewDomains
 var rootDomain = domains[0].rootDomain
+var imagesDomain = {
+  rootDomain: rootDomain
+  subDomain: 'images'
+  fullDomain: 'images.${rootDomain}'
+}
+
 var resourceGroupPrefix = 'rg-xprtzbv-website-${application}'
 var resourceGroupName = isProd
   ? resourceGroupPrefix
   : '${resourceGroupPrefix}-${resourceGroupSuffix}'
 
-var sharedValues = json(loadTextContent('shared-values.json'))
+
 var infrastructureResourceGroup = resourceGroup(
   sharedValues.subscriptionIds.xprtz,
   sharedValues.resourceGroups.infrastructure
 )
 
 var frontDoorProfileName = 'afd-xprtzbv-websites'
-var imagesDomain = 'images'
 
 resource websiteResourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   location: deployment().location
@@ -81,16 +113,17 @@ module frontDoorSettings 'modules/frontdoor.bicep' = if (isProd) {
   }
 }
 
-module dnsSettings 'modules/dns.bicep' = if (isProd) {
+@batchSize(1)
+module dnsSettings 'modules/dns.bicep' = [for domain in domains: if (isProd) {
   scope: infrastructureResourceGroup
-    name: 'dnsSettingsDeploy-${application}'
+    name: 'dnsSettingsDeploy-${domain.fullDomain}-${application}'
     params: {
     origin: frontDoorSettings.outputs.frontDoorCustomDomainHost
     frontDoorEndpointId: frontDoorSettings.outputs.frontDoorEndpointId
-    domains: domains
-    validationTokens: frontDoorSettings.outputs.frontDoorCustomDomainValidationTokens
+    validationToken: filter(frontDoorSettings.outputs.frontDoorCustomDomainValidationTokens,
+      validation => validation.domain.fullDomain == domain.fullDomain)[0]
   }
-}
+}]
 
 module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = if (isProd) {
   scope: infrastructureResourceGroup
@@ -101,9 +134,10 @@ module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = if (isProd) {
     frontDoorProfileName: frontDoorProfileName
     application: application
     rootDomain: rootDomain
-    subDomain: imagesDomain
+    subDomain: imagesDomain.subDomain
   }
 }
+
 
 module imagesDnsSettings 'modules/dns.bicep' = if (isProd) {
   scope: infrastructureResourceGroup
@@ -112,23 +146,10 @@ module imagesDnsSettings 'modules/dns.bicep' = if (isProd) {
     origin: imagesFrontDoorSettings.outputs.frontDoorCustomDomainHost
     frontDoorEndpointId: imagesFrontDoorSettings.outputs.frontDoorEndpointId
     deployApexRecord: false
-    domains: [
-      {
-        rootDomain: rootDomain
-        subDomain: imagesDomain
-        fullDomain: '${imagesDomain}.${rootDomain}'
-      }
-    ]
-    validationTokens: [
-      {
-        domain: {
-          rootDomain: rootDomain
-          subDomain: imagesDomain
-          fullDomain: '${imagesDomain}.${rootDomain}'
-        }
+    validationToken:{
+        domain: imagesDomain
         validationToken: imagesFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
-      }
-    ]
+    }
   }
 }
 
