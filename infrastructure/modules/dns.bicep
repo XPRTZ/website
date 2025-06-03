@@ -7,7 +7,6 @@ param validationTokens validationTokenType[]
 param deployApexRecord bool = true
 
 var cnames = filter(domains, domain => domain.subDomain != '')
-var cnameValidations = filter(validationTokens, validation => validation.domain.subDomain != '')
 
 resource dnsZone 'Microsoft.Network/dnsZones@2023-07-01-preview' existing = {
   name: domains[0].rootDomain
@@ -40,15 +39,15 @@ resource cnameRecord 'Microsoft.Network/dnsZones/CNAME@2023-07-01-preview' = [fo
 }]
 
 @batchSize(1)
-resource validationTxtRecord 'Microsoft.Network/dnsZones/TXT@2023-07-01-preview' = [for cnameValidation in cnameValidations: {
+resource validationTxtRecord 'Microsoft.Network/dnsZones/TXT@2023-07-01-preview' = [for validationToken in validationTokens: {
   parent: dnsZone
-  name: '_dnsauth.${cnameValidation.domain.subDomain}'
+  name: '_dnsauth.${validationToken.domain.subDomain}'
   properties: {
     TTL: 3600
     TXTRecords: [
       {
         value: [
-          cnameValidation.validationToken
+          validationToken.validationToken
         ]
       }
     ]
