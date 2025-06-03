@@ -34,6 +34,11 @@ param prodDomains domainsType[] = [
     subDomain: 'www'
     fullDomain: 'www.xprtz.nl'
   }
+  {
+    rootDomain: 'xprtz.cloud'
+    subDomain: ''
+    fullDomain: 'xprtz.cloud'
+  }
 ]
 
 var domains = isProd ? prodDomains : previewDomains
