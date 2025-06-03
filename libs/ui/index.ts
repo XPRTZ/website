@@ -13,7 +13,7 @@ import HomePageImage from "./src/HomePageImage.astro";
 import HomePageImageWithTitle from "./src/HomePageImageWithTitle.astro";
 import PageImage from "./src/PageImage.astro";
 import Values from "./src/Values.astro";
-import LogoCloud from "./src/LogoCloud.astro";
+import LogoCloud from "./src/ClientCarousel.astro";
 import Text from "./src/Text.astro";
 import Listing from "./src/Listing.astro";
 import SubtitleWithText from "./src/SubtitleWithText.astro";

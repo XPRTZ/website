@@ -12,7 +12,7 @@ const slidesMembers = Array.from({ length: totalSlides }).map(
     const slideMembers = [];
 
     for (let i = 0; i < membersPerSlide; i++) {
-      const memberIndex = (startIndex + i);
+      const memberIndex = startIndex + i;
       if (memberIndex >= totalMembers) break;
       slideMembers.push(team.members[memberIndex]);
     }
