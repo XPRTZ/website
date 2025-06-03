@@ -35,11 +35,6 @@ param prodDomains domainsType[] = [
     fullDomain: 'www.xprtz.nl'
   }
   {
-    rootDomain: 'xprtz.net'
-    subDomain: ''
-    fullDomain: 'xprtz.net'
-  }
-  {
     rootDomain: 'xprtz.cloud'
     subDomain: ''
     fullDomain: 'xprtz.cloud'
