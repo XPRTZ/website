@@ -20,7 +20,7 @@
     "@types/react-dom": "^18.3.0",
     "@xprtz/cms": "file:../../libs/cms",
     "@xprtz/ui": "file:../../libs/ui",
-    "astro": "^5.11.0",
+    "astro": "^5.11.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "remove-markdown": "^0.6.0",
