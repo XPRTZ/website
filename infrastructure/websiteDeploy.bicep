@@ -44,7 +44,9 @@ param prodDomains domainsType[] = [
 var domains = isProd ? prodDomains : previewDomains
 var rootDomain = domains[0].rootDomain
 var resourceGroupPrefix = 'rg-xprtzbv-website-${application}'
-var resourceGroupName = isProd ? resourceGroupPrefix : '${resourceGroupPrefix}-${resourceGroupSuffix}'
+var resourceGroupName = isProd
+  ? resourceGroupPrefix
+  : '${resourceGroupPrefix}-${resourceGroupSuffix}'
 
 var sharedValues = json(loadTextContent('shared-values.json'))
 var infrastructureResourceGroup = resourceGroup(
@@ -70,7 +72,7 @@ module storageAccountModule 'modules/storageAccount.bicep' = {
 
 module frontDoorSettings 'modules/frontdoor.bicep' = if (isProd) {
   scope: infrastructureResourceGroup
-  name: 'frontDoorSettingsDeploy-${application}'
+    name: 'frontDoorSettingsDeploy-${application}'
   params: {
     frontDoorOriginHost: storageAccountModule.outputs.storageAccountHost
     frontDoorProfileName: frontDoorProfileName
@@ -81,12 +83,12 @@ module frontDoorSettings 'modules/frontdoor.bicep' = if (isProd) {
 
 module dnsSettings 'modules/dns.bicep' = if (isProd) {
   scope: infrastructureResourceGroup
-  name: 'dnsSettingsDeploy-${application}'
-  params: {
-    origin: isProd ? frontDoorSettings.outputs.frontDoorCustomDomainHost : ''
-    frontDoorEndpointId: isProd ? frontDoorSettings.outputs.frontDoorEndpointId : ''
+    name: 'dnsSettingsDeploy-${application}'
+    params: {
+    origin: frontDoorSettings.outputs.frontDoorCustomDomainHost
+    frontDoorEndpointId: frontDoorSettings.outputs.frontDoorEndpointId
     domains: domains
-    validationTokens: isProd ? frontDoorSettings.outputs.frontDoorCustomDomainValidationTokens : []
+    validationTokens: frontDoorSettings.outputs.frontDoorCustomDomainValidationTokens
   }
 }
 
@@ -107,8 +109,8 @@ module imagesDnsSettings 'modules/dns.bicep' = if (isProd) {
   scope: infrastructureResourceGroup
   name: 'imagesDnsSettingsDeploy-${application}'
   params: {
-    origin: isProd ? imagesFrontDoorSettings.outputs.frontDoorCustomDomainHost : ''
-    frontDoorEndpointId: isProd ? imagesFrontDoorSettings.outputs.frontDoorEndpointId : ''
+    origin: imagesFrontDoorSettings.outputs.frontDoorCustomDomainHost
+    frontDoorEndpointId: imagesFrontDoorSettings.outputs.frontDoorEndpointId
     deployApexRecord: false
     domains: [
       {
@@ -124,7 +126,7 @@ module imagesDnsSettings 'modules/dns.bicep' = if (isProd) {
           subDomain: imagesDomain
           fullDomain: '${imagesDomain}.${rootDomain}'
         }
-        validationToken: isProd ? imagesFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken : ''
+        validationToken: imagesFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
       }
     ]
   }
@@ -132,4 +134,6 @@ module imagesDnsSettings 'modules/dns.bicep' = if (isProd) {
 
 output storageAccountName string = storageAccountModule.outputs.storageAccountName
 output resourceGroupName string = websiteResourceGroup.name
-output applicationFqdn string = isProd ? 'https://${rootDomain}/' : storageAccountModule.outputs.storageAccountFqdn
+output applicationFqdn string = isProd
+  ? 'https://${rootDomain}/'
+  : storageAccountModule.outputs.storageAccountFqdn
