@@ -27,18 +27,18 @@ const site = import.meta.env.PUBLIC_IMAGES_URL;
     <p class="mt-6 text-lg/8 text-gray-600">{kernwaarden.description}</p>
   </div>
   <dl
-    class="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 text-base/7 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3"
+    class="mx-auto mt-16 max-w-2xl lg:mx-0 lg:max-w-none"
   >
-    {
-      kernwaarden.items.map((item) => (
-        <div>
+    <div class="flex flex-wrap justify-center gap-x-8 gap-y-16">
+      {kernwaarden.items.map((item) => (
+        <div class="w-full max-w-xs sm:w-80 sm:flex-none lg:w-80">
           <dt class="font-semibold text-primary-800 text-center flex flex-col items-center">
             <div>{item.title}</div>
             <img class="p-4" src=`${site}${item.image.url}` />
           </dt>
-          <dd class="mt-1 text-gray-600">{item.description}</dd>
+          <dd class="mt-1 text-gray-600 text-base/7">{item.description}</dd>
         </div>
-      ))
-    }
+      ))}
+    </div>
   </dl>
 </div>
