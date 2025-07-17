@@ -1,0 +1,65 @@
+---
+// This component can be used to add additional SEO-related elements to pages
+// It's meant to be included in layouts or pages for extra SEO benefits
+
+export interface SEOToolsProps {
+  robots?: string;
+  alternateLanguages?: Array<{ lang: string; url: string }>;
+  prevPage?: string;
+  nextPage?: string;
+  ampUrl?: string;
+  breadcrumbs?: Array<{ name: string; url: string }>;
+}
+
+const {
+  robots = "index, follow",
+  alternateLanguages = [],
+  prevPage,
+  nextPage,
+  ampUrl,
+  breadcrumbs = [],
+} = Astro.props as SEOToolsProps;
+
+// Generate breadcrumb structured data if breadcrumbs are provided
+const breadcrumbStructuredData =
+  breadcrumbs.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: breadcrumbs.map((item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.name,
+          item: item.url,
+        })),
+      }
+    : null;
+---
+
+<!-- Additional robots meta (if different from base) -->{
+  robots !== "index, follow" && <meta name="robots" content={robots} />
+}
+
+<!-- Pagination -->
+{prevPage && <link rel="prev" href={prevPage} />}
+{nextPage && <link rel="next" href={nextPage} />}
+
+<!-- AMP version if available -->
+{ampUrl && <link rel="amphtml" href={ampUrl} />}
+
+<!-- Alternate language versions -->
+{
+  alternateLanguages.map(({ lang, url }) => (
+    <link rel="alternate" hreflang={lang} href={url} />
+  ))
+}
+
+<!-- Breadcrumb structured data -->
+{
+  breadcrumbStructuredData && (
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(breadcrumbStructuredData)}
+    />
+  )
+}

@@ -1,8 +1,11 @@
 ---
 import Layout from "../../layouts/layout.astro";
 import { fetchData, type Article } from "@xprtz/cms";
-import { ContentAstro as Content } from "@xprtz/ui";
-
+import {
+  ContentAstro as Content,
+  generateArticleSEOData,
+  generateArticleStructuredData,
+} from "@xprtz/ui";
 
 export async function getStaticPaths() {
   const site = import.meta.env.PUBLIC_SITE || "no-site-found";
@@ -16,7 +19,7 @@ export async function getStaticPaths() {
       "populate[authors][fields]": "*",
       "populate[authors][populate][avatar][fields][0]=url": "url",
       "populate[image][fields][0]": "url",
-      "populate[tags][fields][0]":"title",
+      "populate[tags][fields][0]": "title",
       status: "published",
     },
   });
@@ -28,8 +31,47 @@ export async function getStaticPaths() {
 }
 
 const article: Article = Astro.props;
+
+// Environment variables
+const imagesUrl = import.meta.env.PUBLIC_IMAGES_URL || "";
+const siteUrl = Astro.site?.toString() || "https://xprtz.net";
+
+// Generate structured data for the article
+const structuredData = generateArticleStructuredData({
+  article,
+  siteUrl,
+  siteName: "XPRTZ",
+  imagesUrl,
+});
+
+// Generate comprehensive SEO data
+const seoData = generateArticleSEOData({
+  article,
+  imagesUrl,
+  siteName: "XPRTZ",
+  structuredData,
+});
+
+// Extract primary author info
+const primaryAuthor = article.authors?.[0];
+const authorName = primaryAuthor
+  ? `${primaryAuthor.firstname} ${primaryAuthor.lastname}`
+  : undefined;
+
+// Extract tag names for keywords
+const tagNames = article.tags?.map((tag) => tag.title) || [];
 ---
 
-<Layout title={article.title} description={article.title}>
+<Layout
+  title={article.title}
+  description={article.title}
+  image={article.image ? `${imagesUrl}${article.image.url}` : undefined}
+  imageAlt={article.image?.alternateText || article.title}
+  type="article"
+  author={authorName}
+  publishedTime={article.date}
+  tags={tagNames}
+  seoData={seoData}
+>
   <Content article={article} />
 </Layout>

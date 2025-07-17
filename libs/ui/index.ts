@@ -19,8 +19,13 @@ import Listing from "./src/Listing.astro";
 import SubtitleWithText from "./src/SubtitleWithText.astro";
 import Quote from "./src/Quote.astro";
 import Blogs from "./src/Blogs.astro";
+import SEOTools from "./src/SEOTools.astro";
 
 import ComponentRenderer from "./src/ComponentRenderer.astro";
+
+// SEO utilities
+export * from "./src/seo/index.js";
+export * from "./src/seo/structuredData.js";
 
 export {
   BaseHead,
@@ -44,5 +49,6 @@ export {
   SubtitleWithText,
   Quote,
   Blogs,
-  ComponentRenderer
+  SEOTools,
+  ComponentRenderer,
 };
