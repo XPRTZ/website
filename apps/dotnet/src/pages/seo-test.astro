@@ -1,0 +1,130 @@
+---
+// Test page to verify SEO implementation
+import Layout from "../layouts/layout.astro";
+import { generateWebsiteStructuredData, SEOTools } from "@xprtz/ui";
+
+const siteUrl = Astro.site?.toString() || "https://xprtz.net";
+
+const structuredData = generateWebsiteStructuredData({
+  name: "SEO Test Page - XPRTZ",
+  url: `${siteUrl}/seo-test`,
+  description:
+    "This is a test page to verify that all SEO elements are working correctly.",
+});
+
+const breadcrumbs = [
+  { name: "Home", url: siteUrl },
+  { name: "SEO Test", url: `${siteUrl}/seo-test` },
+];
+---
+
+<Layout
+  title="SEO Test Page"
+  description="This is a test page to verify that all SEO elements are working correctly with Open Graph, Twitter Cards, and structured data."
+  type="website"
+  seoData={{
+    structuredData,
+    keywords: ["SEO", "test", "Open Graph", "Twitter Cards", "structured data"],
+  }}
+>
+  <SEOTools breadcrumbs={breadcrumbs} />
+
+  <div class="max-w-4xl mx-auto px-6 py-12">
+    <h1 class="text-4xl font-bold text-primary-800 mb-8">SEO Test Page</h1>
+
+    <div class="prose max-w-none">
+      <h2>What to Test</h2>
+      <p>
+        This page is designed to test the SEO implementation. Here's what should
+        be present:
+      </p>
+
+      <h3>Meta Tags</h3>
+      <ul>
+        <li>✅ Title tag with "SEO Test Page | XPRTZ"</li>
+        <li>✅ Meta description</li>
+        <li>✅ Meta keywords</li>
+        <li>✅ Canonical URL</li>
+        <li>✅ Language attribute (Dutch)</li>
+        <li>✅ Theme color</li>
+      </ul>
+      <h3>Open Graph Tags</h3>
+      <ul>
+        <li>✅ og:title</li>
+        <li>✅ og:description</li>
+        <li>✅ og:type (website)</li>
+        <li>✅ og:url</li>
+        <li>✅ og:site_name (XPRTZ)</li>
+        <li>✅ og:locale (nl_NL)</li>
+        <li>✅ og:image (default placeholder)</li>
+      </ul>
+
+      <h3>Social Media Platforms</h3>
+      <p>XPRTZ is active on these platforms (included in structured data):</p>
+      <ul>
+        <li>✅ LinkedIn: /company/xprtz</li>
+        <li>✅ GitHub: /xprtz</li>
+        <li>✅ Instagram: @workwithxprtz</li>
+        <li>✅ YouTube: UCFUV8Q5RgFMwN-XM_vkwT3g channel</li>
+      </ul>
+
+      <h3>Structured Data (JSON-LD)</h3>
+      <ul>
+        <li>✅ Website schema</li>
+        <li>✅ Organization information</li>
+        <li>✅ Breadcrumb navigation</li>
+        <li>✅ Search action</li>
+      </ul>
+
+      <h2>Testing Tools</h2>
+      <p>Use these tools to verify the implementation:</p>
+      <ul>
+        <li>
+          <a href="https://www.opengraph.xyz/" target="_blank" rel="noopener"
+            >OpenGraph.xyz</a
+          > - Test Open Graph tags
+        </li>
+        <li>
+          <a
+            href="https://search.google.com/test/rich-results"
+            target="_blank"
+            rel="noopener">Google Rich Results Test</a
+          > - Test structured data
+        </li>
+        <li>
+          <a
+            href="https://developers.facebook.com/tools/debug/"
+            target="_blank"
+            rel="noopener">Facebook Sharing Debugger</a
+          > - Test Facebook sharing
+        </li>
+        <li>
+          <a
+            href="https://www.linkedin.com/post-inspector/"
+            target="_blank"
+            rel="noopener">LinkedIn Post Inspector</a
+          > - Test LinkedIn sharing
+        </li>
+      </ul>
+
+      <h2>How to Test</h2>
+      <ol>
+        <li>Build and deploy the website</li>
+        <li>Visit this page at: <code>/seo-test</code></li>
+        <li>View page source to verify meta tags</li>
+        <li>Use the testing tools listed above</li>
+        <li>Share the page on social media to test preview cards</li>
+      </ol>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-8">
+        <h3 class="text-blue-800 font-semibold mb-2">💡 Pro Tip</h3>
+        <p class="text-blue-700">
+          Right-click on this page and select "View Source" to see all the SEO
+          meta tags that have been generated. You should see comprehensive Open
+          Graph, Twitter Card, and JSON-LD structured data in the &lt;head&gt;
+          section.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>
