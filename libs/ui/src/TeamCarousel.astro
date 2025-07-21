@@ -1,25 +1,8 @@
 ---
 import { type Team } from "@xprtz/cms";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 const team = Astro.props as Team;
 const site = import.meta.env.PUBLIC_IMAGES_URL;
-
-const membersPerSlide = 5;
-const totalMembers = team.members.length;
-const totalSlides = Math.max(1, Math.ceil(totalMembers / membersPerSlide));
-const slidesMembers = Array.from({ length: totalSlides }).map(
-  (_, slideIndex) => {
-    const startIndex = slideIndex * membersPerSlide;
-    const slideMembers = [];
-
-    for (let i = 0; i < membersPerSlide; i++) {
-      const memberIndex = (startIndex + i);
-      if (memberIndex >= totalMembers) break;
-      slideMembers.push(team.members[memberIndex]);
-    }
-
-    return slideMembers;
-  }
-);
 ---
 
 <div class="mx-auto mt-32 max-w-7xl px-6 lg:px-8">
@@ -31,23 +14,24 @@ const slidesMembers = Array.from({ length: totalSlides }).map(
     </h2>
     <p class="mt-6 text-lg/8 text-gray-600">{team.description}</p>
   </div>
-
   <div
-    class="carousel-container mt-20 relative overflow-hidden"
+    class="embla mt-20"
+    data-embla
+    role="region"
+    aria-label="Team members carousel"
     aria-roledescription="carousel"
-    aria-label="Team members"
   >
-    <div class="carousel-track flex transition-transform duration-500">
-      {
-        slidesMembers.map((slideMembers, slideIndex) => (
-          <div
-            class="carousel-slide flex-none w-full flex flex-nowrap justify-center gap-2 md:gap-4"
-            role="group"
-            aria-roledescription="slide"
-            aria-label={`Slide ${slideIndex + 1} of ${totalSlides}`}
-          >
-            {slideMembers.map((member) => (
-              <div class="carousel-item text-center px-2">
+    <div class="embla__viewport">
+      <div class="embla__container" role="group">
+        {
+          team.members.map((member, memberIndex) => (
+            <div
+              class="embla__slide"
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`Team member ${memberIndex + 1} of ${team.members.length}`}
+            >
+              <div class="team-member text-center px-2">
                 <img
                   class="mx-auto size-20 md:size-24 rounded-full"
                   src={`${site}${member.avatar.url}`}
@@ -60,115 +44,260 @@ const slidesMembers = Array.from({ length: totalSlides }).map(
                   {member.realTitle}
                 </p>
               </div>
-            ))}
-          </div>
-        ))
-      }
+            </div>
+          ))
+        }
+      </div>
+    </div>
+    <div class="embla__controls">
+      <div class="embla__buttons">
+        <button
+          class="embla__button embla__button--prev"
+          type="button"
+          aria-label="Previous team member"
+        >
+          <ChevronLeftIcon className="embla__button__icon" />
+        </button>
+        <button
+          class="embla__button embla__button--next"
+          type="button"
+          aria-label="Next team member"
+        >
+          <ChevronRightIcon className="embla__button__icon" />
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
 <style>
-  .carousel-container {
-    max-width: 100%;
+  .embla {
     position: relative;
-  }
-
-  .carousel-track {
-    display: flex;
-    width: 100%;
-    transition: transform 0.5s ease-in-out;
-  }
-
-  .carousel-slide {
-    min-width: 100%;
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: hidden;
-  }
-
-  .carousel-item {
-    transition: opacity 0.3s ease;
-    flex-shrink: 0;
     max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  @media (min-width: 320px) and (max-width: 640px) {
-    .carousel-item {
-      width: 75%; /* 3 items per row on medium-small screens */
+  .embla__viewport {
+    overflow: hidden;
+  }
+
+  .embla__container {
+    display: flex;
+    touch-action: pan-y pinch-zoom;
+    margin-left: calc(1rem * -1);
+  }
+
+  .embla__slide {
+    flex: 0 0 20%;
+    min-width: 0;
+    padding-left: 1rem;
+  }
+
+  .team-member {
+    flex-shrink: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .embla__slide {
+      flex: 0 0 50%;
     }
   }
 
   @media (min-width: 641px) and (max-width: 768px) {
-    .carousel-item {
-      width: 33.333%; /* 3 items per row on medium-small screens */
+    .embla__slide {
+      flex: 0 0 33.333%;
     }
   }
 
   @media (min-width: 769px) and (max-width: 1024px) {
-    .carousel-item {
-      width: 20%; /* 5 items per row on medium screens */
+    .embla__slide {
+      flex: 0 0 25%;
     }
   }
 
   @media (min-width: 1025px) {
-    .carousel-item {
-      width: 20%; /* 5 items per row on large screens */
+    .embla__slide {
+      flex: 0 0 20%;
     }
+  }
+
+  .embla__controls {
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+    margin-top: 0.5rem;
+  }
+
+  .embla__buttons {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .embla__button {
+    -webkit-tap-highlight-color: rgba(var(--text-high-contrast-rgb-value), 0.5);
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    touch-action: manipulation;
+    display: flex;
+    text-decoration: none;
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    z-index: 1;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    @apply text-primary-600 shadow-[inset_0_0_0_0.2rem] shadow-primary-600;
+  }
+
+  .embla__button:disabled {
+    @apply text-primary-300 shadow-primary-300 cursor-not-allowed;
+  }
+
+  .embla__button:not(:disabled):hover,
+  .embla__button:not(:disabled):focus-visible {
+    @apply text-white bg-primary-600 outline-none;
+  }
+
+  .embla__button:not(:disabled):active {
+    @apply text-white bg-primary-700;
+    transform: scale(0.96);
+  }
+
+  .embla__button__icon {
+    width: 70%;
+    height: 70%;
   }
 </style>
 
 <script>
-  // Initialize carousel functionality
-  const initCarousel = () => {
-    const track = document.querySelector(".carousel-track");
-    const slides = document.querySelectorAll(".carousel-slide");
-    const container = document.querySelector(".carousel-container");
+  import EmblaCarousel from "embla-carousel";
 
-    if (!track || !slides.length) return;
+  const CAROUSEL_CONFIG = {
+    AUTOPLAY_INTERVAL: 5000,
+    AUTOPLAY_DELAY: 1000,
+    DRAG_THRESHOLD: 5,
+  };
 
-    let currentSlide = 0;
-    const totalSlides = slides.length;
+  const initEmblaCarousel = (rootElement: HTMLElement) => {
+    const emblaNode = rootElement.querySelector(
+      ".embla__viewport"
+    ) as HTMLElement;
+    const prevBtnNode = rootElement.querySelector(
+      ".embla__button--prev"
+    ) as HTMLButtonElement;
+    const nextBtnNode = rootElement.querySelector(
+      ".embla__button--next"
+    ) as HTMLButtonElement;
 
-    // Function to go to a specific slide
-    const goToSlide = (index) => {
-      if (index < 0) index = totalSlides - 1;
-      if (index >= totalSlides) index = 0;
+    if (!emblaNode) return;
 
-      track.style.transform = `translateX(-${index * 100}%)`;
+    if (rootElement.hasAttribute("data-embla-initialized")) {
+      return;
+    }
+    rootElement.setAttribute("data-embla-initialized", "true");
 
-      // Update ARIA attributes for slides
-      slides.forEach((slide, i) => {
-        slide.setAttribute("aria-hidden", i === index ? "false" : "true");
-      });
+    const embla = EmblaCarousel(emblaNode, {
+      loop: true,
+      containScroll: "trimSnaps",
+      slidesToScroll: 1,
+      align: "start",
+      dragFree: false,
+      dragThreshold: CAROUSEL_CONFIG.DRAG_THRESHOLD,
+      skipSnaps: false,
+    });
 
-      currentSlide = index;
+    let autoplayInterval: ReturnType<typeof setInterval> | null = null;
+    let isAutoplayPaused = false;
+
+    const updateButtonStates = () => {
+      if (prevBtnNode) prevBtnNode.disabled = !embla.canScrollPrev();
+      if (nextBtnNode) nextBtnNode.disabled = !embla.canScrollNext();
     };
 
-    // Initialize first slide
-    goToSlide(0);
+    const startAutoplay = () => {
+      if (autoplayInterval || isAutoplayPaused) return;
 
-    // Auto-rotate carousel
-    let interval = setInterval(() => {
-      goToSlide(currentSlide + 1);
-    }, 5000); // Change slide every 5 seconds
+      autoplayInterval = setInterval(() => {
+        embla.scrollNext();
+      }, CAROUSEL_CONFIG.AUTOPLAY_INTERVAL);
+    };
 
-    // Function to reset auto-rotation
-    const resetAutoRotation = () => {
-      clearInterval(interval);
-      interval = setInterval(() => {
-        goToSlide(currentSlide + 1);
-      }, 5000);
+    const stopAutoplay = () => {
+      if (autoplayInterval) {
+        clearInterval(autoplayInterval);
+        autoplayInterval = null;
+      }
+    };
+
+    const pauseAutoplay = () => {
+      isAutoplayPaused = true;
+      stopAutoplay();
+    };
+
+    const resumeAutoplay = () => {
+      isAutoplayPaused = false;
+      startAutoplay();
+    };
+
+    // Add button event listeners
+    if (prevBtnNode) {
+      prevBtnNode.addEventListener("click", () => {
+        embla.scrollPrev();
+        pauseAutoplay();
+        setTimeout(resumeAutoplay, CAROUSEL_CONFIG.AUTOPLAY_INTERVAL);
+        // Remove focus to reset button state
+        prevBtnNode.blur();
+      });
+    }
+
+    if (nextBtnNode) {
+      nextBtnNode.addEventListener("click", () => {
+        embla.scrollNext();
+        pauseAutoplay();
+        setTimeout(resumeAutoplay, CAROUSEL_CONFIG.AUTOPLAY_INTERVAL);
+        // Remove focus to reset button state
+        nextBtnNode.blur();
+      });
+    }
+
+    // Update button states on select
+    embla.on("select", updateButtonStates);
+    embla.on("init", updateButtonStates);
+
+    setTimeout(startAutoplay, CAROUSEL_CONFIG.AUTOPLAY_DELAY);
+
+    emblaNode.addEventListener("mouseenter", pauseAutoplay);
+    emblaNode.addEventListener("mouseleave", resumeAutoplay);
+
+    return () => {
+      stopAutoplay();
+      embla.destroy();
+      rootElement.removeAttribute("data-embla-initialized");
     };
   };
 
-  // Run on initial load
+  const initAllCarousels = () => {
+    const carouselElements = document.querySelectorAll("[data-embla]");
+    carouselElements.forEach((element) => {
+      initEmblaCarousel(element as HTMLElement);
+    });
+  };
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initCarousel);
+    document.addEventListener("DOMContentLoaded", initAllCarousels);
   } else {
-    initCarousel();
+    initAllCarousels();
   }
 
-  // Also run when Astro updates the page
-  document.addEventListener("astro:page-load", initCarousel);
+  document.addEventListener("astro:page-load", initAllCarousels);
 </script>
