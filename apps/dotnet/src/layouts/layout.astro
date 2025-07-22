@@ -1,16 +1,80 @@
 ---
-import { BaseHead, Footer, Header } from '@xprtz/ui'
-import Logo from '../images/logo_met_tekst.svg'
-const { title, description } = Astro.props;
+import {
+  BaseHead,
+  Footer,
+  Header,
+  type SEOData,
+  generateSEOData,
+  generateWebsiteStructuredData,
+} from "@xprtz/ui";
+import Logo from "../images/logo_met_tekst.svg";
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  imageAlt?: string;
+  type?: "website" | "article";
+  author?: string;
+  publishedTime?: string;
+  tags?: string[];
+  seoData?: Partial<SEOData>;
+}
+
+const {
+  title,
+  description,
+  image,
+  imageAlt,
+  type = "website",
+  author,
+  publishedTime,
+  tags,
+  seoData,
+} = Astro.props;
+
+// Generate base structured data for organization/website
+const baseStructuredData = generateWebsiteStructuredData({
+  name: "XPRTZ",
+  url: Astro.site?.toString() || "https://xprtz.net",
+  description:
+    "Expert consultancy in .NET, Azure, and modern software development",
+  logo: `${Astro.site}${Logo.src}`,
+  sameAs: [
+    "https://www.linkedin.com/company/xprtz",
+    "https://github.com/xprtz",
+    "https://instagram.com/workwithxprtz",
+    "https://www.youtube.com/channel/UCFUV8Q5RgFMwN-XM_vkwT3g",
+  ],
+});
+
+// Generate SEO data with all the props
+const finalSEOData = generateSEOData({
+  title: title,
+  description: description,
+  image: image,
+  imageAlt: imageAlt,
+  type: type,
+  siteName: "XPRTZ",
+  structuredData: baseStructuredData,
+  additionalKeywords: tags,
+  ...seoData,
+});
+
+// Override specific properties if provided
+if (author) finalSEOData.author = author;
+if (publishedTime) finalSEOData.publishedTime = publishedTime;
+if (tags) finalSEOData.tags = tags;
 ---
-<html lang="en">
+
+<html lang="nl">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <BaseHead title={title} description={description} />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <BaseHead {...finalSEOData} />
   </head>
   <body>
-    <Header Logo={Logo.src} client:load/>
+    <Header Logo={Logo.src} client:load />
     <main class="isolate">
       <slot />
     </main>

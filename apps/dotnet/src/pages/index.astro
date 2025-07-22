@@ -1,10 +1,15 @@
 ---
 import { fetchData, type HomePage } from "@xprtz/cms";
-import { ComponentRenderer } from "@xprtz/ui";
+import {
+  ComponentRenderer,
+  generateWebsiteStructuredData,
+  generateOrganizationStructuredData,
+} from "@xprtz/ui";
 
 import Layout from "../layouts/layout.astro";
 
 const site = import.meta.env.PUBLIC_SITE || "no-site-found";
+const siteUrl = Astro.site?.toString() || "https://xprtz.net";
 
 const homepages = await fetchData<Array<HomePage>>({
   endpoint: "homepages",
@@ -19,7 +24,54 @@ const homepage = homepages[0];
 
 const title = homepage.title;
 const description = homepage.description;
+
+// Generate structured data for the homepage
+const websiteStructuredData = generateWebsiteStructuredData({
+  name: "XPRTZ",
+  url: siteUrl,
+  description: description,
+  sameAs: [
+    "https://www.linkedin.com/company/xprtz",
+    "https://github.com/xprtz",
+    "https://instagram.com/workwithxprtz",
+    "https://www.youtube.com/channel/UCFUV8Q5RgFMwN-XM_vkwT3g",
+  ],
+});
+
+// Generate Organization structured data for rich results
+const organizationStructuredData = generateOrganizationStructuredData({
+  name: "XPRTZ",
+  url: siteUrl,
+  logo: `${siteUrl}/images/logo.svg`,
+  description:
+    "XPRTZ is a leading .NET and Azure consulting company specializing in enterprise software development, cloud solutions, and Microsoft technology stack implementations.",
+  sameAs: [
+    "https://www.linkedin.com/company/xprtz",
+    "https://github.com/xprtz",
+    "https://instagram.com/workwithxprtz",
+    "https://www.youtube.com/channel/UCFUV8Q5RgFMwN-XM_vkwT3g",
+  ],
+});
+
+// Add keywords related to your business
+const keywords = [
+  ".NET development",
+  "Azure consulting",
+  "Software development",
+  "Cloud solutions",
+  "Microsoft technology",
+  "Enterprise applications",
+];
 ---
-<Layout title={title} description={description}>
+
+<Layout
+  title={title}
+  description={description}
+  type="website"
+  seoData={{
+    structuredData: [websiteStructuredData, organizationStructuredData],
+    keywords,
+  }}
+>
   <ComponentRenderer components={homepage.components} />
 </Layout>
