@@ -4,5 +4,6 @@
   },
   "resourceGroups": {
     "infrastructure": "rg-xprtzbv-infrastructure"
-  }
+  },
+  "frontDoorProfileName": "afd-xprtzbv-websites"
 }

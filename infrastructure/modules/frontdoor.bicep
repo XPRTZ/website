@@ -1,9 +1,13 @@
-import { domainsType } from '../types.bicep'
+import { hostnameType, validationTokenType } from '../types.bicep'
 
+@description('The name of the Front Door profile to use for the CDN.')
 param frontDoorProfileName string
+@description('The hostname of the origin for the Front Door.')
 param frontDoorOriginHost string
+@description('The name of the application, used to prefix resource names.')
 param application string
-param domains domainsType[]
+@description('List of hostnames to be configured for the Front Door.')
+param hostnames hostnameType[]
 
 var frontDoorOriginName = 'afd-origin-${application}'
 var frontDoorEndpointName = 'fde-${application}-${uniqueString(resourceGroup().id)}'
@@ -11,7 +15,7 @@ var frontDoorOriginGroupName = 'xprtz-website-${application}'
 var frontDoorRouteName = 'inbound'
 
 resource dnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
-  name: domains[0].rootDomain
+  name: hostnames[0].dnsZoneName
 }
 
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2024-02-01' existing = {
@@ -24,7 +28,6 @@ resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2024-02-01' = {
   location: 'global'
   properties: {
     enabledState: 'Enabled'
-
   }
 }
 
@@ -58,6 +61,24 @@ resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2024-02-01
   }
 }
 
+var domainNames = [for hostname in hostnames: empty(hostname.hostname) ? hostname.dnsZoneName : '${hostname.hostname}.${hostname.dnsZoneName}']
+
+// Gebruik de berekende waarden in de resource
+resource frontDoorCustomDomains 'Microsoft.Cdn/profiles/customDomains@2024-02-01' = [for domainName in domainNames: {
+  name: replace(domainName, '.', '-')
+  parent: frontDoorProfile
+  properties: {
+    hostName: domainName
+    tlsSettings: {
+      certificateType: 'ManagedCertificate'
+      minimumTlsVersion: 'TLS12'
+    }
+    azureDnsZone: {
+      id: dnsZone.id
+    }
+  }
+}]
+
 resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = {
   name: frontDoorRouteName
   parent: frontDoorEndpoint
@@ -65,7 +86,7 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
     frontDoorOrigin
   ]
   properties: {
-    customDomains: [for (domain, index) in domains: {
+    customDomains: [for (hostname, index) in hostnames: {
       id: frontDoorCustomDomains[index].id
     }]
     originGroup: {
@@ -84,23 +105,9 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
   }
 }
 
-resource frontDoorCustomDomains 'Microsoft.Cdn/profiles/customDomains@2024-02-01' = [for (domain, index) in domains: {
-  name: replace(domain.fullDomain, '.', '-')
-  parent: frontDoorProfile
-  properties: {
-    hostName: domain.fullDomain
-    tlsSettings: {
-      certificateType: 'ManagedCertificate'
-      minimumTlsVersion: 'TLS12'
-    }
-    azureDnsZone: {
-        id: dnsZone.id
-    }
-  }
-}]
-
-output frontDoorCustomDomainValidationTokens array = [for (domain, index) in domains: {
-  domain: domain
+output frontDoorCustomDomainValidationTokens validationTokenType[] = [for (hostname, index) in hostnames: {
+  dnsZoneName: hostname.dnsZoneName
+  hostname: hostname.hostname
   validationToken: frontDoorCustomDomains[index].properties.validationProperties.validationToken
 }]
 output frontDoorCustomDomainHost string = frontDoorEndpoint.properties.hostName

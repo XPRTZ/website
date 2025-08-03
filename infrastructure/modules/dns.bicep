@@ -1,18 +1,17 @@
-import { domainsType, validationTokenType } from '../types.bicep'
+import { hostnameType, validationTokenType } from '../types.bicep'
 
+@description('The dns record details')
+param hostname hostnameType
+@description('The ID of the Front Door endpoint to link the DNS records to.')
 param frontDoorEndpointId string
-param origin string
-param domains domainsType[]
-param validationTokens validationTokenType[]
-param deployApexRecord bool = true
-
-var cnames = filter(domains, domain => domain.subDomain != '')
+@description('The validation token for DNS verification.')
+param validationToken validationTokenType
 
 resource dnsZone 'Microsoft.Network/dnsZones@2023-07-01-preview' existing = {
-  name: domains[0].rootDomain
+  name: hostname.dnsZoneName
 }
 
-resource apexRecord 'Microsoft.Network/dnszones/A@2023-07-01-preview' = if(deployApexRecord) {
+resource apexRecord 'Microsoft.Network/dnszones/A@2023-07-01-preview' = if (empty(hostname.hostname)) {
   parent: dnsZone
   name: '@'
   properties: {
@@ -23,25 +22,20 @@ resource apexRecord 'Microsoft.Network/dnszones/A@2023-07-01-preview' = if(deplo
   }
 }
 
-@batchSize(1)
-resource cnameRecord 'Microsoft.Network/dnsZones/CNAME@2023-07-01-preview' = [for domain in cnames: {
+resource cnameRecord 'Microsoft.Network/dnsZones/CNAME@2023-07-01-preview' = if (!empty(hostname.hostname)) {
   parent: dnsZone
-  name: domain.subDomain
+  name: hostname.hostname
   properties: {
     TTL: 3600
     CNAMERecord: {
-      cname: origin
+      cname: hostname.dnsZoneName
     }
   }
-  dependsOn: [
-    apexRecord
-  ]
-}]
+}
 
-@batchSize(1)
-resource validationTxtRecord 'Microsoft.Network/dnsZones/TXT@2023-07-01-preview' = [for validationToken in validationTokens: {
+resource validationTxtRecordApex 'Microsoft.Network/dnsZones/TXT@2023-07-01-preview' = {
   parent: dnsZone
-  name: '_dnsauth.${validationToken.domain.subDomain}'
+  name: empty(hostname.hostname) ? '_dnsauth' : '_dnsauth.${hostname.hostname}'
   properties: {
     TTL: 3600
     TXTRecords: [
@@ -52,4 +46,4 @@ resource validationTxtRecord 'Microsoft.Network/dnsZones/TXT@2023-07-01-preview'
       }
     ]
   }
-}]
+}
