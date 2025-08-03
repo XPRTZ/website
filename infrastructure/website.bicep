@@ -52,10 +52,10 @@ module dnsSettings 'modules/dns.bicep' = [for hostname in hostnames: if (isProd)
     name: 'dnsSettingsDeploy-${hostname.hostname}-${hostname.dnsZoneName}-${application}'
     params: {
       hostname: hostname
-      frontDoorEndpointId: frontDoorSettings.outputs.frontDoorEndpointId
-      frontDoorHostname: frontDoorSettings.outputs.frontDoorHostname
+      frontDoorEndpointId: frontDoorSettings!.outputs.frontDoorEndpointId
+      frontDoorHostname: frontDoorSettings!.outputs.frontDoorHostname
       validationToken: filter(
-        frontDoorSettings.outputs.frontDoorCustomDomainValidationTokens,
+        frontDoorSettings!.outputs.frontDoorCustomDomainValidationTokens,
         validation => validation.hostname == hostname.hostname && validation.dnsZoneName == hostname.dnsZoneName
       )[0]
     }
@@ -66,7 +66,7 @@ module imagesFrontDoorSettings 'modules/frontdoor-images.bicep' = if (isProd) {
   scope: infrastructureResourceGroup
   name: 'imagesFrontDoorSettingsDeploy-${application}'
   params: {
-    storageAccountName: storageAccountModule.outputs.storageAccountName
+    storageAccountName: storageAccountModule!.outputs.storageAccountName
     storageAccountResourceGroup: websiteResourceGroup.name
     frontDoorProfileName: sharedValues.frontDoorProfileName
     application: application
@@ -80,12 +80,12 @@ module imagesDnsSettings 'modules/dns.bicep' = if (isProd) {
   name: 'imagesDnsSettingsDeploy-${application}'
   params: {
     hostname: imageHostname
-    frontDoorEndpointId: imagesFrontDoorSettings.outputs.frontDoorEndpointId
-    frontDoorHostname: imagesFrontDoorSettings.outputs.frontDoorHostname
+    frontDoorEndpointId: imagesFrontDoorSettings!.outputs.frontDoorEndpointId
+    frontDoorHostname: imagesFrontDoorSettings!.outputs.frontDoorHostname
     validationToken: {
         dnsZoneName: imageHostname.dnsZoneName
         hostname: imageHostname.hostname
-        validationToken: imagesFrontDoorSettings.outputs.frontDoorCustomDomainValidationToken
+        validationToken: imagesFrontDoorSettings!.outputs.frontDoorCustomDomainValidationToken
     }
   }
 }
