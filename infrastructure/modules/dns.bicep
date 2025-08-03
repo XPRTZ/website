@@ -4,6 +4,8 @@ import { hostnameType, validationTokenType } from '../types.bicep'
 param hostname hostnameType
 @description('The ID of the Front Door endpoint to link the DNS records to.')
 param frontDoorEndpointId string
+@description('The frontdoor hostname to be used for the DNS CNAME records.')
+param frontDoorHostname string
 @description('The validation token for DNS verification.')
 param validationToken validationTokenType
 
@@ -28,7 +30,7 @@ resource cnameRecord 'Microsoft.Network/dnsZones/CNAME@2023-07-01-preview' = if 
   properties: {
     TTL: 3600
     CNAMERecord: {
-      cname: hostname.dnsZoneName
+      cname: frontDoorHostname
     }
   }
 }

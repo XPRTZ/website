@@ -110,5 +110,5 @@ output frontDoorCustomDomainValidationTokens validationTokenType[] = [for (hostn
   hostname: hostname.hostname
   validationToken: frontDoorCustomDomains[index].properties.validationProperties.validationToken
 }]
-output frontDoorCustomDomainHost string = frontDoorEndpoint.properties.hostName
+output frontDoorHostname string = frontDoorEndpoint.properties.hostName
 output frontDoorEndpointId string = frontDoorEndpoint.id
