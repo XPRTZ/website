@@ -14,9 +14,9 @@ var frontDoorEndpointName = 'fde-${application}-${uniqueString(resourceGroup().i
 var frontDoorOriginGroupName = 'xprtz-website-${application}'
 var frontDoorRouteName = 'inbound'
 
-resource dnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
-  name: hostnames[0].dnsZoneName
-}
+resource dnsZones 'Microsoft.Network/dnsZones@2018-05-01' existing = [for hostname in hostnames: {
+  name: hostname.dnsZoneName
+}]
 
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2024-02-01' existing = {
   name: frontDoorProfileName
@@ -63,9 +63,8 @@ resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2024-02-01
 
 var domainNames = [for hostname in hostnames: empty(hostname.hostname) ? hostname.dnsZoneName : '${hostname.hostname}.${hostname.dnsZoneName}']
 
-// Gebruik de berekende waarden in de resource
 @batchSize(1)
-resource frontDoorCustomDomains 'Microsoft.Cdn/profiles/customDomains@2024-02-01' = [for domainName in domainNames: {
+resource frontDoorCustomDomains 'Microsoft.Cdn/profiles/customDomains@2024-02-01' = [for (domainName, index) in domainNames: {
   name: replace(domainName, '.', '-')
   parent: frontDoorProfile
   properties: {
@@ -75,7 +74,7 @@ resource frontDoorCustomDomains 'Microsoft.Cdn/profiles/customDomains@2024-02-01
       minimumTlsVersion: 'TLS12'
     }
     azureDnsZone: {
-      id: dnsZone.id
+      id: dnsZones[index].id
     }
   }
 }]
