@@ -64,6 +64,7 @@ resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2024-02-01
 var domainNames = [for hostname in hostnames: empty(hostname.hostname) ? hostname.dnsZoneName : '${hostname.hostname}.${hostname.dnsZoneName}']
 
 // Gebruik de berekende waarden in de resource
+@batchSize(1)
 resource frontDoorCustomDomains 'Microsoft.Cdn/profiles/customDomains@2024-02-01' = [for domainName in domainNames: {
   name: replace(domainName, '.', '-')
   parent: frontDoorProfile
