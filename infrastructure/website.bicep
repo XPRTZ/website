@@ -55,7 +55,7 @@ module dnsSettings 'modules/dns.bicep' = [for hostname in hostnames: if (isProd)
       frontDoorHostname: frontDoorSettings!.outputs.frontDoorHostname
       validationToken: filter(
         frontDoorSettings!.outputs.frontDoorCustomDomainValidationTokens,
-        validation => validation.hostname == hostname.hostname && validation.dnsZoneName == hostname.dnsZoneName
+        validation => validation.hostname.hostname == hostname.hostname && validation.hostname.dnsZoneName == hostname.dnsZoneName
       )[0]
     }
   }
@@ -82,8 +82,7 @@ module imagesDnsSettings 'modules/dns.bicep' = if (isProd) {
     frontDoorEndpointId: imagesFrontDoorSettings!.outputs.frontDoorEndpointId
     frontDoorHostname: imagesFrontDoorSettings!.outputs.frontDoorHostname
     validationToken: {
-        dnsZoneName: imageHostname.dnsZoneName
-        hostname: imageHostname.hostname
+        hostname: imageHostname
         validationToken: imagesFrontDoorSettings!.outputs.frontDoorCustomDomainValidationToken
     }
   }

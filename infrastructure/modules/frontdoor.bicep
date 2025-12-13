@@ -106,8 +106,7 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' 
 }
 
 output frontDoorCustomDomainValidationTokens validationTokenType[] = [for (hostname, index) in hostnames: {
-  dnsZoneName: hostname.dnsZoneName
-  hostname: hostname.hostname
+  hostname: hostname
   validationToken: frontDoorCustomDomains[index].properties.validationProperties.validationToken
 }]
 output frontDoorHostname string = frontDoorEndpoint.properties.hostName

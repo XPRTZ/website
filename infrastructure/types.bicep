@@ -6,7 +6,6 @@ type hostnameType = {
 
 @export()
 type validationTokenType = {
-  dnsZoneName: string
-  hostname: string
+  hostname: hostnameType
   validationToken: string
 }

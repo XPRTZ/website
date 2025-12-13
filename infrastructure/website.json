@@ -1,0 +1,1190 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "languageVersion": "2.0",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.39.26.7824",
+      "templateHash": "14064476434264607174"
+    }
+  },
+  "definitions": {
+    "hostnameType": {
+      "type": "object",
+      "properties": {
+        "dnsZoneName": {
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        }
+      },
+      "metadata": {
+        "__bicep_imported_from!": {
+          "sourceTemplate": "types.bicep"
+        }
+      }
+    }
+  },
+  "parameters": {
+    "resourceGroupSuffix": {
+      "type": "string",
+      "metadata": {
+        "description": "The suffix for the resource group, typically 'main' for production or a specific identifier for non-production environments."
+      }
+    },
+    "application": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the application, used to prefix resource names."
+      }
+    },
+    "hostnames": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/hostnameType"
+      },
+      "metadata": {
+        "description": "List of hostnames to be configured for the website."
+      }
+    },
+    "imageHostname": {
+      "$ref": "#/definitions/hostnameType",
+      "metadata": {
+        "description": "Hostname for the images domain, used for static content."
+      }
+    }
+  },
+  "variables": {
+    "$fxv#0": "{\n  \"subscriptionIds\": {\n    \"xprtz\": \"92f4e2a9-8f0a-4ecc-90fc-6c77c24a1b31\"\n  },\n  \"resourceGroups\": {\n    \"infrastructure\": \"rg-xprtzbv-infrastructure\"\n  },\n  \"frontDoorProfileName\": \"afd-xprtzbv-websites\"\n}\n",
+    "isProd": "[endsWith(parameters('resourceGroupSuffix'), 'main')]",
+    "sharedValues": "[json(variables('$fxv#0'))]",
+    "infrastructureResourceGroup": {},
+    "resourceGroupPrefix": "[format('rg-xprtzbv-website-{0}', parameters('application'))]",
+    "resourceGroupName": "[if(variables('isProd'), variables('resourceGroupPrefix'), format('{0}-{1}', variables('resourceGroupPrefix'), parameters('resourceGroupSuffix')))]"
+  },
+  "resources": {
+    "websiteResourceGroup": {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2024-03-01",
+      "name": "[variables('resourceGroupName')]",
+      "location": "[deployment().location]"
+    },
+    "storageAccountModule": {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('storageAccountDeploy-{0}', parameters('application'))]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "app": {
+            "value": "[parameters('application')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.39.26.7824",
+              "templateHash": "142108496684892283"
+            }
+          },
+          "parameters": {
+            "sku": {
+              "type": "string",
+              "defaultValue": "Standard_LRS",
+              "allowedValues": [
+                "Premium_LRS",
+                "Premium_ZRS",
+                "Standard_GRS",
+                "Standard_GZRS",
+                "Standard_LRS",
+                "Standard_RAGRS",
+                "Standard_RAGZRS",
+                "Standard_ZRS"
+              ]
+            },
+            "app": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-04-01",
+              "name": "[format('st{0}{1}', parameters('app'), uniqueString(resourceGroup().id))]",
+              "location": "[resourceGroup().location]",
+              "kind": "StorageV2",
+              "sku": {
+                "name": "[parameters('sku')]"
+              },
+              "properties": {
+                "supportsHttpsTrafficOnly": true,
+                "accessTier": "Hot",
+                "allowBlobPublicAccess": true,
+                "minimumTlsVersion": "TLS1_2"
+              }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-04-01",
+              "name": "[format('{0}/{1}/{2}', format('st{0}{1}', parameters('app'), uniqueString(resourceGroup().id)), 'default', '$web')]",
+              "properties": {
+                "immutableStorageWithVersioning": {
+                  "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', format('st{0}{1}', parameters('app'), uniqueString(resourceGroup().id)))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-04-01",
+              "name": "[format('{0}/{1}/{2}', format('st{0}{1}', parameters('app'), uniqueString(resourceGroup().id)), 'default', 'media')]",
+              "properties": {
+                "immutableStorageWithVersioning": {
+                  "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "Blob"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', format('st{0}{1}', parameters('app'), uniqueString(resourceGroup().id)))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "storageAccountName": {
+              "type": "string",
+              "value": "[format('st{0}{1}', parameters('app'), uniqueString(resourceGroup().id))]"
+            },
+            "storageAccountFqdn": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', format('st{0}{1}', parameters('app'), uniqueString(resourceGroup().id))), '2023-04-01').primaryEndpoints.web]"
+            },
+            "storageAccountHost": {
+              "type": "string",
+              "value": "[split(reference(resourceId('Microsoft.Storage/storageAccounts', format('st{0}{1}', parameters('app'), uniqueString(resourceGroup().id))), '2023-04-01').primaryEndpoints.web, '/')[2]]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "websiteResourceGroup"
+      ]
+    },
+    "frontDoorSettings": {
+      "condition": "[variables('isProd')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('frontDoorSettingsDeploy-{0}', parameters('application'))]",
+      "subscriptionId": "[variables('sharedValues').subscriptionIds.xprtz]",
+      "resourceGroup": "[variables('sharedValues').resourceGroups.infrastructure]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "frontDoorOriginHost": {
+            "value": "[reference('storageAccountModule').outputs.storageAccountHost.value]"
+          },
+          "frontDoorProfileName": {
+            "value": "[variables('sharedValues').frontDoorProfileName]"
+          },
+          "application": {
+            "value": "[parameters('application')]"
+          },
+          "hostnames": {
+            "value": "[parameters('hostnames')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.39.26.7824",
+              "templateHash": "14685104079853229267"
+            }
+          },
+          "definitions": {
+            "hostnameType": {
+              "type": "object",
+              "properties": {
+                "dnsZoneName": {
+                  "type": "string"
+                },
+                "hostname": {
+                  "type": "string"
+                }
+              },
+              "metadata": {
+                "__bicep_imported_from!": {
+                  "sourceTemplate": "../types.bicep"
+                }
+              }
+            },
+            "validationTokenType": {
+              "type": "object",
+              "properties": {
+                "hostname": {
+                  "$ref": "#/definitions/hostnameType"
+                },
+                "validationToken": {
+                  "type": "string"
+                }
+              },
+              "metadata": {
+                "__bicep_imported_from!": {
+                  "sourceTemplate": "../types.bicep"
+                }
+              }
+            }
+          },
+          "parameters": {
+            "frontDoorProfileName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the Front Door profile to use for the CDN."
+              }
+            },
+            "frontDoorOriginHost": {
+              "type": "string",
+              "metadata": {
+                "description": "The hostname of the origin for the Front Door."
+              }
+            },
+            "application": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the application, used to prefix resource names."
+              }
+            },
+            "hostnames": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/hostnameType"
+              },
+              "metadata": {
+                "description": "List of hostnames to be configured for the Front Door."
+              }
+            }
+          },
+          "variables": {
+            "copy": [
+              {
+                "name": "domainNames",
+                "count": "[length(parameters('hostnames'))]",
+                "input": "[if(empty(parameters('hostnames')[copyIndex('domainNames')].hostname), parameters('hostnames')[copyIndex('domainNames')].dnsZoneName, format('{0}.{1}', parameters('hostnames')[copyIndex('domainNames')].hostname, parameters('hostnames')[copyIndex('domainNames')].dnsZoneName))]"
+              }
+            ],
+            "frontDoorOriginName": "[format('afd-origin-{0}', parameters('application'))]",
+            "frontDoorEndpointName": "[format('fde-{0}-{1}', parameters('application'), uniqueString(resourceGroup().id))]",
+            "frontDoorOriginGroupName": "[format('xprtz-website-{0}', parameters('application'))]",
+            "frontDoorRouteName": "inbound"
+          },
+          "resources": {
+            "dnsZones": {
+              "copy": {
+                "name": "dnsZones",
+                "count": "[length(parameters('hostnames'))]"
+              },
+              "existing": true,
+              "type": "Microsoft.Network/dnsZones",
+              "apiVersion": "2018-05-01",
+              "name": "[parameters('hostnames')[copyIndex()].dnsZoneName]"
+            },
+            "frontDoorProfile": {
+              "existing": true,
+              "type": "Microsoft.Cdn/profiles",
+              "apiVersion": "2024-02-01",
+              "name": "[parameters('frontDoorProfileName')]"
+            },
+            "frontDoorEndpoint": {
+              "type": "Microsoft.Cdn/profiles/afdEndpoints",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}', parameters('frontDoorProfileName'), variables('frontDoorEndpointName'))]",
+              "location": "global",
+              "properties": {
+                "enabledState": "Enabled"
+              }
+            },
+            "frontDoorOriginGroup": {
+              "type": "Microsoft.Cdn/profiles/originGroups",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}', parameters('frontDoorProfileName'), variables('frontDoorOriginGroupName'))]",
+              "properties": {
+                "loadBalancingSettings": {
+                  "sampleSize": 4,
+                  "successfulSamplesRequired": 3
+                },
+                "healthProbeSettings": {
+                  "probePath": "/",
+                  "probeRequestType": "HEAD",
+                  "probeProtocol": "Http",
+                  "probeIntervalInSeconds": 100
+                }
+              }
+            },
+            "frontDoorOrigin": {
+              "type": "Microsoft.Cdn/profiles/originGroups/origins",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}/{2}', parameters('frontDoorProfileName'), variables('frontDoorOriginGroupName'), variables('frontDoorOriginName'))]",
+              "properties": {
+                "hostName": "[parameters('frontDoorOriginHost')]",
+                "httpPort": 80,
+                "httpsPort": 443,
+                "originHostHeader": "[parameters('frontDoorOriginHost')]",
+                "priority": 1,
+                "weight": 1000
+              },
+              "dependsOn": [
+                "frontDoorOriginGroup"
+              ]
+            },
+            "frontDoorCustomDomains": {
+              "copy": {
+                "name": "frontDoorCustomDomains",
+                "count": "[length(variables('domainNames'))]",
+                "mode": "serial",
+                "batchSize": 1
+              },
+              "type": "Microsoft.Cdn/profiles/customDomains",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}', parameters('frontDoorProfileName'), replace(variables('domainNames')[copyIndex()], '.', '-'))]",
+              "properties": {
+                "hostName": "[variables('domainNames')[copyIndex()]]",
+                "tlsSettings": {
+                  "certificateType": "ManagedCertificate",
+                  "minimumTlsVersion": "TLS12"
+                },
+                "azureDnsZone": {
+                  "id": "[resourceId('Microsoft.Network/dnsZones', parameters('hostnames')[copyIndex()].dnsZoneName)]"
+                }
+              }
+            },
+            "frontDoorRoute": {
+              "type": "Microsoft.Cdn/profiles/afdEndpoints/routes",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}/{2}', parameters('frontDoorProfileName'), variables('frontDoorEndpointName'), variables('frontDoorRouteName'))]",
+              "properties": {
+                "copy": [
+                  {
+                    "name": "customDomains",
+                    "count": "[length(parameters('hostnames'))]",
+                    "input": {
+                      "id": "[resourceId('Microsoft.Cdn/profiles/customDomains', parameters('frontDoorProfileName'), replace(variables('domainNames')[copyIndex('customDomains')], '.', '-'))]"
+                    }
+                  }
+                ],
+                "originGroup": {
+                  "id": "[resourceId('Microsoft.Cdn/profiles/originGroups', parameters('frontDoorProfileName'), variables('frontDoorOriginGroupName'))]"
+                },
+                "supportedProtocols": [
+                  "Http",
+                  "Https"
+                ],
+                "patternsToMatch": [
+                  "/*"
+                ],
+                "forwardingProtocol": "HttpsOnly",
+                "linkToDefaultDomain": "Enabled",
+                "httpsRedirect": "Enabled"
+              },
+              "dependsOn": [
+                "frontDoorCustomDomains",
+                "frontDoorEndpoint",
+                "frontDoorOrigin",
+                "frontDoorOriginGroup"
+              ]
+            }
+          },
+          "outputs": {
+            "frontDoorCustomDomainValidationTokens": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/validationTokenType"
+              },
+              "copy": {
+                "count": "[length(parameters('hostnames'))]",
+                "input": {
+                  "hostname": "[parameters('hostnames')[copyIndex()]]",
+                  "validationToken": "[reference(format('frontDoorCustomDomains[{0}]', copyIndex())).validationProperties.validationToken]"
+                }
+              }
+            },
+            "frontDoorHostname": {
+              "type": "string",
+              "value": "[reference('frontDoorEndpoint').hostName]"
+            },
+            "frontDoorEndpointId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', parameters('frontDoorProfileName'), variables('frontDoorEndpointName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "storageAccountModule"
+      ]
+    },
+    "dnsSettings": {
+      "copy": {
+        "name": "dnsSettings",
+        "count": "[length(parameters('hostnames'))]",
+        "mode": "serial",
+        "batchSize": 1
+      },
+      "condition": "[variables('isProd')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('dnsSettingsDeploy-{0}-{1}-{2}', parameters('hostnames')[copyIndex()].hostname, parameters('hostnames')[copyIndex()].dnsZoneName, parameters('application'))]",
+      "subscriptionId": "[variables('sharedValues').subscriptionIds.xprtz]",
+      "resourceGroup": "[variables('sharedValues').resourceGroups.infrastructure]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "hostname": {
+            "value": "[parameters('hostnames')[copyIndex()]]"
+          },
+          "frontDoorEndpointId": {
+            "value": "[reference('frontDoorSettings').outputs.frontDoorEndpointId.value]"
+          },
+          "frontDoorHostname": {
+            "value": "[reference('frontDoorSettings').outputs.frontDoorHostname.value]"
+          },
+          "validationToken": {
+            "value": "[filter(reference('frontDoorSettings').outputs.frontDoorCustomDomainValidationTokens.value, lambda('validation', and(equals(lambdaVariables('validation').hostname.hostname, parameters('hostnames')[copyIndex()].hostname), equals(lambdaVariables('validation').hostname.dnsZoneName, parameters('hostnames')[copyIndex()].dnsZoneName))))[0]]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.39.26.7824",
+              "templateHash": "9607504885755172534"
+            }
+          },
+          "definitions": {
+            "hostnameType": {
+              "type": "object",
+              "properties": {
+                "dnsZoneName": {
+                  "type": "string"
+                },
+                "hostname": {
+                  "type": "string"
+                }
+              },
+              "metadata": {
+                "__bicep_imported_from!": {
+                  "sourceTemplate": "../types.bicep"
+                }
+              }
+            },
+            "validationTokenType": {
+              "type": "object",
+              "properties": {
+                "hostname": {
+                  "$ref": "#/definitions/hostnameType"
+                },
+                "validationToken": {
+                  "type": "string"
+                }
+              },
+              "metadata": {
+                "__bicep_imported_from!": {
+                  "sourceTemplate": "../types.bicep"
+                }
+              }
+            }
+          },
+          "parameters": {
+            "hostname": {
+              "$ref": "#/definitions/hostnameType",
+              "metadata": {
+                "description": "The dns record details"
+              }
+            },
+            "frontDoorEndpointId": {
+              "type": "string",
+              "metadata": {
+                "description": "The ID of the Front Door endpoint to link the DNS records to."
+              }
+            },
+            "frontDoorHostname": {
+              "type": "string",
+              "metadata": {
+                "description": "The frontdoor hostname to be used for the DNS CNAME records."
+              }
+            },
+            "validationToken": {
+              "$ref": "#/definitions/validationTokenType",
+              "metadata": {
+                "description": "The validation token for DNS verification."
+              }
+            }
+          },
+          "resources": {
+            "dnsZone": {
+              "existing": true,
+              "type": "Microsoft.Network/dnsZones",
+              "apiVersion": "2023-07-01-preview",
+              "name": "[parameters('hostname').dnsZoneName]"
+            },
+            "apexRecord": {
+              "condition": "[empty(parameters('hostname').hostname)]",
+              "type": "Microsoft.Network/dnsZones/A",
+              "apiVersion": "2023-07-01-preview",
+              "name": "[format('{0}/{1}', parameters('hostname').dnsZoneName, '@')]",
+              "properties": {
+                "TTL": 3600,
+                "targetResource": {
+                  "id": "[parameters('frontDoorEndpointId')]"
+                }
+              }
+            },
+            "cnameRecord": {
+              "condition": "[not(empty(parameters('hostname').hostname))]",
+              "type": "Microsoft.Network/dnsZones/CNAME",
+              "apiVersion": "2023-07-01-preview",
+              "name": "[format('{0}/{1}', parameters('hostname').dnsZoneName, parameters('hostname').hostname)]",
+              "properties": {
+                "TTL": 3600,
+                "CNAMERecord": {
+                  "cname": "[parameters('frontDoorHostname')]"
+                }
+              }
+            },
+            "validationTxtRecordApex": {
+              "type": "Microsoft.Network/dnsZones/TXT",
+              "apiVersion": "2023-07-01-preview",
+              "name": "[format('{0}/{1}', parameters('hostname').dnsZoneName, if(empty(parameters('hostname').hostname), '_dnsauth', format('_dnsauth.{0}', parameters('hostname').hostname)))]",
+              "properties": {
+                "TTL": 3600,
+                "TXTRecords": [
+                  {
+                    "value": [
+                      "[parameters('validationToken').validationToken]"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "frontDoorSettings"
+      ]
+    },
+    "imagesFrontDoorSettings": {
+      "condition": "[variables('isProd')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('imagesFrontDoorSettingsDeploy-{0}', parameters('application'))]",
+      "subscriptionId": "[variables('sharedValues').subscriptionIds.xprtz]",
+      "resourceGroup": "[variables('sharedValues').resourceGroups.infrastructure]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "storageAccountName": {
+            "value": "[reference('storageAccountModule').outputs.storageAccountName.value]"
+          },
+          "storageAccountResourceGroup": {
+            "value": "[variables('resourceGroupName')]"
+          },
+          "frontDoorProfileName": {
+            "value": "[variables('sharedValues').frontDoorProfileName]"
+          },
+          "application": {
+            "value": "[parameters('application')]"
+          },
+          "rootDomain": {
+            "value": "[parameters('imageHostname').dnsZoneName]"
+          },
+          "subDomain": {
+            "value": "[parameters('imageHostname').hostname]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.39.26.7824",
+              "templateHash": "6970417190122259700"
+            }
+          },
+          "parameters": {
+            "frontDoorProfileName": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "storageAccountResourceGroup": {
+              "type": "string"
+            },
+            "application": {
+              "type": "string"
+            },
+            "rootDomain": {
+              "type": "string"
+            },
+            "subDomain": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "frontDoorOriginName": "[format('afd-origin-images-{0}', parameters('application'))]",
+            "frontDoorEndpointName": "[format('fde-images-{0}-{1}', parameters('application'), uniqueString(resourceGroup().id))]",
+            "frontDoorOriginGroupName": "[format('xprtz-images-{0}', parameters('application'))]",
+            "frontDoorRouteName": "images-route",
+            "customDomainHost": "[format('{0}.{1}', parameters('subDomain'), parameters('rootDomain'))]",
+            "customDomainResourceName": "[replace(format('{0}', variables('customDomainHost')), '.', '-')]",
+            "ruleSetName": "images"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Cdn/profiles/afdEndpoints",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}', parameters('frontDoorProfileName'), variables('frontDoorEndpointName'))]",
+              "location": "global",
+              "properties": {
+                "enabledState": "Enabled"
+              }
+            },
+            {
+              "type": "Microsoft.Cdn/profiles/ruleSets",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}', parameters('frontDoorProfileName'), variables('ruleSetName'))]"
+            },
+            {
+              "type": "Microsoft.Cdn/profiles/ruleSets/rules",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}/{2}', parameters('frontDoorProfileName'), variables('ruleSetName'), 'jpeg')]",
+              "properties": {
+                "order": 1,
+                "conditions": [
+                  {
+                    "name": "UrlFileExtension",
+                    "parameters": {
+                      "typeName": "DeliveryRuleUrlFileExtensionMatchConditionParameters",
+                      "operator": "Equal",
+                      "negateCondition": false,
+                      "matchValues": [
+                        "jpg",
+                        "jpeg"
+                      ],
+                      "transforms": [
+                        "Lowercase"
+                      ]
+                    }
+                  }
+                ],
+                "actions": [
+                  {
+                    "name": "ModifyResponseHeader",
+                    "parameters": {
+                      "typeName": "DeliveryRuleHeaderActionParameters",
+                      "headerAction": "Overwrite",
+                      "headerName": "Content-Type",
+                      "value": "image/jpeg"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/ruleSets', parameters('frontDoorProfileName'), variables('ruleSetName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Cdn/profiles/ruleSets/rules",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}/{2}', parameters('frontDoorProfileName'), variables('ruleSetName'), 'png')]",
+              "properties": {
+                "order": 2,
+                "conditions": [
+                  {
+                    "name": "UrlFileExtension",
+                    "parameters": {
+                      "typeName": "DeliveryRuleUrlFileExtensionMatchConditionParameters",
+                      "operator": "Equal",
+                      "negateCondition": false,
+                      "matchValues": [
+                        "png"
+                      ],
+                      "transforms": [
+                        "Lowercase"
+                      ]
+                    }
+                  }
+                ],
+                "actions": [
+                  {
+                    "name": "ModifyResponseHeader",
+                    "parameters": {
+                      "typeName": "DeliveryRuleHeaderActionParameters",
+                      "headerAction": "Overwrite",
+                      "headerName": "Content-Type",
+                      "value": "image/png"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/ruleSets', parameters('frontDoorProfileName'), variables('ruleSetName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Cdn/profiles/ruleSets/rules",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}/{2}', parameters('frontDoorProfileName'), variables('ruleSetName'), 'svg')]",
+              "properties": {
+                "order": 3,
+                "conditions": [
+                  {
+                    "name": "UrlFileExtension",
+                    "parameters": {
+                      "typeName": "DeliveryRuleUrlFileExtensionMatchConditionParameters",
+                      "operator": "Equal",
+                      "negateCondition": false,
+                      "matchValues": [
+                        "svg"
+                      ],
+                      "transforms": [
+                        "Lowercase"
+                      ]
+                    }
+                  }
+                ],
+                "actions": [
+                  {
+                    "name": "ModifyResponseHeader",
+                    "parameters": {
+                      "typeName": "DeliveryRuleHeaderActionParameters",
+                      "headerAction": "Overwrite",
+                      "headerName": "Content-Type",
+                      "value": "image/svg+xml"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/ruleSets', parameters('frontDoorProfileName'), variables('ruleSetName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Cdn/profiles/ruleSets/rules",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}/{2}', parameters('frontDoorProfileName'), variables('ruleSetName'), 'gif')]",
+              "properties": {
+                "order": 4,
+                "conditions": [
+                  {
+                    "name": "UrlFileExtension",
+                    "parameters": {
+                      "typeName": "DeliveryRuleUrlFileExtensionMatchConditionParameters",
+                      "operator": "Equal",
+                      "negateCondition": false,
+                      "matchValues": [
+                        "gif"
+                      ],
+                      "transforms": [
+                        "Lowercase"
+                      ]
+                    }
+                  }
+                ],
+                "actions": [
+                  {
+                    "name": "ModifyResponseHeader",
+                    "parameters": {
+                      "typeName": "DeliveryRuleHeaderActionParameters",
+                      "headerAction": "Overwrite",
+                      "headerName": "Content-Type",
+                      "value": "image/gif"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/ruleSets', parameters('frontDoorProfileName'), variables('ruleSetName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Cdn/profiles/ruleSets/rules",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}/{2}', parameters('frontDoorProfileName'), variables('ruleSetName'), 'webp')]",
+              "properties": {
+                "order": 5,
+                "conditions": [
+                  {
+                    "name": "UrlFileExtension",
+                    "parameters": {
+                      "typeName": "DeliveryRuleUrlFileExtensionMatchConditionParameters",
+                      "operator": "Equal",
+                      "negateCondition": false,
+                      "matchValues": [
+                        "webp"
+                      ],
+                      "transforms": [
+                        "Lowercase"
+                      ]
+                    }
+                  }
+                ],
+                "actions": [
+                  {
+                    "name": "ModifyResponseHeader",
+                    "parameters": {
+                      "typeName": "DeliveryRuleHeaderActionParameters",
+                      "headerAction": "Overwrite",
+                      "headerName": "Content-Type",
+                      "value": "image/webp"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/ruleSets', parameters('frontDoorProfileName'), variables('ruleSetName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Cdn/profiles/ruleSets/rules",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}/{2}', parameters('frontDoorProfileName'), variables('ruleSetName'), 'avif')]",
+              "properties": {
+                "order": 6,
+                "conditions": [
+                  {
+                    "name": "UrlFileExtension",
+                    "parameters": {
+                      "typeName": "DeliveryRuleUrlFileExtensionMatchConditionParameters",
+                      "operator": "Equal",
+                      "negateCondition": false,
+                      "matchValues": [
+                        "avif"
+                      ],
+                      "transforms": [
+                        "Lowercase"
+                      ]
+                    }
+                  }
+                ],
+                "actions": [
+                  {
+                    "name": "ModifyResponseHeader",
+                    "parameters": {
+                      "typeName": "DeliveryRuleHeaderActionParameters",
+                      "headerAction": "Overwrite",
+                      "headerName": "Content-Type",
+                      "value": "image/avif"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/ruleSets', parameters('frontDoorProfileName'), variables('ruleSetName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Cdn/profiles/originGroups",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}', parameters('frontDoorProfileName'), variables('frontDoorOriginGroupName'))]",
+              "properties": {
+                "loadBalancingSettings": {
+                  "sampleSize": 4,
+                  "successfulSamplesRequired": 3
+                },
+                "healthProbeSettings": {
+                  "probePath": "/media/",
+                  "probeRequestType": "HEAD",
+                  "probeProtocol": "Https",
+                  "probeIntervalInSeconds": 100
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Cdn/profiles/originGroups/origins",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}/{2}', parameters('frontDoorProfileName'), variables('frontDoorOriginGroupName'), variables('frontDoorOriginName'))]",
+              "properties": {
+                "hostName": "[split(reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('storageAccountResourceGroup')), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2023-04-01').primaryEndpoints.blob, '/')[2]]",
+                "httpPort": 80,
+                "httpsPort": 443,
+                "originHostHeader": "[split(reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('storageAccountResourceGroup')), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2023-04-01').primaryEndpoints.blob, '/')[2]]",
+                "priority": 1,
+                "weight": 1000
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/originGroups', parameters('frontDoorProfileName'), variables('frontDoorOriginGroupName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Cdn/profiles/afdEndpoints/routes",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}/{2}', parameters('frontDoorProfileName'), variables('frontDoorEndpointName'), variables('frontDoorRouteName'))]",
+              "properties": {
+                "customDomains": [
+                  {
+                    "id": "[resourceId('Microsoft.Cdn/profiles/customDomains', parameters('frontDoorProfileName'), variables('customDomainResourceName'))]"
+                  }
+                ],
+                "originGroup": {
+                  "id": "[resourceId('Microsoft.Cdn/profiles/originGroups', parameters('frontDoorProfileName'), variables('frontDoorOriginGroupName'))]"
+                },
+                "ruleSets": [
+                  {
+                    "id": "[resourceId('Microsoft.Cdn/profiles/ruleSets', parameters('frontDoorProfileName'), variables('ruleSetName'))]"
+                  }
+                ],
+                "supportedProtocols": [
+                  "Http",
+                  "Https"
+                ],
+                "patternsToMatch": [
+                  "/uploads/*"
+                ],
+                "forwardingProtocol": "HttpsOnly",
+                "linkToDefaultDomain": "Enabled",
+                "httpsRedirect": "Enabled",
+                "originPath": "/media"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/customDomains', parameters('frontDoorProfileName'), variables('customDomainResourceName'))]",
+                "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', parameters('frontDoorProfileName'), variables('frontDoorEndpointName'))]",
+                "[resourceId('Microsoft.Cdn/profiles/originGroups/origins', parameters('frontDoorProfileName'), variables('frontDoorOriginGroupName'), variables('frontDoorOriginName'))]",
+                "[resourceId('Microsoft.Cdn/profiles/originGroups', parameters('frontDoorProfileName'), variables('frontDoorOriginGroupName'))]",
+                "[resourceId('Microsoft.Cdn/profiles/ruleSets', parameters('frontDoorProfileName'), variables('ruleSetName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Cdn/profiles/customDomains",
+              "apiVersion": "2024-02-01",
+              "name": "[format('{0}/{1}', parameters('frontDoorProfileName'), variables('customDomainResourceName'))]",
+              "properties": {
+                "hostName": "[variables('customDomainHost')]",
+                "tlsSettings": {
+                  "certificateType": "ManagedCertificate",
+                  "minimumTlsVersion": "TLS12"
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "frontDoorCustomDomainValidationToken": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Cdn/profiles/customDomains', parameters('frontDoorProfileName'), variables('customDomainResourceName')), '2024-02-01').validationProperties.validationToken]"
+            },
+            "frontDoorHostname": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Cdn/profiles/afdEndpoints', parameters('frontDoorProfileName'), variables('frontDoorEndpointName')), '2024-02-01').hostName]"
+            },
+            "frontDoorEndpointId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', parameters('frontDoorProfileName'), variables('frontDoorEndpointName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "storageAccountModule",
+        "websiteResourceGroup"
+      ]
+    },
+    "imagesDnsSettings": {
+      "condition": "[variables('isProd')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('imagesDnsSettingsDeploy-{0}', parameters('application'))]",
+      "subscriptionId": "[variables('sharedValues').subscriptionIds.xprtz]",
+      "resourceGroup": "[variables('sharedValues').resourceGroups.infrastructure]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "hostname": {
+            "value": "[parameters('imageHostname')]"
+          },
+          "frontDoorEndpointId": {
+            "value": "[reference('imagesFrontDoorSettings').outputs.frontDoorEndpointId.value]"
+          },
+          "frontDoorHostname": {
+            "value": "[reference('imagesFrontDoorSettings').outputs.frontDoorHostname.value]"
+          },
+          "validationToken": {
+            "value": {
+              "hostname": "[parameters('imageHostname')]",
+              "validationToken": "[reference('imagesFrontDoorSettings').outputs.frontDoorCustomDomainValidationToken.value]"
+            }
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.39.26.7824",
+              "templateHash": "9607504885755172534"
+            }
+          },
+          "definitions": {
+            "hostnameType": {
+              "type": "object",
+              "properties": {
+                "dnsZoneName": {
+                  "type": "string"
+                },
+                "hostname": {
+                  "type": "string"
+                }
+              },
+              "metadata": {
+                "__bicep_imported_from!": {
+                  "sourceTemplate": "../types.bicep"
+                }
+              }
+            },
+            "validationTokenType": {
+              "type": "object",
+              "properties": {
+                "hostname": {
+                  "$ref": "#/definitions/hostnameType"
+                },
+                "validationToken": {
+                  "type": "string"
+                }
+              },
+              "metadata": {
+                "__bicep_imported_from!": {
+                  "sourceTemplate": "../types.bicep"
+                }
+              }
+            }
+          },
+          "parameters": {
+            "hostname": {
+              "$ref": "#/definitions/hostnameType",
+              "metadata": {
+                "description": "The dns record details"
+              }
+            },
+            "frontDoorEndpointId": {
+              "type": "string",
+              "metadata": {
+                "description": "The ID of the Front Door endpoint to link the DNS records to."
+              }
+            },
+            "frontDoorHostname": {
+              "type": "string",
+              "metadata": {
+                "description": "The frontdoor hostname to be used for the DNS CNAME records."
+              }
+            },
+            "validationToken": {
+              "$ref": "#/definitions/validationTokenType",
+              "metadata": {
+                "description": "The validation token for DNS verification."
+              }
+            }
+          },
+          "resources": {
+            "dnsZone": {
+              "existing": true,
+              "type": "Microsoft.Network/dnsZones",
+              "apiVersion": "2023-07-01-preview",
+              "name": "[parameters('hostname').dnsZoneName]"
+            },
+            "apexRecord": {
+              "condition": "[empty(parameters('hostname').hostname)]",
+              "type": "Microsoft.Network/dnsZones/A",
+              "apiVersion": "2023-07-01-preview",
+              "name": "[format('{0}/{1}', parameters('hostname').dnsZoneName, '@')]",
+              "properties": {
+                "TTL": 3600,
+                "targetResource": {
+                  "id": "[parameters('frontDoorEndpointId')]"
+                }
+              }
+            },
+            "cnameRecord": {
+              "condition": "[not(empty(parameters('hostname').hostname))]",
+              "type": "Microsoft.Network/dnsZones/CNAME",
+              "apiVersion": "2023-07-01-preview",
+              "name": "[format('{0}/{1}', parameters('hostname').dnsZoneName, parameters('hostname').hostname)]",
+              "properties": {
+                "TTL": 3600,
+                "CNAMERecord": {
+                  "cname": "[parameters('frontDoorHostname')]"
+                }
+              }
+            },
+            "validationTxtRecordApex": {
+              "type": "Microsoft.Network/dnsZones/TXT",
+              "apiVersion": "2023-07-01-preview",
+              "name": "[format('{0}/{1}', parameters('hostname').dnsZoneName, if(empty(parameters('hostname').hostname), '_dnsauth', format('_dnsauth.{0}', parameters('hostname').hostname)))]",
+              "properties": {
+                "TTL": 3600,
+                "TXTRecords": [
+                  {
+                    "value": [
+                      "[parameters('validationToken').validationToken]"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "imagesFrontDoorSettings"
+      ]
+    }
+  },
+  "outputs": {
+    "storageAccountName": {
+      "type": "string",
+      "value": "[reference('storageAccountModule').outputs.storageAccountName.value]"
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "value": "[variables('resourceGroupName')]"
+    },
+    "applicationFqdn": {
+      "type": "string",
+      "value": "[if(variables('isProd'), format('https://{0}/', parameters('hostnames')[0].dnsZoneName), reference('storageAccountModule').outputs.storageAccountFqdn.value)]"
+    }
+  }
+}
