@@ -324,5 +324,5 @@ resource frontDoorCustomDomain 'Microsoft.Cdn/profiles/customDomains@2024-02-01'
 }
 
 output frontDoorCustomDomainValidationToken string = frontDoorCustomDomain.properties.validationProperties.validationToken
-output frontDoorCustomDomainHost string = frontDoorEndpoint.properties.hostName
+output frontDoorHostname string = frontDoorEndpoint.properties.hostName
 output frontDoorEndpointId string = frontDoorEndpoint.id

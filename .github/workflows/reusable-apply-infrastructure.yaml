@@ -47,9 +47,11 @@ jobs:
         with:
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          template: ./infrastructure/websiteDeploy.bicep
+          template: ./infrastructure/website.bicep
           deploymentName: deploy-${{ inputs.application }}
-          parameters: "resourceGroupSuffix=${{ env.GITHUB_REF_NAME_SLUG }} application=${{ inputs.application }}"
+          parameters: >-
+            ./infrastructure/dotnet.bicepparam
+            resourceGroupSuffix=${{ env.GITHUB_REF_NAME_SLUG }}
           region: westeurope
 
       - name: Comment Website FQDNs on Pull Requests
