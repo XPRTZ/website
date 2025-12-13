@@ -2,8 +2,6 @@
 type hostnameType = {
   dnsZoneName: string
   hostname: string
-//   subDomain: string
-//   fullDomain: string
 }
 
 @export()

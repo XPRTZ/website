@@ -13,7 +13,6 @@ param imageHostname hostnameType
 
 var isProd = endsWith(resourceGroupSuffix, 'main')
 
-
 var sharedValues = json(loadTextContent('shared-values.json'))
 var infrastructureResourceGroup = resourceGroup(
   sharedValues.subscriptionIds.xprtz,
@@ -29,7 +28,7 @@ resource websiteResourceGroup 'Microsoft.Resources/resourceGroups@2024-03-01' = 
 
 module storageAccountModule 'modules/storageAccount.bicep' = {
   scope: websiteResourceGroup
-  name: 'StorageAccountDeploy-${application}'
+  name: 'storageAccountDeploy-${application}'
   params: {
     app: application
   }
