@@ -2,7 +2,12 @@
 import type { GetStaticPaths } from "astro";
 import { fetchData, type Article, type Page as PageType } from "@xprtz/cms";
 import Layout from "../../../layouts/layout.astro";
-import { Container, Blogs } from "@xprtz/ui";
+import {
+  Container,
+  Blogs,
+  SEOTools,
+  generateWebsiteStructuredData,
+} from "@xprtz/ui";
 
 interface PageData {
   data: Article[];
@@ -44,6 +49,8 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
 };
 
 const site = import.meta.env.PUBLIC_SITE || "no-site-found";
+const siteUrl = Astro.site?.toString() || "https://xprtz.net";
+
 const articlesPages = await fetchData<Array<PageType>>({
   endpoint: "pages",
   wrappedByKey: "data",
@@ -55,14 +62,66 @@ const articlesPages = await fetchData<Array<PageType>>({
 });
 
 const { page } = Astro.props as { page: PageData };
-
 const articlesPage = articlesPages[0];
+
+// Generate pagination URLs
+const prevPageUrl = page.url.prev ? `${siteUrl}${page.url.prev}` : undefined;
+const nextPageUrl = page.url.next ? `${siteUrl}${page.url.next}` : undefined;
+
+// Generate structured data for the blog listing page
+const structuredData = generateWebsiteStructuredData({
+  name: `${articlesPage.title_website} - Pagina ${page.currentPage}`,
+  url: `${siteUrl}${page.url.current}`,
+  description: `${articlesPage.description} - Pagina ${page.currentPage} van ${page.lastPage}`,
+});
+
+// Generate breadcrumbs
+const breadcrumbs = [
+  { name: "Home", url: siteUrl },
+  { name: articlesPage.title_website, url: `${siteUrl}/artikelen/` },
+  ...(Number(page.currentPage) > 1
+    ? [
+        {
+          name: `Pagina ${page.currentPage}`,
+          url: `${siteUrl}${page.url.current}`,
+        },
+      ]
+    : []),
+];
+
+// Create page-specific title and description
+const pageTitle =
+  Number(page.currentPage) > 1
+    ? `${articlesPage.title_website} - Pagina ${page.currentPage}`
+    : articlesPage.title_website;
+
+const pageDescription =
+  Number(page.currentPage) > 1
+    ? `${articlesPage.description} - Pagina ${page.currentPage} van ${page.lastPage}`
+    : articlesPage.description;
 ---
 
 <Layout
-  title={articlesPage.title_website}
-  description={articlesPage.description}
+  title={pageTitle}
+  description={pageDescription}
+  type="website"
+  seoData={{
+    structuredData,
+    keywords: [
+      "articles",
+      "blog posts",
+      ".NET development",
+      "software engineering",
+      "programming tutorials",
+    ],
+  }}
 >
+  <SEOTools
+    prevPage={prevPageUrl}
+    nextPage={nextPageUrl}
+    breadcrumbs={breadcrumbs}
+  />
+
   <Container>
     <svg
       class="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]"
@@ -113,11 +172,11 @@ const articlesPage = articlesPages[0];
           <h1
             class="mt-2 text-pretty text-4xl font-semibold tracking-tight text-primary-800 sm:text-5xl"
           >
-            {articlesPage.title_website}
+            {pageTitle}
           </h1>
-          <p class="mt-6 text-xl/8">{articlesPage.description}</p>
+          <p class="mt-6 text-xl/8">{pageDescription}</p>
           <div class="mt-10 max-w-7xl text-base/7">
-            <Blogs page={page}/>
+            <Blogs page={page} />
           </div>
         </div>
       </div>
