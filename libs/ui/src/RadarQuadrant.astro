@@ -1,0 +1,191 @@
+---
+import type { RadarRing, RadarItem } from "@xprtz/cms";
+
+interface ItemWithNumber extends RadarItem {
+  number: number;
+}
+
+interface Props {
+  /**
+   * Which quadrant position (0: 0-90°, 1: 90-180°, 2: 180-270°, 3: 270-360°)
+   */
+  position: 0 | 1 | 2 | 3;
+
+  /**
+   * The color of the quadrant
+   */
+  color: string;
+
+  /**
+   * Size of the quadrant in pixels
+   */
+  size?: number;
+
+  /**
+   * Radar items to display in this quadrant
+   */
+  items?: ItemWithNumber[];
+}
+
+const { position, color, size = 400, items = [] } = Astro.props;
+
+// Define the four rings from center to outside
+const rings: { ring: RadarRing; radiusPercent: number }[] = [
+  { ring: "Adopt", radiusPercent: 25 },
+  { ring: "Trial", radiusPercent: 50 },
+  { ring: "Assess", radiusPercent: 75 },
+  { ring: "Hold", radiusPercent: 100 },
+];
+
+// Determine origin point based on quadrant position
+// Position 0 (0-90°): bottom-left corner
+// Position 1 (90-180°): bottom-right corner
+// Position 2 (180-270°): top-right corner
+// Position 3 (270-360°): top-left corner
+const origins = [
+  { x: 0, y: size },      // bottom-left
+  { x: size, y: size },   // bottom-right
+  { x: size, y: 0 },      // top-right
+  { x: 0, y: 0 },         // top-left
+];
+
+const origin = origins[position];
+
+// Generate SVG path for a quarter circle that fills the canvas
+const generateQuarterCirclePath = (radiusPercent: number): string => {
+  const radius = size * (radiusPercent / 100);
+
+  // Calculate end points based on position
+  // Position 0: arc from right (x+r, y) to top (x, y-r)
+  // Position 1: arc from left (x-r, y) to top (x, y-r)
+  // Position 2: arc from left (x-r, y) to bottom (x, y+r)
+  // Position 3: arc from right (x+r, y) to bottom (x, y+r)
+
+  const paths = [
+    // Position 0: bottom-left origin, arc goes right then up
+    `M ${origin.x} ${origin.y} L ${origin.x + radius} ${origin.y} A ${radius} ${radius} 0 0 0 ${origin.x} ${origin.y - radius} Z`,
+    // Position 1: bottom-right origin, arc goes left then up
+    `M ${origin.x} ${origin.y} L ${origin.x - radius} ${origin.y} A ${radius} ${radius} 0 0 1 ${origin.x} ${origin.y - radius} Z`,
+    // Position 2: top-right origin, arc goes left then down
+    `M ${origin.x} ${origin.y} L ${origin.x - radius} ${origin.y} A ${radius} ${radius} 0 0 0 ${origin.x} ${origin.y + radius} Z`,
+    // Position 3: top-left origin, arc goes right then down
+    `M ${origin.x} ${origin.y} L ${origin.x + radius} ${origin.y} A ${radius} ${radius} 0 0 1 ${origin.x} ${origin.y + radius} Z`,
+  ];
+
+  return paths[position];
+};
+
+// Circle radius for items (scaled for 20-30 items)
+const circleRadius = 12;
+
+// Function to get radius range for each ring
+const getRingRadiusRange = (ring: RadarRing): { min: number; max: number } => {
+  const ringData = rings.find(r => r.ring === ring);
+  if (!ringData) return { min: 0, max: size * 0.25 };
+
+  const index = rings.findIndex(r => r.ring === ring);
+  const minPercent = index > 0 ? rings[index - 1].radiusPercent : 0;
+  const maxPercent = ringData.radiusPercent;
+
+  return {
+    min: size * (minPercent / 100),
+    max: size * (maxPercent / 100)
+  };
+};
+
+// Position items within their rings using a simple grid-like distribution
+const positionedItems = items.map((item, index) => {
+  const { min, max } = getRingRadiusRange(item.ring);
+
+  // Use a pseudo-random but deterministic position based on item number
+  // This ensures consistent positioning across renders
+  const seed = item.number * 137.508; // Golden angle for better distribution
+  const angle = (seed % 90) * (Math.PI / 180); // Convert to radians within 90°
+
+  // Add some variation in radius within the ring
+  const radiusVariation = ((item.number * 73) % 100) / 100; // 0-1 range
+  const radius = min + (max - min) * (0.3 + radiusVariation * 0.6); // Use 30-90% of ring width
+
+  // Calculate position based on quadrant
+  let x: number, y: number;
+  if (position === 0) {
+    // Bottom-left origin: items spread in first quadrant (0-90°)
+    x = origin.x + radius * Math.cos(angle);
+    y = origin.y - radius * Math.sin(angle);
+  } else if (position === 1) {
+    // Bottom-right origin: items spread in second quadrant (90-180°)
+    x = origin.x - radius * Math.cos(angle);
+    y = origin.y - radius * Math.sin(angle);
+  } else if (position === 2) {
+    // Top-right origin: items spread in third quadrant (180-270°)
+    x = origin.x - radius * Math.cos(angle);
+    y = origin.y + radius * Math.sin(angle);
+  } else {
+    // Top-left origin: items spread in fourth quadrant (270-360°)
+    x = origin.x + radius * Math.cos(angle);
+    y = origin.y + radius * Math.sin(angle);
+  }
+
+  return { ...item, x, y };
+});
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox={`0 0 ${size} ${size}`}
+  class="radar-quadrant"
+>
+  <!-- Draw rings from outside to inside so inner rings appear on top -->
+  {rings.slice().reverse().map((ringData, index) => {
+    const actualIndex = rings.length - 1 - index;
+    // Calculate opacity based on ring position (inner rings lighter)
+    const opacity = 0.3 + (actualIndex * 0.15);
+
+    return (
+      <g>
+        <path
+          d={generateQuarterCirclePath(ringData.radiusPercent)}
+          fill={color}
+          fill-opacity={opacity}
+          stroke="white"
+          stroke-width="2"
+        />
+      </g>
+    );
+  })}
+
+  <!-- Draw items as numbered circles -->
+  {positionedItems.map((item) => (
+    <g class="radar-item">
+      <a href={`/technology-radar/${item.slug}`}>
+        <title>{item.number}. {item.title}</title>
+        <circle
+          cx={item.x}
+          cy={item.y}
+          r={circleRadius}
+          fill="white"
+          stroke={color}
+          stroke-width="2"
+          class="cursor-pointer hover:fill-gray-100 transition-colors"
+        />
+        <text
+          x={item.x}
+          y={item.y}
+          text-anchor="middle"
+          dominant-baseline="middle"
+          class="text-sm font-semibold pointer-events-none"
+          fill={color}
+        >
+          {item.number}
+        </text>
+      </a>
+    </g>
+  ))}
+</svg>
+
+<style>
+  .radar-quadrant {
+    display: block;
+  }
+</style>

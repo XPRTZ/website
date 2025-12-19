@@ -1,0 +1,99 @@
+---
+import RadarQuadrant from "./RadarQuadrant.astro";
+import type { RadarItem } from "@xprtz/cms";
+
+interface Props {
+  /**
+   * Array of radar items to display on the chart
+   */
+  items?: RadarItem[];
+
+  /**
+   * Size of each quadrant in pixels
+   */
+  quadrantSize?: number;
+}
+
+const { items = [], quadrantSize = 400 } = Astro.props;
+
+// Margin between quadrants
+const margin = 20;
+
+// Define colors for each quadrant
+const quadrantColors = {
+  "Techniques": "#3b82f6",           // blue
+  "Tools": "#10b981",                // green
+  "Platforms": "#f59e0b",            // amber
+  "Languages & Frameworks": "#ef4444" // red
+};
+
+// Add numbers to items and group by quadrant
+const itemsWithNumbers = items.map((item, index) => ({
+  ...item,
+  number: index + 1
+}));
+
+const itemsByQuadrant = {
+  "Techniques": itemsWithNumbers.filter(item => item.quadrant === "Techniques"),
+  "Tools": itemsWithNumbers.filter(item => item.quadrant === "Tools"),
+  "Platforms": itemsWithNumbers.filter(item => item.quadrant === "Platforms"),
+  "Languages & Frameworks": itemsWithNumbers.filter(item => item.quadrant === "Languages & Frameworks")
+};
+
+// Calculate total size
+const totalWidth = quadrantSize * 2 + margin;
+const totalHeight = quadrantSize * 2 + margin;
+---
+
+<div class="radar-chart-container" style={`width: ${totalWidth}px; height: ${totalHeight}px;`}>
+  <div class="grid grid-cols-2 grid-rows-2" style={`gap: ${margin}px;`}>
+    <!-- Top Left: Position 1 (90-180°) - Tools -->
+    <div class="flex justify-end items-end">
+      <RadarQuadrant
+        position={1}
+        color={quadrantColors["Tools"]}
+        size={quadrantSize}
+        items={itemsByQuadrant["Tools"]}
+      />
+    </div>
+
+    <!-- Top Right: Position 0 (0-90°) - Techniques -->
+    <div class="flex justify-start items-end">
+      <RadarQuadrant
+        position={0}
+        color={quadrantColors["Techniques"]}
+        size={quadrantSize}
+        items={itemsByQuadrant["Techniques"]}
+      />
+    </div>
+
+    <!-- Bottom Left: Position 2 (180-270°) - Platforms -->
+    <div class="flex justify-end items-start">
+      <RadarQuadrant
+        position={2}
+        color={quadrantColors["Platforms"]}
+        size={quadrantSize}
+        items={itemsByQuadrant["Platforms"]}
+      />
+    </div>
+
+    <!-- Bottom Right: Position 3 (270-360°) - Languages & Frameworks -->
+    <div class="flex justify-start items-start">
+      <RadarQuadrant
+        position={3}
+        color={quadrantColors["Languages & Frameworks"]}
+        size={quadrantSize}
+        items={itemsByQuadrant["Languages & Frameworks"]}
+      />
+    </div>
+  </div>
+</div>
+
+<style>
+  .radar-chart-container {
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>

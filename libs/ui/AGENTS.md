@@ -54,6 +54,10 @@ libs/ui/
 - [BlogListing.astro](src/BlogListing.astro) - Blog posts grid/list
 - [BlogCard.astro](src/BlogCard.astro) - Individual blog post card
 
+### Technology Radar Components
+- [RadarChart.astro](src/RadarChart.astro) - Technology radar visualization with four quadrants
+- [RadarQuadrant.astro](src/RadarQuadrant.astro) - Individual radar quadrant with concentric rings and items
+
 ### Utility Components
 - [LogoCloud.astro](src/LogoCloud.astro) - Client/partner logo display
 - [ComponentRenderer.astro](src/ComponentRenderer.astro) - **Dynamic component routing** (maps CMS `__component` to actual components)
@@ -357,6 +361,111 @@ Components like [TeamCarousel.astro](src/TeamCarousel.astro) use Embla Carousel:
     document.querySelectorAll(".embla").forEach(initEmblaCarousel);
   });
 </script>
+```
+
+## Technology Radar Pattern
+
+The Technology Radar components provide an interactive visualization of technology adoption:
+
+### RadarChart Component
+
+The main radar visualization that combines four quadrants into a complete circle.
+
+**Props:**
+- `items?: RadarItem[]` - Array of radar items from CMS
+- `quadrantSize?: number` - Size of each quadrant in pixels (default: 400)
+
+**Features:**
+- Automatically numbers items sequentially (starting at 1)
+- Distributes items to appropriate quadrants based on `item.quadrant` field
+- Uses predefined colors for each quadrant:
+  - **Techniques**: Blue (#3b82f6)
+  - **Tools**: Green (#10b981)
+  - **Platforms**: Amber (#f59e0b)
+  - **Languages & Frameworks**: Red (#ef4444)
+- 20px margin between quadrants for visual separation
+
+**Usage:**
+```astro
+import { RadarChart } from "@xprtz/ui";
+
+<RadarChart items={allRadarItems} quadrantSize={400} />
+```
+
+### RadarQuadrant Component
+
+Individual quadrant representing 90° of the radar (one quarter circle).
+
+**Props:**
+- `position: 0 | 1 | 2 | 3` - Quadrant position (0: 0-90°, 1: 90-180°, 2: 180-270°, 3: 270-360°)
+- `color: string` - Color for the quadrant
+- `size?: number` - Size in pixels (default: 400)
+- `items?: ItemWithNumber[]` - Radar items to display
+
+**Features:**
+- Four concentric rings representing adoption stages:
+  - **Adopt** (innermost, 25% radius)
+  - **Trial** (50% radius)
+  - **Assess** (75% radius)
+  - **Hold** (outermost, 100% radius)
+- Items displayed as numbered circles (12px radius)
+- Deterministic positioning using golden angle distribution
+- Interactive items with:
+  - SVG tooltips showing "{number}. {title}"
+  - Click to navigate to item detail page
+  - Hover effects (gray background on hover)
+- Origin point positioned at appropriate corner based on position
+
+**Item Positioning Algorithm:**
+- Items placed within their ring based on `item.ring` value
+- Pseudo-random but deterministic distribution using item number as seed
+- Golden angle (137.508°) for optimal spread
+- Radius variation within ring (30-90% of ring width) to reduce overlap
+- Optimized for 20-30 items per quadrant
+
+**Usage:**
+```astro
+import { RadarQuadrant } from "@xprtz/ui";
+
+<RadarQuadrant
+  position={0}
+  color="#3b82f6"
+  size={400}
+  items={itemsWithNumbers}
+/>
+```
+
+### RadarItem Type
+
+Items require the following structure:
+```typescript
+interface ItemWithNumber extends RadarItem {
+  number: number;          // Sequential number (1, 2, 3...)
+  title: string;           // Display title
+  slug: string;            // URL slug for detail page
+  ring: RadarRing;         // "Adopt" | "Trial" | "Assess" | "Hold"
+  quadrant: RadarQuadrant; // Quadrant name
+}
+```
+
+### Integration Example
+
+```astro
+---
+import { fetchData, type RadarItem } from "@xprtz/cms";
+import { RadarChart } from "@xprtz/ui";
+
+const allRadarItems = await fetchData<Array<RadarItem>>({
+  endpoint: "radar-items",
+  wrappedByKey: "data",
+  query: {
+    "populate[tags][fields][0]": "title",
+    status: "published",
+  },
+});
+---
+
+<RadarChart items={allRadarItems} />
 ```
 
 ## Important Notes

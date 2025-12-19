@@ -2,43 +2,11 @@
 import type { GetStaticPaths } from "astro";
 import { fetchData, type RadarItem, type Page as PageType } from "@xprtz/cms";
 import Layout from "../../../layouts/layout.astro";
-import { Container, RadarItems } from "@xprtz/ui";
+import { Container, RadarChart } from "@xprtz/ui";
 
-interface PageData {
-  data: RadarItem[];
-  start: number;
-  end: number;
-  size: number;
-  total: number;
-  currentPage: number;
-  lastPage: number;
-  url: Url;
-}
-
-interface Url {
-  current: string;
-  next: string;
-  prev: string;
-  first: string;
-  last: string;
-}
-
-export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
-  const radarItems = await fetchData<Array<RadarItem>>({
-    endpoint: "radar-items",
-    wrappedByKey: "data",
-    query: {
-      "populate[tags][fields][0]": "title",
-      status: "published",
-    },
-  });
-
-  // Return empty array if no items found to prevent build errors
-  if (!radarItems || radarItems.length === 0) {
-    return [];
-  }
-
-  return paginate(radarItems, { pageSize: 10 });
+export const getStaticPaths: GetStaticPaths = async () => {
+  // Generate a single page for the radar
+  return [{ params: { page: "1" } }];
 };
 
 const site = import.meta.env.PUBLIC_SITE || "no-site-found";
@@ -52,9 +20,17 @@ const radarPages = await fetchData<Array<PageType>>({
   },
 });
 
-const { page } = Astro.props as { page: PageData };
-
 const radarPage = radarPages[0];
+
+// Fetch all radar items for the chart
+const allRadarItems = await fetchData<Array<RadarItem>>({
+  endpoint: "radar-items",
+  wrappedByKey: "data",
+  query: {
+    "populate[tags][fields][0]": "title",
+    status: "published",
+  },
+});
 ---
 
 <Layout
@@ -114,8 +90,8 @@ const radarPage = radarPages[0];
             {radarPage.title_website}
           </h1>
           <p class="mt-6 text-xl/8">{radarPage.description}</p>
-          <div class="mt-10 max-w-7xl text-base/7">
-            <RadarItems page={page}/>
+          <div class="mt-10 flex justify-center">
+            <RadarChart items={allRadarItems} />
           </div>
         </div>
       </div>
