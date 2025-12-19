@@ -6,9 +6,13 @@ import { Page } from "@xprtz/ui";
 // Get the slug parameter from the URL
 const { slug } = Astro.params;
 
-// Check if the slug is exactly 'artikelen'
+// Check if the slug is exactly 'artikelen' or 'technology-radar'
 if (slug === 'artikelen') {
   return Astro.rewrite('/artikelen/page/1');
+}
+
+if (slug === 'technology-radar') {
+  return Astro.rewrite('/technology-radar/page/1');
 }
 
 export async function getStaticPaths() {
