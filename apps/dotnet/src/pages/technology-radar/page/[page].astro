@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from "astro";
 import { fetchData, type RadarItem, type Page as PageType } from "@xprtz/cms";
 import Layout from "../../../layouts/layout.astro";
-import { Container, RadarChart } from "@xprtz/ui";
+import { Container, RadarChart, ComponentRenderer } from "@xprtz/ui";
 
 export const getStaticPaths: GetStaticPaths = async () => {
   // Generate a single page for the radar
@@ -16,6 +16,7 @@ const radarPages = await fetchData<Array<PageType>>({
   query: {
     "filters[site][$eq]": site,
     "filters[slug][$eq]": "technology-radar",
+    "populate[components]": "*",
     status: "published",
   },
 });
@@ -92,6 +93,9 @@ const allRadarItems = await fetchData<Array<RadarItem>>({
           <p class="mt-6 text-xl/8">{radarPage.description}</p>
           <div class="mt-10 flex justify-center">
             <RadarChart items={allRadarItems} />
+          </div>
+          <div class="mt-16 max-w-7xl text-base/7">
+            <ComponentRenderer components={radarPage.components} />
           </div>
         </div>
       </div>
