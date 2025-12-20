@@ -58,11 +58,11 @@ const quadrantLabels = [
 ---
 
 <div class="radar-chart-container" style={`width: ${totalWidth}px; height: ${totalHeight}px;`}>
-  <div class="relative" style={`width: ${totalWidth}px; height: ${totalHeight}px;`}>
+  <div class="relative radar-chart" style={`width: ${totalWidth}px; height: ${totalHeight}px;`}>
     <!-- Quadrants Grid -->
     <div class="grid grid-cols-2 grid-rows-2" style={`gap: ${margin}px;`}>
     <!-- Top Left: Position 1 (90-180°) - Tools -->
-    <div class="flex justify-end items-end">
+    <div class="flex justify-end items-end quadrant-wrapper transition-opacity duration-300" data-quadrant="tools">
       <RadarQuadrant
         position={1}
         color={quadrantColors["Tools"]}
@@ -72,7 +72,7 @@ const quadrantLabels = [
     </div>
 
     <!-- Top Right: Position 0 (0-90°) - Techniques -->
-    <div class="flex justify-start items-end">
+    <div class="flex justify-start items-end quadrant-wrapper transition-opacity duration-300" data-quadrant="techniques">
       <RadarQuadrant
         position={0}
         color={quadrantColors["Techniques"]}
@@ -82,7 +82,7 @@ const quadrantLabels = [
     </div>
 
     <!-- Bottom Left: Position 2 (180-270°) - Platforms -->
-    <div class="flex justify-end items-start">
+    <div class="flex justify-end items-start quadrant-wrapper transition-opacity duration-300" data-quadrant="platforms">
       <RadarQuadrant
         position={2}
         color={quadrantColors["Platforms"]}
@@ -92,7 +92,7 @@ const quadrantLabels = [
     </div>
 
     <!-- Bottom Right: Position 3 (270-360°) - Languages & Frameworks -->
-    <div class="flex justify-start items-start">
+    <div class="flex justify-start items-start quadrant-wrapper transition-opacity duration-300" data-quadrant="frameworks">
       <RadarQuadrant
         position={3}
         color={quadrantColors["Languages & Frameworks"]}
@@ -139,22 +139,27 @@ const quadrantLabels = [
   </div>
 
   <!-- Quadrant Labels in Corners -->
-  {quadrantLabels.map((quadrant) => {
+  {quadrantLabels.map((quadrant, index) => {
     let positionStyle = "";
     let textAlign = "";
+    let quadrantKey = "";
 
     if (quadrant.position === "top-left") {
       positionStyle = `top: 0; left: 0;`;
       textAlign = "text-left";
+      quadrantKey = "tools";
     } else if (quadrant.position === "top-right") {
       positionStyle = `top: 0; right: 0;`;
       textAlign = "text-right";
+      quadrantKey = "techniques";
     } else if (quadrant.position === "bottom-left") {
       positionStyle = `bottom: 0; left: 0;`;
       textAlign = "text-left";
+      quadrantKey = "platforms";
     } else {
       positionStyle = `bottom: 0; right: 0;`;
       textAlign = "text-right";
+      quadrantKey = "frameworks";
     }
 
     // Get the color - need to handle the modified name with <br/>
@@ -162,7 +167,8 @@ const quadrantLabels = [
 
     return (
       <div
-        class={`absolute text-lg font-bold ${textAlign}`}
+        class={`absolute text-lg font-bold ${textAlign} quadrant-label transition-opacity duration-300`}
+        data-label-quadrant={quadrantKey}
         style={`${positionStyle} padding: 8px; color: ${quadrantColors[colorKey as keyof typeof quadrantColors]};`}
         set:html={quadrant.name}
       />
@@ -178,4 +184,65 @@ const quadrantLabels = [
     justify-content: center;
     align-items: center;
   }
+
+  .radar-chart.hovering .quadrant-wrapper {
+    opacity: 0.5;
+  }
+
+  .radar-chart.hovering .quadrant-wrapper.active {
+    opacity: 1;
+  }
+
+  .radar-chart.hovering .quadrant-label {
+    opacity: 0.5;
+  }
+
+  .radar-chart.hovering .quadrant-label.active {
+    opacity: 1;
+  }
 </style>
+
+<script>
+  const initRadarHover = () => {
+    const radarCharts = document.querySelectorAll(".radar-chart");
+
+    radarCharts.forEach((chart) => {
+      const quadrants = chart.querySelectorAll(".quadrant-wrapper");
+      const labels = chart.querySelectorAll(".quadrant-label");
+
+      quadrants.forEach((quadrant) => {
+        const quadrantKey = quadrant.getAttribute("data-quadrant");
+        const correspondingLabel = Array.from(labels).find(
+          (label) => label.getAttribute("data-label-quadrant") === quadrantKey
+        );
+
+        const handleMouseEnter = () => {
+          chart.classList.add("hovering");
+          quadrant.classList.add("active");
+          if (correspondingLabel) {
+            correspondingLabel.classList.add("active");
+          }
+        };
+
+        const handleMouseLeave = () => {
+          chart.classList.remove("hovering");
+          quadrant.classList.remove("active");
+          if (correspondingLabel) {
+            correspondingLabel.classList.remove("active");
+          }
+        };
+
+        quadrant.addEventListener("mouseenter", handleMouseEnter);
+        quadrant.addEventListener("mouseleave", handleMouseLeave);
+      });
+    });
+  };
+
+  // Initialize on page load
+  document.addEventListener("astro:page-load", initRadarHover);
+
+  // Also initialize immediately in case the event already fired
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initRadarHover();
+  }
+</script>
