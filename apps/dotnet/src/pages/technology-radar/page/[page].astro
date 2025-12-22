@@ -130,22 +130,16 @@ const allTags = Array.from(
     let selectedTag = null;
 
     const initTagFiltering = () => {
-      console.log('Initializing tag filtering...');
       const tagButtons = document.querySelectorAll('.tag-filter');
       const radarContainer = document.getElementById('radar-container');
 
-      console.log('Found tag buttons:', tagButtons.length);
-      console.log('Radar container:', radarContainer);
-
       if (!radarContainer) {
-        console.warn('Radar container not found!');
         return;
       }
 
       tagButtons.forEach(button => {
         button.addEventListener('click', () => {
           const tag = button.getAttribute('data-tag');
-          console.log('Tag clicked:', tag);
 
           // Toggle tag selection
           if (selectedTag === tag) {
@@ -177,46 +171,34 @@ const allTags = Array.from(
     };
 
     const filterRadarItems = (tag) => {
-      console.log('Filtering radar items by tag:', tag);
       const radarItems = document.querySelectorAll('.radar-item');
-      console.log('Found radar items:', radarItems.length);
-      console.log('All radar items data:', allRadarItems);
 
       radarItems.forEach((item, index) => {
         const link = item.querySelector('a');
         if (!link) {
-          console.warn('No link found in radar item', index);
           return;
         }
 
         const href = link.getAttribute('href');
         const slug = href?.replace('/technology-radar/', '');
-        console.log(`Item ${index}: href=${href}, slug=${slug}`);
 
         // Find the corresponding radar item data
         const itemData = allRadarItems.find(ri => ri.slug === slug);
 
         if (!itemData) {
-          console.warn('No data found for slug:', slug);
           return;
         }
-
-        console.log(`Item ${index} data:`, itemData.title, 'tags:', itemData.tags);
 
         if (!tag) {
           // Show all items
           item.setAttribute('style', 'transition: opacity 0.3s ease; opacity: 1; pointer-events: auto;');
-          console.log(`Showing item ${index}`);
         } else {
           // Check if item has the selected tag
           const hasTag = itemData.tags?.some(t => t.title === tag);
-          console.log(`Item ${index} has tag ${tag}:`, hasTag);
           if (hasTag) {
             item.setAttribute('style', 'transition: opacity 0.3s ease; opacity: 1; pointer-events: auto;');
-            console.log(`Showing item ${index}`);
           } else {
             item.setAttribute('style', 'transition: opacity 0.3s ease; opacity: 0.2; pointer-events: none;');
-            console.log(`Hiding item ${index}`);
           }
         }
       });

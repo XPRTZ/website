@@ -126,6 +126,10 @@ const positionedItems = items.map((item, index) => {
     y = origin.y + radius * Math.sin(angle);
   }
 
+  // Clamp positions to keep circles within SVG bounds (considering circle radius)
+  x = Math.max(circleRadius, Math.min(size - circleRadius, x));
+  y = Math.max(circleRadius, Math.min(size - circleRadius, y));
+
   return { ...item, x, y };
 });
 ---
@@ -135,6 +139,7 @@ const positionedItems = items.map((item, index) => {
   height={size}
   viewBox={`0 0 ${size} ${size}`}
   class="radar-quadrant"
+  style={`--quadrant-color: ${color};`}
 >
   <!-- Draw rings from outside to inside so inner rings appear on top -->
   {rings.slice().reverse().map((ringData, index) => {
@@ -167,15 +172,16 @@ const positionedItems = items.map((item, index) => {
           fill="white"
           stroke={color}
           stroke-width="2"
-          class="cursor-pointer hover:fill-gray-100 transition-colors"
+          class="cursor-pointer radar-item-circle transition-all"
         />
         <text
           x={item.x}
-          y={item.y}
+          y={item.y + 1}
           text-anchor="middle"
           dominant-baseline="middle"
           class="text-sm font-semibold pointer-events-none"
           fill={color}
+          style="font-family: system-ui, -apple-system, sans-serif;"
         >
           {item.number}
         </text>
@@ -187,5 +193,15 @@ const positionedItems = items.map((item, index) => {
 <style>
   .radar-quadrant {
     display: block;
+  }
+
+  .radar-item-circle {
+    transition: all 0.2s ease;
+  }
+
+  .radar-item:hover .radar-item-circle {
+    fill: color-mix(in srgb, var(--quadrant-color) 10%, white);
+    stroke-width: 3;
+    r: 14;
   }
 </style>
