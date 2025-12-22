@@ -21,6 +21,7 @@ import Quote from "./src/Quote.astro";
 import Blogs from "./src/Blogs.astro";
 import RadarQuadrant from "./src/RadarQuadrant.astro";
 import RadarChart from "./src/RadarChart.astro";
+import RadarQuadrantItemList from "./src/RadarQuadrantItemList.astro";
 
 import ComponentRenderer from "./src/ComponentRenderer.astro";
 
@@ -48,5 +49,6 @@ export {
   Blogs,
   RadarQuadrant,
   RadarChart,
+  RadarQuadrantItemList,
   ComponentRenderer
 };

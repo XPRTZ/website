@@ -1,5 +1,6 @@
 ---
 import RadarQuadrant from "./RadarQuadrant.astro";
+import RadarQuadrantItemList from "./RadarQuadrantItemList.astro";
 import type { RadarItem } from "@xprtz/cms";
 
 interface Props {
@@ -21,23 +22,25 @@ const margin = 20;
 
 // Define colors for each quadrant
 const quadrantColors = {
-  "Techniques": "#3b82f6",           // blue
-  "Tools": "#10b981",                // green
-  "Platforms": "#f59e0b",            // amber
-  "Languages & Frameworks": "#ef4444" // red
+  Techniques: "#3b82f6", // blue
+  Tools: "#10b981", // green
+  Platforms: "#f59e0b", // amber
+  "Languages & Frameworks": "#ef4444", // red
 };
 
 // Add numbers to items and group by quadrant
 const itemsWithNumbers = items.map((item, index) => ({
   ...item,
-  number: index + 1
+  number: index + 1,
 }));
 
 const itemsByQuadrant = {
-  "Techniques": itemsWithNumbers.filter(item => item.quadrant === "Techniques"),
-  "Tools": itemsWithNumbers.filter(item => item.quadrant === "Tools"),
-  "Platforms": itemsWithNumbers.filter(item => item.quadrant === "Platforms"),
-  "Languages & Frameworks": itemsWithNumbers.filter(item => item.quadrant === "Languages & Frameworks")
+  Techniques: itemsWithNumbers.filter((item) => item.quadrant === "Techniques"),
+  Tools: itemsWithNumbers.filter((item) => item.quadrant === "Tools"),
+  Platforms: itemsWithNumbers.filter((item) => item.quadrant === "Platforms"),
+  "Languages & Frameworks": itemsWithNumbers.filter(
+    (item) => item.quadrant === "Languages & Frameworks"
+  ),
 };
 
 // Calculate total size
@@ -57,129 +60,194 @@ const quadrantLabels = [
 ];
 ---
 
-<div class="radar-chart-container" style={`width: ${totalWidth}px; height: ${totalHeight}px;`}>
-  <div class="relative radar-chart" style={`width: ${totalWidth}px; height: ${totalHeight}px;`}>
-    <!-- Quadrants Grid -->
-    <div class="grid grid-cols-2 grid-rows-2" style={`gap: ${margin}px;`}>
-    <!-- Top Left: Position 1 (90-180°) - Tools -->
-    <div class="flex justify-end items-end quadrant-wrapper transition-opacity duration-300" data-quadrant="tools">
-      <RadarQuadrant
-        position={1}
-        color={quadrantColors["Tools"]}
-        size={quadrantSize}
-        items={itemsByQuadrant["Tools"]}
-      />
-    </div>
-
-    <!-- Top Right: Position 0 (0-90°) - Techniques -->
-    <div class="flex justify-start items-end quadrant-wrapper transition-opacity duration-300" data-quadrant="techniques">
-      <RadarQuadrant
-        position={0}
-        color={quadrantColors["Techniques"]}
-        size={quadrantSize}
-        items={itemsByQuadrant["Techniques"]}
-      />
-    </div>
-
-    <!-- Bottom Left: Position 2 (180-270°) - Platforms -->
-    <div class="flex justify-end items-start quadrant-wrapper transition-opacity duration-300" data-quadrant="platforms">
-      <RadarQuadrant
-        position={2}
-        color={quadrantColors["Platforms"]}
-        size={quadrantSize}
-        items={itemsByQuadrant["Platforms"]}
-      />
-    </div>
-
-    <!-- Bottom Right: Position 3 (270-360°) - Languages & Frameworks -->
-    <div class="flex justify-start items-start quadrant-wrapper transition-opacity duration-300" data-quadrant="frameworks">
-      <RadarQuadrant
-        position={3}
-        color={quadrantColors["Languages & Frameworks"]}
-        size={quadrantSize}
-        items={itemsByQuadrant["Languages & Frameworks"]}
-      />
-    </div>
-  </div>
-
-  <!-- Ring Labels - Horizontal (between Tools and Platforms - left side) -->
-  <div class="absolute left-0 flex justify-center items-center ring-labels transition-opacity duration-300" data-ring-labels="left" style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}>
-    {ringLabels.map((label, index) => {
-      const radius = quadrantSize * ringRadii[index];
-      const prevRadius = index > 0 ? quadrantSize * ringRadii[index - 1] : 0;
-      const ringCenter = prevRadius + (radius - prevRadius) / 2;
-
-      return (
+<div class="radar-chart-wrapper">
+  <div
+    class="radar-chart-container"
+    style={`width: ${totalWidth}px; height: ${totalHeight}px;`}
+  >
+    <div
+      class="relative radar-chart"
+      style={`width: ${totalWidth}px; height: ${totalHeight}px;`}
+    >
+      <!-- Quadrants Grid -->
+      <div class="grid grid-cols-2 grid-rows-2" style={`gap: ${margin}px;`}>
+        <!-- Top Left: Position 1 (90-180°) - Tools -->
         <div
-          class="absolute text-xs font-bold text-gray-600 flex items-center -translate-x-1/2"
-          style={`left: ${quadrantSize - ringCenter}px; height: ${margin}px;`}
+          class="flex justify-end items-end quadrant-wrapper transition-opacity duration-300"
+          data-quadrant="tools"
         >
-          {label}
+          <RadarQuadrant
+            position={1}
+            color={quadrantColors["Tools"]}
+            size={quadrantSize}
+            items={itemsByQuadrant["Tools"]}
+          />
         </div>
-      );
-    })}
-  </div>
 
-  <!-- Ring Labels - Horizontal (between Techniques and Languages & Frameworks - right side) -->
-  <div class="absolute right-0 flex justify-center items-center ring-labels transition-opacity duration-300" data-ring-labels="right" style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}>
-    {ringLabels.map((label, index) => {
-      const radius = quadrantSize * ringRadii[index];
-      const prevRadius = index > 0 ? quadrantSize * ringRadii[index - 1] : 0;
-      const ringCenter = prevRadius + (radius - prevRadius) / 2;
-
-      return (
+        <!-- Top Right: Position 0 (0-90°) - Techniques -->
         <div
-          class="absolute text-xs font-bold text-gray-600 flex items-center -translate-x-1/2"
-          style={`left: ${ringCenter}px; height: ${margin}px;`}
+          class="flex justify-start items-end quadrant-wrapper transition-opacity duration-300"
+          data-quadrant="techniques"
         >
-          {label}
+          <RadarQuadrant
+            position={0}
+            color={quadrantColors["Techniques"]}
+            size={quadrantSize}
+            items={itemsByQuadrant["Techniques"]}
+          />
         </div>
-      );
-    })}
-  </div>
 
-  <!-- Quadrant Labels in Corners -->
-  {quadrantLabels.map((quadrant, index) => {
-    let positionStyle = "";
-    let textAlign = "";
-    let quadrantKey = "";
+        <!-- Bottom Left: Position 2 (180-270°) - Platforms -->
+        <div
+          class="flex justify-end items-start quadrant-wrapper transition-opacity duration-300"
+          data-quadrant="platforms"
+        >
+          <RadarQuadrant
+            position={2}
+            color={quadrantColors["Platforms"]}
+            size={quadrantSize}
+            items={itemsByQuadrant["Platforms"]}
+          />
+        </div>
 
-    if (quadrant.position === "top-left") {
-      positionStyle = `top: 0; left: 0;`;
-      textAlign = "text-left";
-      quadrantKey = "tools";
-    } else if (quadrant.position === "top-right") {
-      positionStyle = `top: 0; right: 0;`;
-      textAlign = "text-right";
-      quadrantKey = "techniques";
-    } else if (quadrant.position === "bottom-left") {
-      positionStyle = `bottom: 0; left: 0;`;
-      textAlign = "text-left";
-      quadrantKey = "platforms";
-    } else {
-      positionStyle = `bottom: 0; right: 0;`;
-      textAlign = "text-right";
-      quadrantKey = "frameworks";
-    }
+        <!-- Bottom Right: Position 3 (270-360°) - Languages & Frameworks -->
+        <div
+          class="flex justify-start items-start quadrant-wrapper transition-opacity duration-300"
+          data-quadrant="frameworks"
+        >
+          <RadarQuadrant
+            position={3}
+            color={quadrantColors["Languages & Frameworks"]}
+            size={quadrantSize}
+            items={itemsByQuadrant["Languages & Frameworks"]}
+          />
+        </div>
+      </div>
 
-    // Get the color - need to handle the modified name with <br/>
-    const colorKey = quadrant.name.replace("<br/>", " ");
-
-    return (
+      <!-- Ring Labels - Horizontal (between Tools and Platforms - left side) -->
       <div
-        class={`absolute text-lg font-bold ${textAlign} quadrant-label transition-opacity duration-300`}
-        data-label-quadrant={quadrantKey}
-        style={`${positionStyle} padding: 8px; color: ${quadrantColors[colorKey as keyof typeof quadrantColors]};`}
-        set:html={quadrant.name}
-      />
-    );
-  })}
+        class="absolute left-0 flex justify-center items-center ring-labels transition-opacity duration-300"
+        data-ring-labels="left"
+        style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}
+      >
+        {
+          ringLabels.map((label, index) => {
+            const radius = quadrantSize * ringRadii[index];
+            const prevRadius =
+              index > 0 ? quadrantSize * ringRadii[index - 1] : 0;
+            const ringCenter = prevRadius + (radius - prevRadius) / 2;
+
+            return (
+              <div
+                class="absolute text-xs font-bold text-gray-600 flex items-center -translate-x-1/2"
+                style={`left: ${quadrantSize - ringCenter}px; height: ${margin}px;`}
+              >
+                {label}
+              </div>
+            );
+          })
+        }
+      </div>
+
+      <!-- Ring Labels - Horizontal (between Techniques and Languages & Frameworks - right side) -->
+      <div
+        class="absolute right-0 flex justify-center items-center ring-labels transition-opacity duration-300"
+        data-ring-labels="right"
+        style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}
+      >
+        {
+          ringLabels.map((label, index) => {
+            const radius = quadrantSize * ringRadii[index];
+            const prevRadius =
+              index > 0 ? quadrantSize * ringRadii[index - 1] : 0;
+            const ringCenter = prevRadius + (radius - prevRadius) / 2;
+
+            return (
+              <div
+                class="absolute text-xs font-bold text-gray-600 flex items-center -translate-x-1/2"
+                style={`left: ${ringCenter}px; height: ${margin}px;`}
+              >
+                {label}
+              </div>
+            );
+          })
+        }
+      </div>
+
+      <!-- Quadrant Labels in Corners -->
+      {
+        quadrantLabels.map((quadrant, index) => {
+          let positionStyle = "";
+          let textAlign = "";
+          let quadrantKey = "";
+
+          if (quadrant.position === "top-left") {
+            positionStyle = `top: 0; left: 0;`;
+            textAlign = "text-left";
+            quadrantKey = "tools";
+          } else if (quadrant.position === "top-right") {
+            positionStyle = `top: 0; right: 0;`;
+            textAlign = "text-right";
+            quadrantKey = "techniques";
+          } else if (quadrant.position === "bottom-left") {
+            positionStyle = `bottom: 0; left: 0;`;
+            textAlign = "text-left";
+            quadrantKey = "platforms";
+          } else {
+            positionStyle = `bottom: 0; right: 0;`;
+            textAlign = "text-right";
+            quadrantKey = "frameworks";
+          }
+
+          // Get the color - need to handle the modified name with <br/>
+          const colorKey = quadrant.name.replace("<br/>", " ");
+
+          return (
+            <div
+              class={`absolute text-lg font-bold ${textAlign} quadrant-label transition-opacity duration-300`}
+              data-label-quadrant={quadrantKey}
+              style={`${positionStyle} padding: 8px; color: ${quadrantColors[colorKey as keyof typeof quadrantColors]};`}
+              set:html={quadrant.name}
+            />
+          );
+        })
+      }
+    </div>
   </div>
+
+  <!-- Quadrant Item Lists (hidden by default) -->
+  <RadarQuadrantItemList
+    items={itemsByQuadrant["Tools"]}
+    quadrantName="Tools"
+    color={quadrantColors["Tools"]}
+  />
+  <RadarQuadrantItemList
+    items={itemsByQuadrant["Techniques"]}
+    quadrantName="Techniques"
+    color={quadrantColors["Techniques"]}
+  />
+  <RadarQuadrantItemList
+    items={itemsByQuadrant["Platforms"]}
+    quadrantName="Platforms"
+    color={quadrantColors["Platforms"]}
+  />
+  <RadarQuadrantItemList
+    items={itemsByQuadrant["Languages & Frameworks"]}
+    quadrantName="Languages & Frameworks"
+    color={quadrantColors["Languages & Frameworks"]}
+  />
 </div>
 
 <style>
+  .radar-chart-wrapper {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
   .radar-chart-container {
-    margin: 0 auto;
+    flex-shrink: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -217,33 +285,29 @@ const quadrantLabels = [
   .radar-chart.zoomed .quadrant-wrapper.zoomed-in {
     opacity: 1;
     pointer-events: auto;
-    transform: scale(2) translate(0, 0);
+    transform: scale(1.75) translate(0, 0);
     z-index: 10;
   }
 
   /* Position adjustments for each quadrant when zoomed */
   .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="tools"] {
-    transform: scale(2) translate(25%, 25%);
+    transform: scale(1.75) translate(25%, 25%);
   }
 
   .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="techniques"] {
-    transform: scale(2) translate(-25%, 25%);
+    transform: scale(1.75) translate(-25%, 25%);
   }
 
   .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="platforms"] {
-    transform: scale(2) translate(25%, -25%);
+    transform: scale(1.75) translate(25%, calc(-25% - 15px));
   }
 
   .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="frameworks"] {
-    transform: scale(2) translate(-25%, -25%);
+    transform: scale(1.75) translate(-25%, calc(-25% - 15px));
   }
 
   .radar-chart.zoomed .quadrant-label {
-    opacity: 0;
-  }
-
-  .radar-chart.zoomed .quadrant-label.zoomed-in {
-    opacity: 1;
+    display: none;
   }
 
   /* Ring labels positioning and transitions */
@@ -261,25 +325,25 @@ const quadrantLabels = [
   /* Show and transform ring labels for Tools quadrant (top-left) */
   .radar-chart.zoomed.zoom-tools .ring-labels[data-ring-labels="left"] {
     opacity: 1;
-    transform: scale(2) translate(25%, 205px);
+    transform: scale(1.75) translate(25%, 190px);
   }
 
   /* Show and transform ring labels for Platforms quadrant (bottom-left) */
   .radar-chart.zoomed.zoom-platforms .ring-labels[data-ring-labels="left"] {
     opacity: 1;
-    transform: scale(2) translate(25%, -205px);
+    transform: scale(1.75) translate(25%, -205px);
   }
 
   /* Show and transform ring labels for Techniques quadrant (top-right) */
   .radar-chart.zoomed.zoom-techniques .ring-labels[data-ring-labels="right"] {
     opacity: 1;
-    transform: scale(2) translate(-25%, 205px);
+    transform: scale(1.75) translate(-25%, 190px);
   }
 
   /* Show and transform ring labels for Frameworks quadrant (bottom-right) */
   .radar-chart.zoomed.zoom-frameworks .ring-labels[data-ring-labels="right"] {
     opacity: 1;
-    transform: scale(2) translate(-25%, -205px);
+    transform: scale(1.75) translate(-25%, -205px);
   }
 </style>
 
@@ -328,6 +392,10 @@ const quadrantLabels = [
     radarCharts.forEach((chart) => {
       const quadrants = chart.querySelectorAll(".quadrant-wrapper");
       const labels = chart.querySelectorAll(".quadrant-label");
+      const wrapper = chart.closest(".radar-chart-wrapper");
+
+      // Get all quadrant item lists in this wrapper
+      const itemLists = wrapper?.querySelectorAll(".quadrant-item-list");
 
       quadrants.forEach((quadrant) => {
         const quadrantKey = quadrant.getAttribute("data-quadrant");
@@ -350,15 +418,26 @@ const quadrantLabels = [
           const isCurrentlyZoomed = quadrant.classList.contains("zoomed-in");
 
           if (isCurrentlyZoomed) {
-            // Zoom out - remove all zoom classes
+            // Zoom out - remove all zoom classes and hide list
             chart.classList.remove("zoomed");
-            chart.classList.remove("zoom-tools", "zoom-techniques", "zoom-platforms", "zoom-frameworks");
+            chart.classList.remove(
+              "zoom-tools",
+              "zoom-techniques",
+              "zoom-platforms",
+              "zoom-frameworks"
+            );
             quadrants.forEach((q) => q.classList.remove("zoomed-in"));
             labels.forEach((l) => l.classList.remove("zoomed-in"));
+            itemLists?.forEach((list) => list.classList.add("hidden"));
           } else {
             // Zoom in - add zoom class to chart and this quadrant
             chart.classList.add("zoomed");
-            chart.classList.remove("zoom-tools", "zoom-techniques", "zoom-platforms", "zoom-frameworks");
+            chart.classList.remove(
+              "zoom-tools",
+              "zoom-techniques",
+              "zoom-platforms",
+              "zoom-frameworks"
+            );
             chart.classList.add(`zoom-${quadrantKey}`);
             quadrants.forEach((q) => q.classList.remove("zoomed-in"));
             labels.forEach((l) => l.classList.remove("zoomed-in"));
@@ -366,7 +445,40 @@ const quadrantLabels = [
             if (correspondingLabel) {
               correspondingLabel.classList.add("zoomed-in");
             }
+
+            // Show the corresponding item list
+            itemLists?.forEach((list) => {
+              const listQuadrant = list
+                .querySelector("h3")
+                ?.textContent?.trim();
+              const quadrantName =
+                quadrantKey === "frameworks"
+                  ? "Languages & Frameworks"
+                  : quadrantKey.charAt(0).toUpperCase() + quadrantKey.slice(1);
+              if (listQuadrant === quadrantName) {
+                list.classList.remove("hidden");
+              } else {
+                list.classList.add("hidden");
+              }
+            });
           }
+        });
+      });
+
+      // Handle back to radar button clicks
+      const backButtons = wrapper?.querySelectorAll(".back-to-radar");
+      backButtons?.forEach((button) => {
+        button.addEventListener("click", () => {
+          chart.classList.remove("zoomed");
+          chart.classList.remove(
+            "zoom-tools",
+            "zoom-techniques",
+            "zoom-platforms",
+            "zoom-frameworks"
+          );
+          quadrants.forEach((q) => q.classList.remove("zoomed-in"));
+          labels.forEach((l) => l.classList.remove("zoomed-in"));
+          itemLists?.forEach((list) => list.classList.add("hidden"));
         });
       });
     });
@@ -381,7 +493,10 @@ const quadrantLabels = [
   document.addEventListener("astro:page-load", initRadar);
 
   // Also initialize immediately in case the event already fired
-  if (document.readyState === "complete" || document.readyState === "interactive") {
+  if (
+    document.readyState === "complete" ||
+    document.readyState === "interactive"
+  ) {
     initRadar();
   }
 </script>
