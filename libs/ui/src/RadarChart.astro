@@ -103,7 +103,7 @@ const quadrantLabels = [
   </div>
 
   <!-- Ring Labels - Horizontal (between Tools and Platforms - left side) -->
-  <div class="absolute left-0 flex justify-center items-center" style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}>
+  <div class="absolute left-0 flex justify-center items-center ring-labels transition-opacity duration-300" data-ring-labels="left" style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}>
     {ringLabels.map((label, index) => {
       const radius = quadrantSize * ringRadii[index];
       const prevRadius = index > 0 ? quadrantSize * ringRadii[index - 1] : 0;
@@ -121,7 +121,7 @@ const quadrantLabels = [
   </div>
 
   <!-- Ring Labels - Horizontal (between Techniques and Languages & Frameworks - right side) -->
-  <div class="absolute right-0 flex justify-center items-center" style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}>
+  <div class="absolute right-0 flex justify-center items-center ring-labels transition-opacity duration-300" data-ring-labels="right" style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}>
     {ringLabels.map((label, index) => {
       const radius = quadrantSize * ringRadii[index];
       const prevRadius = index > 0 ? quadrantSize * ringRadii[index - 1] : 0;
@@ -200,6 +200,87 @@ const quadrantLabels = [
   .radar-chart.hovering .quadrant-label.active {
     opacity: 1;
   }
+
+  /* Zoom functionality */
+  .quadrant-wrapper {
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+    position: relative;
+  }
+
+  .radar-chart.zoomed .quadrant-wrapper {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .radar-chart.zoomed .quadrant-wrapper.zoomed-in {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(2) translate(0, 0);
+    z-index: 10;
+  }
+
+  /* Position adjustments for each quadrant when zoomed */
+  .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="tools"] {
+    transform: scale(2) translate(25%, 25%);
+  }
+
+  .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="techniques"] {
+    transform: scale(2) translate(-25%, 25%);
+  }
+
+  .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="platforms"] {
+    transform: scale(2) translate(25%, -25%);
+  }
+
+  .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="frameworks"] {
+    transform: scale(2) translate(-25%, -25%);
+  }
+
+  .radar-chart.zoomed .quadrant-label {
+    opacity: 0;
+  }
+
+  .radar-chart.zoomed .quadrant-label.zoomed-in {
+    opacity: 1;
+  }
+
+  /* Ring labels positioning and transitions */
+  .ring-labels {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+  }
+
+  /* Hide ring labels by default when zoomed */
+  .radar-chart.zoomed .ring-labels {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Show and transform ring labels for Tools quadrant (top-left) */
+  .radar-chart.zoomed.zoom-tools .ring-labels[data-ring-labels="left"] {
+    opacity: 1;
+    transform: scale(2) translate(25%, 205px);
+  }
+
+  /* Show and transform ring labels for Platforms quadrant (bottom-left) */
+  .radar-chart.zoomed.zoom-platforms .ring-labels[data-ring-labels="left"] {
+    opacity: 1;
+    transform: scale(2) translate(25%, -205px);
+  }
+
+  /* Show and transform ring labels for Techniques quadrant (top-right) */
+  .radar-chart.zoomed.zoom-techniques .ring-labels[data-ring-labels="right"] {
+    opacity: 1;
+    transform: scale(2) translate(-25%, 205px);
+  }
+
+  /* Show and transform ring labels for Frameworks quadrant (bottom-right) */
+  .radar-chart.zoomed.zoom-frameworks .ring-labels[data-ring-labels="right"] {
+    opacity: 1;
+    transform: scale(2) translate(-25%, -205px);
+  }
 </style>
 
 <script>
@@ -217,10 +298,13 @@ const quadrantLabels = [
         );
 
         const handleMouseEnter = () => {
-          chart.classList.add("hovering");
-          quadrant.classList.add("active");
-          if (correspondingLabel) {
-            correspondingLabel.classList.add("active");
+          // Only show hover effect if not zoomed
+          if (!chart.classList.contains("zoomed")) {
+            chart.classList.add("hovering");
+            quadrant.classList.add("active");
+            if (correspondingLabel) {
+              correspondingLabel.classList.add("active");
+            }
           }
         };
 
@@ -238,11 +322,66 @@ const quadrantLabels = [
     });
   };
 
+  const initRadarZoom = () => {
+    const radarCharts = document.querySelectorAll(".radar-chart");
+
+    radarCharts.forEach((chart) => {
+      const quadrants = chart.querySelectorAll(".quadrant-wrapper");
+      const labels = chart.querySelectorAll(".quadrant-label");
+
+      quadrants.forEach((quadrant) => {
+        const quadrantKey = quadrant.getAttribute("data-quadrant");
+        const correspondingLabel = Array.from(labels).find(
+          (label) => label.getAttribute("data-label-quadrant") === quadrantKey
+        );
+
+        quadrant.addEventListener("click", (e) => {
+          // Check if the click is on a radar item (link)
+          const target = e.target as HTMLElement;
+          if (target.closest("a")) {
+            // Let the link handle the click
+            return;
+          }
+
+          // Prevent the click from bubbling
+          e.stopPropagation();
+
+          // Toggle zoom state
+          const isCurrentlyZoomed = quadrant.classList.contains("zoomed-in");
+
+          if (isCurrentlyZoomed) {
+            // Zoom out - remove all zoom classes
+            chart.classList.remove("zoomed");
+            chart.classList.remove("zoom-tools", "zoom-techniques", "zoom-platforms", "zoom-frameworks");
+            quadrants.forEach((q) => q.classList.remove("zoomed-in"));
+            labels.forEach((l) => l.classList.remove("zoomed-in"));
+          } else {
+            // Zoom in - add zoom class to chart and this quadrant
+            chart.classList.add("zoomed");
+            chart.classList.remove("zoom-tools", "zoom-techniques", "zoom-platforms", "zoom-frameworks");
+            chart.classList.add(`zoom-${quadrantKey}`);
+            quadrants.forEach((q) => q.classList.remove("zoomed-in"));
+            labels.forEach((l) => l.classList.remove("zoomed-in"));
+            quadrant.classList.add("zoomed-in");
+            if (correspondingLabel) {
+              correspondingLabel.classList.add("zoomed-in");
+            }
+          }
+        });
+      });
+    });
+  };
+
+  const initRadar = () => {
+    initRadarHover();
+    initRadarZoom();
+  };
+
   // Initialize on page load
-  document.addEventListener("astro:page-load", initRadarHover);
+  document.addEventListener("astro:page-load", initRadar);
 
   // Also initialize immediately in case the event already fired
   if (document.readyState === "complete" || document.readyState === "interactive") {
-    initRadarHover();
+    initRadar();
   }
 </script>
