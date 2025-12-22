@@ -32,6 +32,15 @@ const allRadarItems = await fetchData<Array<RadarItem>>({
     status: "published",
   },
 });
+
+// Extract all unique tags from radar items
+const allTags = Array.from(
+  new Set(
+    allRadarItems
+      .flatMap(item => item.tags || [])
+      .map(tag => tag.title)
+  )
+).sort();
 ---
 
 <Layout
@@ -91,9 +100,22 @@ const allRadarItems = await fetchData<Array<RadarItem>>({
             {radarPage.title_website}
           </h1>
           <p class="mt-6 text-xl/8">{radarPage.description}</p>
-          <div class="mt-10 flex justify-center">
+          <div class="mt-10 flex justify-center" id="radar-container">
             <RadarChart items={allRadarItems} />
           </div>
+          {allTags.length > 0 && (
+            <div class="mt-10 flex flex-wrap justify-center gap-3" id="tag-filter-container">
+              {allTags.map((tag) => (
+                <button
+                  type="button"
+                  class="tag-filter inline-flex items-center rounded-xl bg-primary-100 px-4 py-1 text-sm/6 font-medium text-primary-700 hover:bg-primary-200 transition-colors cursor-pointer"
+                  data-tag={tag}
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          )}
           <div class="mt-16 max-w-7xl text-base/7">
             <ComponentRenderer components={radarPage.components} />
           </div>
@@ -102,3 +124,112 @@ const allRadarItems = await fetchData<Array<RadarItem>>({
     </div>
   </Container>
 </Layout>
+
+<script is:inline define:vars={{ allRadarItems }}>
+  (function() {
+    let selectedTag = null;
+
+    const initTagFiltering = () => {
+      console.log('Initializing tag filtering...');
+      const tagButtons = document.querySelectorAll('.tag-filter');
+      const radarContainer = document.getElementById('radar-container');
+
+      console.log('Found tag buttons:', tagButtons.length);
+      console.log('Radar container:', radarContainer);
+
+      if (!radarContainer) {
+        console.warn('Radar container not found!');
+        return;
+      }
+
+      tagButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const tag = button.getAttribute('data-tag');
+          console.log('Tag clicked:', tag);
+
+          // Toggle tag selection
+          if (selectedTag === tag) {
+            selectedTag = null;
+            // Reset all buttons
+            tagButtons.forEach(btn => {
+              btn.classList.remove('bg-primary-600', 'text-white');
+              btn.classList.add('bg-primary-100', 'text-primary-700');
+            });
+            // Show all items
+            filterRadarItems(null);
+          } else {
+            selectedTag = tag;
+            // Update button states
+            tagButtons.forEach(btn => {
+              if (btn.getAttribute('data-tag') === tag) {
+                btn.classList.remove('bg-primary-100', 'text-primary-700');
+                btn.classList.add('bg-primary-600', 'text-white');
+              } else {
+                btn.classList.remove('bg-primary-600', 'text-white');
+                btn.classList.add('bg-primary-100', 'text-primary-700');
+              }
+            });
+            // Filter items
+            filterRadarItems(tag);
+          }
+        });
+      });
+    };
+
+    const filterRadarItems = (tag) => {
+      console.log('Filtering radar items by tag:', tag);
+      const radarItems = document.querySelectorAll('.radar-item');
+      console.log('Found radar items:', radarItems.length);
+      console.log('All radar items data:', allRadarItems);
+
+      radarItems.forEach((item, index) => {
+        const link = item.querySelector('a');
+        if (!link) {
+          console.warn('No link found in radar item', index);
+          return;
+        }
+
+        const href = link.getAttribute('href');
+        const slug = href?.replace('/technology-radar/', '');
+        console.log(`Item ${index}: href=${href}, slug=${slug}`);
+
+        // Find the corresponding radar item data
+        const itemData = allRadarItems.find(ri => ri.slug === slug);
+
+        if (!itemData) {
+          console.warn('No data found for slug:', slug);
+          return;
+        }
+
+        console.log(`Item ${index} data:`, itemData.title, 'tags:', itemData.tags);
+
+        if (!tag) {
+          // Show all items
+          item.setAttribute('style', 'transition: opacity 0.3s ease; opacity: 1; pointer-events: auto;');
+          console.log(`Showing item ${index}`);
+        } else {
+          // Check if item has the selected tag
+          const hasTag = itemData.tags?.some(t => t.title === tag);
+          console.log(`Item ${index} has tag ${tag}:`, hasTag);
+          if (hasTag) {
+            item.setAttribute('style', 'transition: opacity 0.3s ease; opacity: 1; pointer-events: auto;');
+            console.log(`Showing item ${index}`);
+          } else {
+            item.setAttribute('style', 'transition: opacity 0.3s ease; opacity: 0.2; pointer-events: none;');
+            console.log(`Hiding item ${index}`);
+          }
+        }
+      });
+    };
+
+    // Initialize on page load
+    document.addEventListener('astro:page-load', initTagFiltering);
+
+    // Also initialize immediately in case the event already fired
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      initTagFiltering();
+    } else {
+      document.addEventListener('DOMContentLoaded', initTagFiltering);
+    }
+  })();
+</script>
