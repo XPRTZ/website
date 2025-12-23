@@ -241,9 +241,9 @@ const quadrantLabels = [
 <style>
   .radar-chart-wrapper {
     display: flex;
-    gap: 2rem;
     justify-content: center;
     align-items: flex-start;
+    position: relative;
   }
 
   .radar-chart-container {
@@ -251,6 +251,18 @@ const quadrantLabels = [
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .radar-chart-wrapper.list-visible .radar-chart-container {
+    transform: translateX(-200px);
+  }
+
+  /* Position item lists absolutely to prevent layout jump */
+  .radar-chart-wrapper :global(.quadrant-item-list) {
+    position: absolute;
+    left: calc(50% + 220px);
+    top: 0;
   }
 
   .radar-chart.hovering .quadrant-wrapper {
@@ -418,17 +430,25 @@ const quadrantLabels = [
           const isCurrentlyZoomed = quadrant.classList.contains("zoomed-in");
 
           if (isCurrentlyZoomed) {
-            // Zoom out - remove all zoom classes and hide list
-            chart.classList.remove("zoomed");
-            chart.classList.remove(
-              "zoom-tools",
-              "zoom-techniques",
-              "zoom-platforms",
-              "zoom-frameworks"
-            );
-            quadrants.forEach((q) => q.classList.remove("zoomed-in"));
-            labels.forEach((l) => l.classList.remove("zoomed-in"));
-            itemLists?.forEach((list) => list.classList.add("hidden"));
+            // Zoom out - hide list and slide wrapper back, then zoom out
+            itemLists?.forEach((list) => {
+              list.classList.remove("visible");
+            });
+            wrapper?.classList.remove("list-visible");
+
+            // Wait for list animation to complete before zooming out
+            setTimeout(() => {
+              chart.classList.remove("zoomed");
+              chart.classList.remove(
+                "zoom-tools",
+                "zoom-techniques",
+                "zoom-platforms",
+                "zoom-frameworks"
+              );
+              quadrants.forEach((q) => q.classList.remove("zoomed-in"));
+              labels.forEach((l) => l.classList.remove("zoomed-in"));
+              itemLists?.forEach((list) => list.classList.add("hidden"));
+            }, 400);
           } else {
             // Zoom in - add zoom class to chart and this quadrant
             chart.classList.add("zoomed");
@@ -446,21 +466,31 @@ const quadrantLabels = [
               correspondingLabel.classList.add("zoomed-in");
             }
 
-            // Show the corresponding item list
-            itemLists?.forEach((list) => {
-              const listQuadrant = list
-                .querySelector("h3")
-                ?.textContent?.trim();
-              const quadrantName =
-                quadrantKey === "frameworks"
-                  ? "Languages & Frameworks"
-                  : quadrantKey.charAt(0).toUpperCase() + quadrantKey.slice(1);
-              if (listQuadrant === quadrantName) {
-                list.classList.remove("hidden");
-              } else {
-                list.classList.add("hidden");
-              }
-            });
+            // Show the corresponding item list after zoom animation completes
+            setTimeout(() => {
+              // Slide wrapper and show list simultaneously
+              wrapper?.classList.add("list-visible");
+
+              itemLists?.forEach((list) => {
+                const listQuadrant = list
+                  .querySelector("h3")
+                  ?.textContent?.trim();
+                const quadrantName =
+                  quadrantKey === "frameworks"
+                    ? "Languages & Frameworks"
+                    : quadrantKey.charAt(0).toUpperCase() + quadrantKey.slice(1);
+                if (listQuadrant === quadrantName) {
+                  list.classList.remove("hidden");
+                  // Use requestAnimationFrame to ensure display:block is applied before animation
+                  requestAnimationFrame(() => {
+                    list.classList.add("visible");
+                  });
+                } else {
+                  list.classList.add("hidden");
+                  list.classList.remove("visible");
+                }
+              });
+            }, 500); // Wait for zoom animation (500ms) to complete
           }
         });
       });
@@ -469,16 +499,25 @@ const quadrantLabels = [
       const backButtons = wrapper?.querySelectorAll(".back-to-radar");
       backButtons?.forEach((button) => {
         button.addEventListener("click", () => {
-          chart.classList.remove("zoomed");
-          chart.classList.remove(
-            "zoom-tools",
-            "zoom-techniques",
-            "zoom-platforms",
-            "zoom-frameworks"
-          );
-          quadrants.forEach((q) => q.classList.remove("zoomed-in"));
-          labels.forEach((l) => l.classList.remove("zoomed-in"));
-          itemLists?.forEach((list) => list.classList.add("hidden"));
+          // Hide list and slide wrapper back simultaneously
+          itemLists?.forEach((list) => {
+            list.classList.remove("visible");
+          });
+          wrapper?.classList.remove("list-visible");
+
+          // Wait for list animation to complete before zooming out
+          setTimeout(() => {
+            chart.classList.remove("zoomed");
+            chart.classList.remove(
+              "zoom-tools",
+              "zoom-techniques",
+              "zoom-platforms",
+              "zoom-frameworks"
+            );
+            quadrants.forEach((q) => q.classList.remove("zoomed-in"));
+            labels.forEach((l) => l.classList.remove("zoomed-in"));
+            itemLists?.forEach((list) => list.classList.add("hidden"));
+          }, 400);
         });
       });
     });

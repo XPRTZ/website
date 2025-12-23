@@ -385,6 +385,10 @@ The main radar visualization that combines four quadrants into a complete circle
   - **Platforms**: Amber (#f59e0b)
   - **Languages & Frameworks**: Red (#ef4444)
 - 20px margin between quadrants for visual separation
+- Interactive zoom functionality with smooth animations (500ms duration)
+- Transform-based container slide (200px left) prevents layout reflow
+- List slides in from right after zoom completes
+- Synchronized animations create smooth push-effect without jumping
 
 **Usage:**
 ```astro
@@ -481,6 +485,9 @@ List view displaying all items within a selected quadrant, grouped by ring.
 - Scrollable list with sticky ring headers
 - "Back to radar" button to return to main view
 - Hidden by default, shown when quadrant is clicked
+- Smooth slide-in animation from right (400ms duration)
+- Appears after quadrant zoom animation completes (500ms delay)
+- Coordinated slide-out animation when zooming out
 
 ### Integration Example
 
