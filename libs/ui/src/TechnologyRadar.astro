@@ -113,7 +113,8 @@ const allTags = Array.from(
         }
 
         const href = link.getAttribute("href");
-        const slug = href?.replace("/expertise/", "");
+        // Extract slug from URL (handle both /radar-items/slug and /radar-items/slug?from=...)
+        const slug = href?.split('?')[0].replace("/radar-items/", "");
 
         // Find the corresponding radar item data
         const itemData = allRadarItems.find((ri) => ri.slug === slug);
