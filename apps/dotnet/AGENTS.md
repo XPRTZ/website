@@ -324,6 +324,14 @@ The technology radar is now a CMS-driven component that can be added to any page
 - It renders the `RadarChart` with all items
 - It includes tag filtering functionality
 - The component can be placed on any CMS-managed page
+- Automatically tracks the current page URL for back navigation from radar items
+
+**Back Navigation:**
+When a user clicks on a radar item from the technology radar:
+1. The item page URL includes a `?from={page-slug}` query parameter
+2. The radar item page reads this parameter to create a dynamic back link
+3. Shows "Terug naar radar" that links to the parent page if the parameter exists
+4. If no parameter exists, defaults to `/expertise` (backwards compatibility)
 
 ### Pagination Pattern
 
