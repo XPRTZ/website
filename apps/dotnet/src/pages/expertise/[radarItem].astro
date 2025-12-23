@@ -30,13 +30,27 @@ const radarItem: RadarItem = Astro.props;
 
 // Define colors for each quadrant (matching RadarChart)
 const quadrantColors = {
-  "Techniques": "#3b82f6",           // blue
-  "Tools": "#10b981",                // green
-  "Platforms": "#f59e0b",            // amber
-  "Languages & Frameworks": "#ef4444" // red
+  Techniques: "#3b82f6", // blue
+  Tools: "#10b981", // green
+  Platforms: "#f59e0b", // amber
+  "Languages & Frameworks": "#ef4444", // red
 };
 
-const quadrantColor = quadrantColors[radarItem.quadrant as keyof typeof quadrantColors] || "#3b82f6";
+// Dutch translations for quadrant names
+const quadrantTranslations = {
+  Techniques: "Technieken",
+  Tools: "Tools",
+  Platforms: "Platformen",
+  "Languages & Frameworks": "Talen & Frameworks",
+};
+
+const quadrantColor =
+  quadrantColors[radarItem.quadrant as keyof typeof quadrantColors] ||
+  "#3b82f6";
+const quadrantDisplayName =
+  quadrantTranslations[
+    radarItem.quadrant as keyof typeof quadrantTranslations
+  ] || radarItem.quadrant;
 ---
 
 <Layout title={radarItem.title} description={radarItem.description}>
@@ -82,106 +96,179 @@ const quadrantColor = quadrantColors[radarItem.quadrant as keyof typeof quadrant
 
     <div class="overflow-hidden">
       <div class="mx-auto max-w-7xl px-6 pt-20 sm:pt-32 lg:px-8 lg:pt-16">
-        <div class="mx-auto max-w-2xl gap-x-14 lg:mx-0 lg:max-w-none lg:items-center">
+        <div
+          class="mx-auto max-w-2xl gap-x-14 lg:mx-0 lg:max-w-none lg:items-center"
+        >
           <div class="mx-auto lg:mx-0">
-      <p class="text-base/7 font-semibold text-primary-600">Technology Radar</p>
-      <h1 class="mt-2 text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
-        {radarItem.title}
-      </h1>
+            <p class="text-base/7 font-semibold text-primary-600">
+              Technology Radar
+            </p>
+            <h1
+              class="mt-2 text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
+            >
+              {radarItem.title}
+            </h1>
 
-      <div class="mt-4">
-        <div class="mr-4 inline-flex">
-          <span class="inline-flex items-center rounded-xl px-4 py-1 text-sm/6 font-medium" style={`background-color: ${quadrantColor}20; color: ${quadrantColor};`}>
-            {radarItem.quadrant}
-          </span>
-        </div>
-        <div class="inline-flex">
-          <span class="inline-flex items-center rounded-xl bg-gray-100 px-4 py-1 text-sm/6 font-medium text-gray-700">
-            {radarItem.ring}
-          </span>
-        </div>
-      </div>
-
-      {radarItem.tags && radarItem.tags.length > 0 && (
-        <div class="mt-4">
-          {radarItem.tags.map((tag) => (
-            <div class="mr-4 inline-flex">
-              <span class="inline-flex items-center rounded-xl bg-primary-100 px-4 py-1 text-sm/6 font-medium text-primary-700">
-                #{tag.title}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <p class="mt-6 text-lg/8">
-        {radarItem.description}
-      </p>
-
-      {(radarItem.pros && radarItem.pros.length > 0) || (radarItem.cons && radarItem.cons.length > 0) ? (
-        <div class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {radarItem.pros && radarItem.pros.length > 0 && (
-            <div class="rounded-lg bg-green-50 p-6">
-              <div class="flex items-center gap-3">
-                <svg class="size-8 text-green-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clip-rule="evenodd" />
-                </svg>
-                <h2 class="text-2xl font-bold tracking-tight text-green-900">Voordelen</h2>
+            <div class="mt-4">
+              <div class="mr-4 inline-flex">
+                <span
+                  class="inline-flex items-center rounded-xl px-4 py-1 text-sm/6 font-medium"
+                  style={`background-color: ${quadrantColor}20; color: ${quadrantColor};`}
+                >
+                  {quadrantDisplayName}
+                </span>
               </div>
-              <ul class="mt-4 space-y-4">
-                {radarItem.pros.map((pro) => (
-                  <li class="flex gap-x-3">
-                    <svg class="mt-1 size-5 flex-none text-green-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clip-rule="evenodd" />
-                    </svg>
-                    <div>
-                      <strong class="font-semibold text-gray-900">{pro.title.charAt(0).toUpperCase() + pro.title.slice(1)}:</strong> {pro.description.charAt(0).toUpperCase() + pro.description.slice(1)}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {radarItem.cons && radarItem.cons.length > 0 && (
-            <div class="rounded-lg bg-red-50 p-6">
-              <div class="flex items-center gap-3">
-                <svg class="size-8 text-red-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z" clip-rule="evenodd" />
-                </svg>
-                <h2 class="text-2xl font-bold tracking-tight text-red-900">Nadelen</h2>
+              <div class="inline-flex">
+                <span
+                  class="inline-flex items-center rounded-xl bg-gray-100 px-4 py-1 text-sm/6 font-medium text-gray-700"
+                >
+                  {radarItem.ring}
+                </span>
               </div>
-              <ul class="mt-4 space-y-4">
-                {radarItem.cons.map((con) => (
-                  <li class="flex gap-x-3">
-                    <svg class="mt-1 size-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z" clip-rule="evenodd" />
-                    </svg>
-                    <div>
-                      <strong class="font-semibold text-gray-900">{con.title.charAt(0).toUpperCase() + con.title.slice(1)}:</strong> {con.description.charAt(0).toUpperCase() + con.description.slice(1)}
-                    </div>
-                  </li>
-                ))}
-              </ul>
             </div>
-          )}
-        </div>
-      ) : null}
 
-      {radarItem.conclusion && (
-        <div class="mt-10">
-          <h2 class="text-2xl font-bold tracking-tight text-gray-900">Conclusie</h2>
-          <p class="mt-4 text-base/7">
-            {radarItem.conclusion}
-          </p>
-        </div>
-      )}
+            {
+              radarItem.tags && radarItem.tags.length > 0 && (
+                <div class="mt-4">
+                  {radarItem.tags.map((tag) => (
+                    <div class="mr-4 inline-flex">
+                      <span class="inline-flex items-center rounded-xl bg-primary-100 px-4 py-1 text-sm/6 font-medium text-primary-700">
+                        #{tag.title}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )
+            }
 
-      <div class="mt-10">
-        <a href="/technology-radar/page/1" class="text-base/7 font-semibold text-primary-600 hover:text-primary-500">
-          &larr; Terug naar Technology Radar
-        </a>
-      </div>
+            <p class="mt-6 text-lg/8">
+              {radarItem.description}
+            </p>
+
+            {
+              (radarItem.pros && radarItem.pros.length > 0) ||
+              (radarItem.cons && radarItem.cons.length > 0) ? (
+                <div class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  {radarItem.pros && radarItem.pros.length > 0 && (
+                    <div class="rounded-lg bg-green-50 p-6">
+                      <div class="flex items-center gap-3">
+                        <svg
+                          class="size-8 text-green-600"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        <h2 class="text-2xl font-bold tracking-tight text-green-900">
+                          Voordelen
+                        </h2>
+                      </div>
+                      <ul class="mt-4 space-y-4">
+                        {radarItem.pros.map((pro) => (
+                          <li class="flex gap-x-3">
+                            <svg
+                              class="mt-1 size-5 flex-none text-green-600"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              aria-hidden="true"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z"
+                                clip-rule="evenodd"
+                              />
+                            </svg>
+                            <div>
+                              <strong class="font-semibold text-gray-900">
+                                {pro.title.charAt(0).toUpperCase() +
+                                  pro.title.slice(1)}
+                                :
+                              </strong>{" "}
+                              {pro.description.charAt(0).toUpperCase() +
+                                pro.description.slice(1)}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {radarItem.cons && radarItem.cons.length > 0 && (
+                    <div class="rounded-lg bg-red-50 p-6">
+                      <div class="flex items-center gap-3">
+                        <svg
+                          class="size-8 text-red-600"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        <h2 class="text-2xl font-bold tracking-tight text-red-900">
+                          Nadelen
+                        </h2>
+                      </div>
+                      <ul class="mt-4 space-y-4">
+                        {radarItem.cons.map((con) => (
+                          <li class="flex gap-x-3">
+                            <svg
+                              class="mt-1 size-5 flex-none text-red-600"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              aria-hidden="true"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z"
+                                clip-rule="evenodd"
+                              />
+                            </svg>
+                            <div>
+                              <strong class="font-semibold text-gray-900">
+                                {con.title.charAt(0).toUpperCase() +
+                                  con.title.slice(1)}
+                                :
+                              </strong>{" "}
+                              {con.description.charAt(0).toUpperCase() +
+                                con.description.slice(1)}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ) : null
+            }
+
+            {
+              radarItem.conclusion && (
+                <div class="mt-10">
+                  <h2 class="text-2xl font-bold tracking-tight text-gray-900">
+                    Conclusie
+                  </h2>
+                  <p class="mt-4 text-base/7">{radarItem.conclusion}</p>
+                </div>
+              )
+            }
+
+            <div class="mt-10">
+              <a
+                href="/expertise"
+                class="text-base/7 font-semibold text-primary-600 hover:text-primary-500"
+              >
+                &larr; Terug naar Expertise
+              </a>
+            </div>
           </div>
         </div>
       </div>

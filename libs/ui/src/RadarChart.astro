@@ -28,6 +28,14 @@ const quadrantColors = {
   "Languages & Frameworks": "#ef4444", // red
 };
 
+// Dutch translations for quadrant names
+const quadrantTranslations = {
+  Techniques: "Technieken",
+  Tools: "Tools",
+  Platforms: "Platformen",
+  "Languages & Frameworks": "Talen & Frameworks",
+};
+
 // Add numbers to items and group by quadrant
 const itemsWithNumbers: RadarItemWithNumber[] = items.map((item, index) => ({
   ...item,
@@ -53,10 +61,10 @@ const ringRadii = [0.25, 0.5, 0.75, 1.0]; // Percentages of quadrant size
 
 // Quadrant labels and their positions
 const quadrantLabels = [
-  { name: "Tools", position: "top-left" },
-  { name: "Techniques", position: "top-right" },
-  { name: "Platforms", position: "bottom-left" },
-  { name: "Languages &<br/>Frameworks", position: "bottom-right" },
+  { name: "Tools", displayName: "Tools", position: "top-left" },
+  { name: "Techniques", displayName: "Technieken", position: "top-right" },
+  { name: "Platforms", displayName: "Platformen", position: "bottom-left" },
+  { name: "Languages & Frameworks", displayName: "Talen &<br/>Frameworks", position: "bottom-right" },
 ];
 ---
 
@@ -199,15 +207,15 @@ const quadrantLabels = [
             quadrantKey = "frameworks";
           }
 
-          // Get the color - need to handle the modified name with <br/>
-          const colorKey = quadrant.name.replace("<br/>", " ");
+          // Get the color using the name property
+          const colorKey = quadrant.name;
 
           return (
             <div
               class={`absolute text-lg font-bold ${textAlign} quadrant-label transition-opacity duration-300`}
               data-label-quadrant={quadrantKey}
               style={`${positionStyle} padding: 8px; color: ${quadrantColors[colorKey as keyof typeof quadrantColors]};`}
-              set:html={quadrant.name}
+              set:html={quadrant.displayName}
             />
           );
         })
@@ -218,22 +226,22 @@ const quadrantLabels = [
   <!-- Quadrant Item Lists (hidden by default) -->
   <RadarQuadrantItemList
     items={itemsByQuadrant["Tools"]}
-    quadrantName="Tools"
+    quadrantName={quadrantTranslations["Tools"]}
     color={quadrantColors["Tools"]}
   />
   <RadarQuadrantItemList
     items={itemsByQuadrant["Techniques"]}
-    quadrantName="Techniques"
+    quadrantName={quadrantTranslations["Techniques"]}
     color={quadrantColors["Techniques"]}
   />
   <RadarQuadrantItemList
     items={itemsByQuadrant["Platforms"]}
-    quadrantName="Platforms"
+    quadrantName={quadrantTranslations["Platforms"]}
     color={quadrantColors["Platforms"]}
   />
   <RadarQuadrantItemList
     items={itemsByQuadrant["Languages & Frameworks"]}
-    quadrantName="Languages & Frameworks"
+    quadrantName={quadrantTranslations["Languages & Frameworks"]}
     color={quadrantColors["Languages & Frameworks"]}
   />
 </div>
@@ -475,10 +483,14 @@ const quadrantLabels = [
                 const listQuadrant = list
                   .querySelector("h3")
                   ?.textContent?.trim();
-                const quadrantName =
-                  quadrantKey === "frameworks"
-                    ? "Languages & Frameworks"
-                    : quadrantKey.charAt(0).toUpperCase() + quadrantKey.slice(1);
+                // Map quadrant keys to Dutch names
+                const quadrantNameMap: Record<string, string> = {
+                  tools: "Tools",
+                  techniques: "Technieken",
+                  platforms: "Platformen",
+                  frameworks: "Talen & Frameworks",
+                };
+                const quadrantName = quadrantNameMap[quadrantKey] || "";
                 if (listQuadrant === quadrantName) {
                   list.classList.remove("hidden");
                   // Use requestAnimationFrame to ensure display:block is applied before animation

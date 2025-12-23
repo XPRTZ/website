@@ -163,7 +163,7 @@ const positionedItems = items.map((item, index) => {
   <!-- Draw items as numbered circles -->
   {positionedItems.map((item) => (
     <g class="radar-item" style="transition: opacity 0.3s ease;">
-      <a href={`/technology-radar/${item.slug}`}>
+      <a href={`/expertise/${item.slug}`}>
         <title>{item.number}. {item.title}</title>
         <circle
           cx={item.x}
