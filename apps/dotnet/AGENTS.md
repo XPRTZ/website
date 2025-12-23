@@ -21,10 +21,14 @@ apps/dotnet/
 │   │   ├── index.astro          # Homepage
 │   │   ├── [slug].astro         # Dynamic pages
 │   │   ├── 404.astro            # Not found page
-│   │   └── artikelen/           # Blog section
-│   │       ├── [article].astro      # Individual article
+│   │   ├── artikelen/           # Blog section
+│   │   │   ├── [article].astro      # Individual article
+│   │   │   └── page/
+│   │   │       └── [page].astro     # Paginated article list
+│   │   └── expertise/           # Technology expertise radar
+│   │       ├── [radarItem].astro    # Individual radar item
 │   │       └── page/
-│   │           └── [page].astro     # Paginated article list
+│   │           └── [page].astro     # Radar overview page
 │   ├── env.d.ts         # Environment type definitions
 │   └── assets/          # Static assets (images, etc.)
 ├── public/              # Public static files
@@ -112,6 +116,8 @@ export default defineConfig({
 - `/{slug}` → [pages/[slug].astro](src/pages/[slug].astro) - Generic pages
 - `/artikelen/{article}` → [pages/artikelen/[article].astro](src/pages/artikelen/[article].astro) - Individual articles
 - `/artikelen/page/{page}` → [pages/artikelen/page/[page].astro](src/pages/artikelen/page/[page].astro) - Paginated article list
+- `/expertise/{radarItem}` → [pages/expertise/[radarItem].astro](src/pages/expertise/[radarItem].astro) - Individual radar items
+- `/expertise/page/{page}` → [pages/expertise/page/[page].astro](src/pages/expertise/page/[page].astro) - Radar overview page
 
 ### Static Path Generation
 
@@ -273,6 +279,68 @@ const article: Article = Astro.props;
 </Layout>
 ```
 
+### Radar Item Pattern
+
+File: [src/pages/expertise/[radarItem].astro](src/pages/expertise/[radarItem].astro)
+
+```astro
+---
+import { fetchData, type RadarItem } from '@xprtz/cms';
+
+export async function getStaticPaths() {
+  const radarItems = await fetchData<Array<RadarItem>>({
+    endpoint: "radar-items",
+    wrappedByKey: "data",
+    query: {
+      "populate[pros]": "*",
+      "populate[cons]": "*",
+      "populate[tags][fields][0]": "title",
+      status: "published",
+    },
+  });
+
+  return radarItems.map((item) => ({
+    params: { radarItem: item.slug },
+    props: item,
+  }));
+}
+
+const radarItem: RadarItem = Astro.props;
+---
+
+<Layout title={radarItem.title} description={radarItem.description}>
+  <!-- Radar item content -->
+</Layout>
+```
+
+### Radar Overview Pattern
+
+File: [src/pages/expertise/page/[page].astro](src/pages/expertise/page/[page].astro)
+
+```astro
+---
+import { fetchData, type RadarItem, type Page as PageType } from '@xprtz/cms';
+import { RadarChart } from '@xprtz/ui';
+
+export const getStaticPaths = async () => {
+  return [{ params: { page: "1" } }];
+};
+
+const radarItems = await fetchData<Array<RadarItem>>({
+  endpoint: "radar-items",
+  wrappedByKey: "data",
+  query: {
+    "populate[tags][fields][0]": "title",
+    status: "published",
+  },
+});
+---
+
+<Layout title="Expertise" description="...">
+  <RadarChart items={radarItems} />
+</Layout>
+```
+
 ### Pagination Pattern
 
 File: [src/pages/artikelen/page/[page].astro](src/pages/artikelen/page/[page].astro)
@@ -342,6 +410,20 @@ const articles = await fetchData<Array<Article>>({
     "populate[authors][populate][avatar][fields][0]": "url",
     "populate[image][fields][0]": "url",
     "populate[tags][fields][0]": "name",
+    status: "published",
+  },
+});
+```
+
+### Fetch Radar Items
+```typescript
+const radarItems = await fetchData<Array<RadarItem>>({
+  endpoint: "radar-items",
+  wrappedByKey: "data",
+  query: {
+    "populate[pros]": "*",
+    "populate[cons]": "*",
+    "populate[tags][fields][0]": "title",
     status: "published",
   },
 });

@@ -15,7 +15,7 @@ const radarPages = await fetchData<Array<PageType>>({
   wrappedByKey: "data",
   query: {
     "filters[site][$eq]": site,
-    "filters[slug][$eq]": "technology-radar",
+    "filters[slug][$eq]": "expertise",
     "populate[components]": "*",
     status: "published",
   },
@@ -94,6 +94,7 @@ const allTags = Array.from(
           >
             {radarPage.title_website}
           </h1>
+          <p class="mt-6 text-xl/8">{radarPage.description}</p>
           <div class="mt-10 flex justify-center" id="radar-container">
             <RadarChart items={allRadarItems} />
           </div>
