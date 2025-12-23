@@ -1,7 +1,7 @@
 ---
 import RadarQuadrant from "./RadarQuadrant.astro";
 import RadarQuadrantItemList from "./RadarQuadrantItemList.astro";
-import type { RadarItem } from "@xprtz/cms";
+import type { RadarItem, RadarItemWithNumber } from "@xprtz/cms";
 
 interface Props {
   /**
@@ -29,7 +29,7 @@ const quadrantColors = {
 };
 
 // Add numbers to items and group by quadrant
-const itemsWithNumbers = items.map((item, index) => ({
+const itemsWithNumbers: RadarItemWithNumber[] = items.map((item, index) => ({
   ...item,
   number: index + 1,
 }));

@@ -57,6 +57,7 @@ libs/ui/
 ### Technology Radar Components
 - [RadarChart.astro](src/RadarChart.astro) - Technology radar visualization with four quadrants
 - [RadarQuadrant.astro](src/RadarQuadrant.astro) - Individual radar quadrant with concentric rings and items
+- [RadarQuadrantItemList.astro](src/RadarQuadrantItemList.astro) - List view of items in a selected quadrant
 
 ### Utility Components
 - [LogoCloud.astro](src/LogoCloud.astro) - Client/partner logo display
@@ -400,7 +401,7 @@ Individual quadrant representing 90° of the radar (one quarter circle).
 - `position: 0 | 1 | 2 | 3` - Quadrant position (0: 0-90°, 1: 90-180°, 2: 180-270°, 3: 270-360°)
 - `color: string` - Color for the quadrant
 - `size?: number` - Size in pixels (default: 400)
-- `items?: ItemWithNumber[]` - Radar items to display
+- `items?: RadarItemWithNumber[]` - Radar items to display
 
 **Features:**
 - Four concentric rings representing adoption stages:
@@ -435,18 +436,51 @@ import { RadarQuadrant } from "@xprtz/ui";
 />
 ```
 
-### RadarItem Type
+### RadarItem Types
 
-Items require the following structure:
+The radar system uses two related types:
+
 ```typescript
-interface ItemWithNumber extends RadarItem {
+// Base type from CMS (no number property)
+type RadarItem = {
+  slug: string;
+  quadrant: RadarQuadrant;
+  ring: RadarRing;
+  title: string;
+  description: string;
+  pros: ListItem[];
+  cons: ListItem[];
+  conclusion: string;
+  tags: Tag[];
+}
+
+// Extended type with number property (added by UI layer)
+type RadarItemWithNumber = RadarItem & {
   number: number;          // Sequential number (1, 2, 3...)
-  title: string;           // Display title
-  slug: string;            // URL slug for detail page
-  ring: RadarRing;         // "Adopt" | "Trial" | "Assess" | "Hold"
-  quadrant: RadarQuadrant; // Quadrant name
 }
 ```
+
+**Type Usage Flow:**
+1. Fetch `RadarItem[]` from CMS (no numbers)
+2. RadarChart component adds numbers, creating `RadarItemWithNumber[]`
+3. Pass `RadarItemWithNumber[]` to child components (RadarQuadrant, RadarQuadrantItemList)
+
+### RadarQuadrantItemList Component
+
+List view displaying all items within a selected quadrant, grouped by ring.
+
+**Props:**
+- `items: RadarItemWithNumber[]` - Array of radar items for the quadrant
+- `quadrantName: string` - Name of the quadrant
+- `color: string` - Color for the quadrant header
+
+**Features:**
+- Groups items by ring (Adopt, Trial, Assess, Hold)
+- Displays item number, title, and description
+- Links to item detail pages
+- Scrollable list with sticky ring headers
+- "Back to radar" button to return to main view
+- Hidden by default, shown when quadrant is clicked
 
 ### Integration Example
 

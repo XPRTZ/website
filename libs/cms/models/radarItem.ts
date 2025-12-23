@@ -15,3 +15,7 @@ export type RadarItem = {
   conclusion: string;
   tags: Tag[];
 }
+
+export type RadarItemWithNumber = RadarItem & {
+  number: number;
+}

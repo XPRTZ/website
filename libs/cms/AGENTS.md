@@ -273,6 +273,38 @@ export type AlgemeneVoorwaarden = {
 }
 ```
 
+### Technology Radar Models
+
+#### [radarItem.ts](models/radarItem.ts)
+Technology radar items with adoption stages:
+```typescript
+export type RadarQuadrant = "Techniques" | "Tools" | "Platforms" | "Languages & Frameworks";
+export type RadarRing = "Adopt" | "Trial" | "Assess" | "Hold";
+
+export type RadarItem = {
+  slug: string;
+  quadrant: RadarQuadrant;
+  ring: RadarRing;
+  title: string;
+  description: string;
+  pros: ListItem[];
+  cons: ListItem[];
+  conclusion: string;
+  tags: Tag[];
+}
+
+export type RadarItemWithNumber = RadarItem & {
+  number: number;
+}
+```
+
+**Important Notes:**
+- `RadarItem` represents the base type from CMS without numbers
+- `RadarItemWithNumber` extends `RadarItem` with a `number` property added during rendering
+- Numbers are assigned sequentially by the UI layer, not stored in CMS
+- Use `RadarItem` when fetching from CMS
+- Use `RadarItemWithNumber` when passing items to UI components that need numbering
+
 ## API Wrapper
 
 ### fetchData Function

@@ -1,9 +1,11 @@
 ---
+import type { RadarItemWithNumber } from "@xprtz/cms";
+
 interface Props {
   /**
    * Array of radar items for the selected quadrant
    */
-  items: object[];
+  items: RadarItemWithNumber[];
 
   /**
    * Name of the quadrant
@@ -28,7 +30,7 @@ const itemsByRing = ringOrder.reduce(
     }
     return acc;
   },
-  {} as Record<string, object[]>
+  {} as Record<string, RadarItemWithNumber[]>
 );
 ---
 
