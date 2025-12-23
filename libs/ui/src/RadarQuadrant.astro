@@ -25,9 +25,14 @@ interface Props {
    * Radar items to display in this quadrant
    */
   items?: ItemWithNumber[];
+
+  /**
+   * Slug of the parent page (for back links from radar items)
+   */
+  parentPageSlug?: string;
 }
 
-const { position, color, size = 400, items = [] } = Astro.props;
+const { position, color, size = 400, items = [], parentPageSlug } = Astro.props;
 
 // Define the four rings from center to outside
 const rings: { ring: RadarRing; radiusPercent: number }[] = [
@@ -167,35 +172,42 @@ const positionedItems = items.map((item, index) => {
 
   <!-- Draw items as numbered circles -->
   {
-    positionedItems.map((item) => (
-      <g class="radar-item" style="transition: opacity 0.3s ease;">
-        <a href={`/radar-items/${item.slug}`}>
-          <title>
-            {item.number}. {item.title}
-          </title>
-          <circle
-            cx={item.x}
-            cy={item.y}
-            r={circleRadius}
-            fill="white"
-            stroke={color}
-            stroke-width="2"
-            class="cursor-pointer radar-item-circle transition-all"
-          />
-          <text
-            x={item.x}
-            y={item.y + 1}
-            text-anchor="middle"
-            dominant-baseline="middle"
-            class="text-sm font-semibold pointer-events-none"
-            fill={color}
-            style="font-family: system-ui, -apple-system, sans-serif;"
-          >
-            {item.number}
-          </text>
-        </a>
-      </g>
-    ))
+    positionedItems.map((item) => {
+      // Build the link with optional parent page query parameter
+      const itemLink = parentPageSlug
+        ? `/radar-items/${item.slug}?from=${encodeURIComponent(parentPageSlug)}`
+        : `/radar-items/${item.slug}`;
+
+      return (
+        <g class="radar-item" style="transition: opacity 0.3s ease;">
+          <a href={itemLink}>
+            <title>
+              {item.number}. {item.title}
+            </title>
+            <circle
+              cx={item.x}
+              cy={item.y}
+              r={circleRadius}
+              fill="white"
+              stroke={color}
+              stroke-width="2"
+              class="cursor-pointer radar-item-circle transition-all"
+            />
+            <text
+              x={item.x}
+              y={item.y + 1}
+              text-anchor="middle"
+              dominant-baseline="middle"
+              class="text-sm font-semibold pointer-events-none"
+              fill={color}
+              style="font-family: system-ui, -apple-system, sans-serif;"
+            >
+              {item.number}
+            </text>
+          </a>
+        </g>
+      );
+    })
   }
 </svg>
 

@@ -13,9 +13,14 @@ interface Props {
    * Size of each quadrant in pixels
    */
   quadrantSize?: number;
+
+  /**
+   * Slug of the parent page (for back links from radar items)
+   */
+  parentPageSlug?: string;
 }
 
-const { items = [], quadrantSize = 400 } = Astro.props;
+const { items = [], quadrantSize = 400, parentPageSlug } = Astro.props;
 
 // Margin between quadrants
 const margin = 20;
@@ -89,6 +94,7 @@ const quadrantLabels = [
             color={quadrantColors["Tools"]}
             size={quadrantSize}
             items={itemsByQuadrant["Tools"]}
+            parentPageSlug={parentPageSlug}
           />
         </div>
 
@@ -102,6 +108,7 @@ const quadrantLabels = [
             color={quadrantColors["Techniques"]}
             size={quadrantSize}
             items={itemsByQuadrant["Techniques"]}
+            parentPageSlug={parentPageSlug}
           />
         </div>
 
@@ -115,6 +122,7 @@ const quadrantLabels = [
             color={quadrantColors["Platforms"]}
             size={quadrantSize}
             items={itemsByQuadrant["Platforms"]}
+            parentPageSlug={parentPageSlug}
           />
         </div>
 
@@ -128,6 +136,7 @@ const quadrantLabels = [
             color={quadrantColors["Languages & Frameworks"]}
             size={quadrantSize}
             items={itemsByQuadrant["Languages & Frameworks"]}
+            parentPageSlug={parentPageSlug}
           />
         </div>
       </div>
@@ -228,21 +237,25 @@ const quadrantLabels = [
     items={itemsByQuadrant["Tools"]}
     quadrantName={quadrantTranslations["Tools"]}
     color={quadrantColors["Tools"]}
+    parentPageSlug={parentPageSlug}
   />
   <RadarQuadrantItemList
     items={itemsByQuadrant["Techniques"]}
     quadrantName={quadrantTranslations["Techniques"]}
     color={quadrantColors["Techniques"]}
+    parentPageSlug={parentPageSlug}
   />
   <RadarQuadrantItemList
     items={itemsByQuadrant["Platforms"]}
     quadrantName={quadrantTranslations["Platforms"]}
     color={quadrantColors["Platforms"]}
+    parentPageSlug={parentPageSlug}
   />
   <RadarQuadrantItemList
     items={itemsByQuadrant["Languages & Frameworks"]}
     quadrantName={quadrantTranslations["Languages & Frameworks"]}
     color={quadrantColors["Languages & Frameworks"]}
+    parentPageSlug={parentPageSlug}
   />
 </div>
 

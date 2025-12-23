@@ -16,9 +16,14 @@ interface Props {
    * Color for the quadrant
    */
   color: string;
+
+  /**
+   * Slug of the parent page (for back links from radar items)
+   */
+  parentPageSlug?: string;
 }
 
-const { items, quadrantName, color } = Astro.props;
+const { items, quadrantName, color, parentPageSlug } = Astro.props;
 
 // Group items by ring
 const ringOrder = ["Adopt", "Trial", "Assess", "Hold"];
@@ -72,23 +77,30 @@ const itemsByRing = ringOrder.reduce(
               {ring}
             </h4>
             <ul class="space-y-2">
-              {ringItems.map((item) => (
-                <li>
-                  <a
-                    href={`/radar-items/${item.slug}`}
-                    class="block p-3 rounded-md hover:bg-gray-50 transition-colors border border-gray-200 hover:border-gray-300"
-                  >
-                    <div class="font-medium text-gray-900">
-                      {item.number}. {item.title}
-                    </div>
-                    {item.description && (
-                      <div class="text-sm text-gray-600 mt-1 line-clamp-2">
-                        {item.description}
+              {ringItems.map((item) => {
+                // Build the link with optional parent page query parameter
+                const itemLink = parentPageSlug
+                  ? `/radar-items/${item.slug}?from=${encodeURIComponent(parentPageSlug)}`
+                  : `/radar-items/${item.slug}`;
+
+                return (
+                  <li>
+                    <a
+                      href={itemLink}
+                      class="block p-3 rounded-md hover:bg-gray-50 transition-colors border border-gray-200 hover:border-gray-300"
+                    >
+                      <div class="font-medium text-gray-900">
+                        {item.number}. {item.title}
                       </div>
-                    )}
-                  </a>
-                </li>
-              ))}
+                      {item.description && (
+                        <div class="text-sm text-gray-600 mt-1 line-clamp-2">
+                          {item.description}
+                        </div>
+                      )}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))

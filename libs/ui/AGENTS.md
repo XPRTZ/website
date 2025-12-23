@@ -402,8 +402,15 @@ import { TechnologyRadar } from "@xprtz/ui";
 **Important Notes:**
 - The component handles its own data fetching - no need to pass items
 - Tag filtering is client-side and persists until page reload
-- Links to radar items point to `/radar-items/{slug}` (not `/expertise/`)
+- Links to radar items point to `/radar-items/{slug}` with a `from` query parameter
+- The `from` parameter contains the current page slug for proper back navigation
 - This replaces the old hard-coded expertise page approach
+
+**Back Navigation:**
+- The component automatically detects the current page URL
+- When users click on a radar item, the current page slug is passed as `?from={slug}`
+- The radar item page uses this to create a dynamic "Back" link
+- If no `from` parameter exists, it defaults to `/expertise` for backwards compatibility
 
 ### RadarChart Component
 
@@ -412,6 +419,7 @@ The main radar visualization that combines four quadrants into a complete circle
 **Props:**
 - `items?: RadarItem[]` - Array of radar items from CMS
 - `quadrantSize?: number` - Size of each quadrant in pixels (default: 400)
+- `parentPageSlug?: string` - Slug of the parent page for back navigation (optional)
 
 **Features:**
 - Automatically numbers items sequentially (starting at 1)
@@ -467,6 +475,8 @@ Individual quadrant representing 90° of the radar (one quarter circle).
 
 **Item Links:**
 - Items link to `/radar-items/{slug}` for individual radar item pages
+- If `parentPageSlug` is provided, adds `?from={parentPageSlug}` query parameter for back navigation
+- The radar item page reads this parameter to create a dynamic back link
 
 **Usage:**
 ```astro
@@ -517,11 +527,12 @@ List view displaying all items within a selected quadrant, grouped by ring.
 - `items: RadarItemWithNumber[]` - Array of radar items for the quadrant
 - `quadrantName: string` - Name of the quadrant
 - `color: string` - Color for the quadrant header
+- `parentPageSlug?: string` - Slug of the parent page for back navigation (optional)
 
 **Features:**
 - Groups items by ring (Adopt, Trial, Assess, Hold)
 - Displays item number, title, and description
-- Links to item detail pages
+- Links to item detail pages with `from` query parameter for back navigation
 - Scrollable list with sticky ring headers
 - "Back to radar" button to return to main view
 - Hidden by default, shown when quadrant is clicked

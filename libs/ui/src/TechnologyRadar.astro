@@ -9,6 +9,10 @@ interface TechnologyRadarProps {
 
 const { title } = Astro.props as TechnologyRadarProps;
 
+// Get the current page slug from Astro context
+// This will be used as the back link for radar items
+const currentPageSlug = Astro.url.pathname.replace(/^\//, "").replace(/\/$/, "") || "home";
+
 // Fetch all radar items for the chart
 const allRadarItems = await fetchData<Array<RadarItem>>({
   endpoint: "radar-items",
@@ -33,7 +37,7 @@ const allTags = Array.from(
   {title}
 </h2>
 <div class="mt-10 flex justify-center" id="radar-container">
-  <RadarChart items={allRadarItems} />
+  <RadarChart items={allRadarItems} parentPageSlug={currentPageSlug} />
 </div>
 {
   allTags.length > 0 && (

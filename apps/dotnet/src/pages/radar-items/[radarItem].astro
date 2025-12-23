@@ -28,6 +28,10 @@ export async function getStaticPaths() {
 
 const radarItem: RadarItem = Astro.props;
 
+// Get the parent page from query parameter (if provided)
+const parentPageSlug = Astro.url.searchParams.get("from");
+const backLink = parentPageSlug ? `/${parentPageSlug}` : "/expertise";
+
 // Define colors for each quadrant (matching RadarChart)
 const quadrantColors = {
   Techniques: "#3b82f6", // blue
@@ -263,10 +267,10 @@ const quadrantDisplayName =
 
             <div class="mt-10">
               <a
-                href="/expertise"
+                href={backLink}
                 class="text-base/7 font-semibold text-primary-600 hover:text-primary-500"
               >
-                &larr; Terug naar Expertise
+                &larr; Terug naar radar
               </a>
             </div>
           </div>
