@@ -55,6 +55,7 @@ libs/ui/
 - [BlogCard.astro](src/BlogCard.astro) - Individual blog post card
 
 ### Technology Radar Components
+- [TechnologyRadar.astro](src/TechnologyRadar.astro) - **CMS-driven component** that renders the complete technology radar on any page
 - [RadarChart.astro](src/RadarChart.astro) - Technology radar visualization with four quadrants
 - [RadarQuadrant.astro](src/RadarQuadrant.astro) - Individual radar quadrant with concentric rings and items
 - [RadarQuadrantItemList.astro](src/RadarQuadrantItemList.astro) - List view of items in a selected quadrant
@@ -139,6 +140,7 @@ const componentMap: Record<string, any> = {
   "ui.klant-logo-s": LogoCloud,
   "ui.team": TeamCarousel,
   "ui.directeuren": Directors,
+  "ui.technology-radar": TechnologyRadar,
 };
 ```
 
@@ -366,7 +368,42 @@ Components like [TeamCarousel.astro](src/TeamCarousel.astro) use Embla Carousel:
 
 ## Technology Radar Pattern
 
-The Technology Radar components provide an interactive visualization of technology adoption:
+The Technology Radar components provide an interactive visualization of technology adoption. The radar can be added to any CMS-managed page using the `TechnologyRadar` component.
+
+### TechnologyRadar Component (CMS-Driven)
+
+The main CMS component that can be added to any page to display the technology radar.
+
+**Props:**
+- `__component: "ui.technology-radar"` - Component identifier for CMS
+- `title: string` - Title displayed above the radar
+
+**Features:**
+- Automatically fetches all radar items from CMS
+- Renders the complete radar visualization using `RadarChart`
+- Includes tag filtering functionality with toggle buttons
+- Displays all unique tags from radar items
+- Clicking a tag filters radar items to show only those with that tag
+- Clicking the same tag again removes the filter
+- Smooth opacity transitions for filtered items
+
+**Usage in CMS:**
+Add the component to any page's components array in Strapi with:
+- Component type: `ui.technology-radar`
+- Title field: e.g., "Our Technology Radar"
+
+**Direct Usage (if needed):**
+```astro
+import { TechnologyRadar } from "@xprtz/ui";
+
+<TechnologyRadar title="Our Technology Radar" />
+```
+
+**Important Notes:**
+- The component handles its own data fetching - no need to pass items
+- Tag filtering is client-side and persists until page reload
+- Links to radar items point to `/radar-items/{slug}` (not `/expertise/`)
+- This replaces the old hard-coded expertise page approach
 
 ### RadarChart Component
 
@@ -427,6 +464,9 @@ Individual quadrant representing 90° of the radar (one quarter circle).
 - Golden angle (137.508°) for optimal spread
 - Radius variation within ring (30-90% of ring width) to reduce overlap
 - Optimized for 20-30 items per quadrant
+
+**Item Links:**
+- Items link to `/radar-items/{slug}` for individual radar item pages
 
 **Usage:**
 ```astro
@@ -491,6 +531,17 @@ List view displaying all items within a selected quadrant, grouped by ring.
 
 ### Integration Example
 
+**Using TechnologyRadar (Recommended for CMS pages):**
+```astro
+---
+import { TechnologyRadar } from "@xprtz/ui";
+---
+
+<!-- Add via CMS or use directly -->
+<TechnologyRadar title="Our Technology Radar" />
+```
+
+**Using RadarChart directly (Advanced usage):**
 ```astro
 ---
 import { fetchData, type RadarItem } from "@xprtz/cms";

@@ -11,9 +11,9 @@ if (slug === "artikelen") {
   return Astro.rewrite("/artikelen/page/1");
 }
 
-if (slug === "expertise") {
-  return Astro.rewrite("/expertise/page/1");
-}
+// if (slug === "expertise") {
+//   return Astro.rewrite("/expertise/page/1");
+// }
 
 export async function getStaticPaths() {
   const pageData = await fetchData<Array<PageType>>({

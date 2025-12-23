@@ -43,10 +43,10 @@ const rings: { ring: RadarRing; radiusPercent: number }[] = [
 // Position 2 (180-270°): top-right corner
 // Position 3 (270-360°): top-left corner
 const origins = [
-  { x: 0, y: size },      // bottom-left
-  { x: size, y: size },   // bottom-right
-  { x: size, y: 0 },      // top-right
-  { x: 0, y: 0 },         // top-left
+  { x: 0, y: size }, // bottom-left
+  { x: size, y: size }, // bottom-right
+  { x: size, y: 0 }, // top-right
+  { x: 0, y: 0 }, // top-left
 ];
 
 const origin = origins[position];
@@ -80,16 +80,16 @@ const circleRadius = 12;
 
 // Function to get radius range for each ring
 const getRingRadiusRange = (ring: RadarRing): { min: number; max: number } => {
-  const ringData = rings.find(r => r.ring === ring);
+  const ringData = rings.find((r) => r.ring === ring);
   if (!ringData) return { min: 0, max: size * 0.25 };
 
-  const index = rings.findIndex(r => r.ring === ring);
+  const index = rings.findIndex((r) => r.ring === ring);
   const minPercent = index > 0 ? rings[index - 1].radiusPercent : 0;
   const maxPercent = ringData.radiusPercent;
 
   return {
     min: size * (minPercent / 100),
-    max: size * (maxPercent / 100)
+    max: size * (maxPercent / 100),
   };
 };
 
@@ -142,52 +142,61 @@ const positionedItems = items.map((item, index) => {
   style={`--quadrant-color: ${color};`}
 >
   <!-- Draw rings from outside to inside so inner rings appear on top -->
-  {rings.slice().reverse().map((ringData, index) => {
-    const actualIndex = rings.length - 1 - index;
-    // Calculate opacity based on ring position (inner rings lighter)
-    const opacity = 0.3 + (actualIndex * 0.15);
+  {
+    rings
+      .slice()
+      .reverse()
+      .map((ringData, index) => {
+        const actualIndex = rings.length - 1 - index;
+        // Calculate opacity based on ring position (inner rings lighter)
+        const opacity = 0.3 + actualIndex * 0.15;
 
-    return (
-      <g>
-        <path
-          d={generateQuarterCirclePath(ringData.radiusPercent)}
-          fill={color}
-          fill-opacity={opacity}
-          stroke="white"
-          stroke-width="2"
-        />
-      </g>
-    );
-  })}
+        return (
+          <g>
+            <path
+              d={generateQuarterCirclePath(ringData.radiusPercent)}
+              fill={color}
+              fill-opacity={opacity}
+              stroke="white"
+              stroke-width="2"
+            />
+          </g>
+        );
+      })
+  }
 
   <!-- Draw items as numbered circles -->
-  {positionedItems.map((item) => (
-    <g class="radar-item" style="transition: opacity 0.3s ease;">
-      <a href={`/expertise/${item.slug}`}>
-        <title>{item.number}. {item.title}</title>
-        <circle
-          cx={item.x}
-          cy={item.y}
-          r={circleRadius}
-          fill="white"
-          stroke={color}
-          stroke-width="2"
-          class="cursor-pointer radar-item-circle transition-all"
-        />
-        <text
-          x={item.x}
-          y={item.y + 1}
-          text-anchor="middle"
-          dominant-baseline="middle"
-          class="text-sm font-semibold pointer-events-none"
-          fill={color}
-          style="font-family: system-ui, -apple-system, sans-serif;"
-        >
-          {item.number}
-        </text>
-      </a>
-    </g>
-  ))}
+  {
+    positionedItems.map((item) => (
+      <g class="radar-item" style="transition: opacity 0.3s ease;">
+        <a href={`/radar-items/${item.slug}`}>
+          <title>
+            {item.number}. {item.title}
+          </title>
+          <circle
+            cx={item.x}
+            cy={item.y}
+            r={circleRadius}
+            fill="white"
+            stroke={color}
+            stroke-width="2"
+            class="cursor-pointer radar-item-circle transition-all"
+          />
+          <text
+            x={item.x}
+            y={item.y + 1}
+            text-anchor="middle"
+            dominant-baseline="middle"
+            class="text-sm font-semibold pointer-events-none"
+            fill={color}
+            style="font-family: system-ui, -apple-system, sans-serif;"
+          >
+            {item.number}
+          </text>
+        </a>
+      </g>
+    ))
+  }
 </svg>
 
 <style>

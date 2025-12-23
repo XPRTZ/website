@@ -25,10 +25,8 @@ apps/dotnet/
 │   │   │   ├── [article].astro      # Individual article
 │   │   │   └── page/
 │   │   │       └── [page].astro     # Paginated article list
-│   │   └── expertise/           # Technology expertise radar
-│   │       ├── [radarItem].astro    # Individual radar item
-│   │       └── page/
-│   │           └── [page].astro     # Radar overview page
+│   │   └── radar-items/         # Technology radar items
+│   │       └── [radarItem].astro    # Individual radar item
 │   ├── env.d.ts         # Environment type definitions
 │   └── assets/          # Static assets (images, etc.)
 ├── public/              # Public static files
@@ -116,8 +114,7 @@ export default defineConfig({
 - `/{slug}` → [pages/[slug].astro](src/pages/[slug].astro) - Generic pages
 - `/artikelen/{article}` → [pages/artikelen/[article].astro](src/pages/artikelen/[article].astro) - Individual articles
 - `/artikelen/page/{page}` → [pages/artikelen/page/[page].astro](src/pages/artikelen/page/[page].astro) - Paginated article list
-- `/expertise/{radarItem}` → [pages/expertise/[radarItem].astro](src/pages/expertise/[radarItem].astro) - Individual radar items
-- `/expertise/page/{page}` → [pages/expertise/page/[page].astro](src/pages/expertise/page/[page].astro) - Radar overview page
+- `/radar-items/{radarItem}` → [pages/radar-items/[radarItem].astro](src/pages/radar-items/[radarItem].astro) - Individual radar items
 
 ### Static Path Generation
 
@@ -281,7 +278,7 @@ const article: Article = Astro.props;
 
 ### Radar Item Pattern
 
-File: [src/pages/expertise/[radarItem].astro](src/pages/expertise/[radarItem].astro)
+File: [src/pages/radar-items/[radarItem].astro](src/pages/radar-items/[radarItem].astro)
 
 ```astro
 ---
@@ -313,33 +310,20 @@ const radarItem: RadarItem = Astro.props;
 </Layout>
 ```
 
-### Radar Overview Pattern
+### Technology Radar on CMS Pages
 
-File: [src/pages/expertise/page/[page].astro](src/pages/expertise/page/[page].astro)
+The technology radar is now a CMS-driven component that can be added to any page via the `TechnologyRadar` component. It's no longer a hard-coded page at `/expertise/page/[page]`.
 
-```astro
----
-import { fetchData, type RadarItem, type Page as PageType } from '@xprtz/cms';
-import { RadarChart } from '@xprtz/ui';
+**Usage in CMS:**
+- Add the `TechnologyRadar` component to any page's components array
+- The component will automatically fetch and display all radar items
+- The component identifier is `"ui.technology-radar"`
 
-export const getStaticPaths = async () => {
-  return [{ params: { page: "1" } }];
-};
-
-const radarItems = await fetchData<Array<RadarItem>>({
-  endpoint: "radar-items",
-  wrappedByKey: "data",
-  query: {
-    "populate[tags][fields][0]": "title",
-    status: "published",
-  },
-});
----
-
-<Layout title="Expertise" description="...">
-  <RadarChart items={radarItems} />
-</Layout>
-```
+**How it works:**
+- The `TechnologyRadar` component from `@xprtz/ui` handles fetching radar items
+- It renders the `RadarChart` with all items
+- It includes tag filtering functionality
+- The component can be placed on any CMS-managed page
 
 ### Pagination Pattern
 

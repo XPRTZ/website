@@ -19,6 +19,7 @@ import Listing from "./src/Listing.astro";
 import SubtitleWithText from "./src/SubtitleWithText.astro";
 import Quote from "./src/Quote.astro";
 import Blogs from "./src/Blogs.astro";
+import TechnologyRadar from "./src/TechnologyRadar.astro";
 import RadarQuadrant from "./src/RadarQuadrant.astro";
 import RadarChart from "./src/RadarChart.astro";
 import RadarQuadrantItemList from "./src/RadarQuadrantItemList.astro";
@@ -47,6 +48,7 @@ export {
   SubtitleWithText,
   Quote,
   Blogs,
+  TechnologyRadar,
   RadarQuadrant,
   RadarChart,
   RadarQuadrantItemList,

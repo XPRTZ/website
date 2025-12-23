@@ -276,7 +276,8 @@ export type AlgemeneVoorwaarden = {
 ### Technology Radar Models
 
 #### [radarItem.ts](models/radarItem.ts)
-Technology radar items with adoption stages:
+Technology radar items with adoption stages. Individual radar items are displayed at `/radar-items/{slug}`.
+
 ```typescript
 export type RadarQuadrant = "Techniques" | "Tools" | "Platforms" | "Languages & Frameworks";
 export type RadarRing = "Adopt" | "Trial" | "Assess" | "Hold";
@@ -304,6 +305,11 @@ export type RadarItemWithNumber = RadarItem & {
 - Numbers are assigned sequentially by the UI layer, not stored in CMS
 - Use `RadarItem` when fetching from CMS
 - Use `RadarItemWithNumber` when passing items to UI components that need numbering
+
+**Technology Radar Display:**
+- The technology radar is now a CMS component (`TechnologyRadar`) that can be added to any page
+- It automatically fetches and displays all radar items with tag filtering
+- Individual radar item pages are located at `/radar-items/{slug}` (not `/expertise/`)
 
 ## API Wrapper
 
