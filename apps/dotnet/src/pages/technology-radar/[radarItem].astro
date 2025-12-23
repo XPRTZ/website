@@ -83,7 +83,7 @@ const quadrantColor = quadrantColors[radarItem.quadrant as keyof typeof quadrant
                 <svg class="size-8 text-green-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clip-rule="evenodd" />
                 </svg>
-                <h2 class="text-2xl font-bold tracking-tight text-green-900">Pros</h2>
+                <h2 class="text-2xl font-bold tracking-tight text-green-900">Voordelen</h2>
               </div>
               <ul class="mt-4 space-y-4">
                 {radarItem.pros.map((pro) => (
@@ -106,7 +106,7 @@ const quadrantColor = quadrantColors[radarItem.quadrant as keyof typeof quadrant
                 <svg class="size-8 text-red-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z" clip-rule="evenodd" />
                 </svg>
-                <h2 class="text-2xl font-bold tracking-tight text-red-900">Cons</h2>
+                <h2 class="text-2xl font-bold tracking-tight text-red-900">Nadelen</h2>
               </div>
               <ul class="mt-4 space-y-4">
                 {radarItem.cons.map((con) => (
@@ -127,7 +127,7 @@ const quadrantColor = quadrantColors[radarItem.quadrant as keyof typeof quadrant
 
       {radarItem.conclusion && (
         <div class="mt-10">
-          <h2 class="text-2xl font-bold tracking-tight text-gray-900">Conclusion</h2>
+          <h2 class="text-2xl font-bold tracking-tight text-gray-900">Conclusie</h2>
           <p class="mt-4 text-base/7">
             {radarItem.conclusion}
           </p>
@@ -136,7 +136,7 @@ const quadrantColor = quadrantColors[radarItem.quadrant as keyof typeof quadrant
 
       <div class="mt-10">
         <a href="/technology-radar/page/1" class="text-base/7 font-semibold text-primary-600 hover:text-primary-500">
-          &larr; Back to Technology Radar
+          &larr; Terug naar Technology Radar
         </a>
       </div>
     </div>
