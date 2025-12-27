@@ -386,6 +386,7 @@ The main CMS component that can be added to any page to display the technology r
 - Clicking a tag filters radar items to show only those with that tag
 - Clicking the same tag again removes the filter
 - Smooth opacity transitions for filtered items
+- **Hover highlighting**: When hovering over an item in the quadrant list, the corresponding radar item on the chart is highlighted with enhanced visual effects (larger size, color fill, and glow)
 
 **Usage in CMS:**
 Add the component to any page's components array in Strapi with:
@@ -464,6 +465,7 @@ Individual quadrant representing 90° of the radar (one quarter circle).
   - SVG tooltips showing "{number}. {title}"
   - Click to navigate to item detail page
   - Hover effects (gray background on hover)
+  - Highlight effects when item in list is hovered (colored fill, larger size, glow)
 - Origin point positioned at appropriate corner based on position
 
 **Item Positioning Algorithm:**
@@ -539,6 +541,7 @@ List view displaying all items within a selected quadrant, grouped by ring.
 - Smooth slide-in animation from right (400ms duration)
 - Appears after quadrant zoom animation completes (500ms delay)
 - Coordinated slide-out animation when zooming out
+- **Interactive hover**: Hovering over list items highlights the corresponding radar item on the chart with enhanced visual effects
 
 ### Integration Example
 

@@ -548,9 +548,49 @@ const quadrantLabels = [
     });
   };
 
+  const initItemListHover = () => {
+    const wrappers = document.querySelectorAll(".radar-chart-wrapper");
+
+    wrappers.forEach((wrapper) => {
+      const itemLists = wrapper.querySelectorAll(".quadrant-item-list");
+
+      itemLists.forEach((list) => {
+        const listItems = list.querySelectorAll("li a");
+
+        listItems.forEach((link) => {
+          const href = link.getAttribute("href");
+          if (!href) return;
+
+          // Extract slug from the link (handle both with and without query params)
+          const slug = href.split("?")[0].replace("/radar-items/", "");
+
+          // Find corresponding radar item by slug
+          const radarItems = wrapper.querySelectorAll(".radar-item");
+          const matchingRadarItem = Array.from(radarItems).find((item) => {
+            const itemLink = item.querySelector("a");
+            const itemHref = itemLink?.getAttribute("href");
+            const itemSlug = itemHref?.split("?")[0].replace("/radar-items/", "");
+            return itemSlug === slug;
+          });
+
+          if (matchingRadarItem) {
+            link.addEventListener("mouseenter", () => {
+              matchingRadarItem.classList.add("highlighted");
+            });
+
+            link.addEventListener("mouseleave", () => {
+              matchingRadarItem.classList.remove("highlighted");
+            });
+          }
+        });
+      });
+    });
+  };
+
   const initRadar = () => {
     initRadarHover();
     initRadarZoom();
+    initItemListHover();
   };
 
   // Initialize on page load

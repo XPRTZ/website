@@ -220,7 +220,8 @@ const positionedItems = items.map((item, index) => {
     transition: all 0.2s ease;
   }
 
-  .radar-item:hover .radar-item-circle {
+  .radar-item:hover .radar-item-circle,
+  .radar-item.highlighted .radar-item-circle {
     fill: color-mix(in srgb, var(--quadrant-color) 10%, white);
     stroke-width: 3;
     r: 14;
