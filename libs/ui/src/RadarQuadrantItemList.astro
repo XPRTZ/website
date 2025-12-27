@@ -116,7 +116,7 @@ const itemsByRing = ringOrder.reduce(
     opacity: 0;
     transition:
       transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
   }
 
   .quadrant-item-list.hidden {
@@ -126,6 +126,9 @@ const itemsByRing = ringOrder.reduce(
   .quadrant-item-list.visible {
     transform: translateX(0);
     opacity: 1;
+    transition:
+      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .line-clamp-2 {

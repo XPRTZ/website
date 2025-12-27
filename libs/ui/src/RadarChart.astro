@@ -69,7 +69,11 @@ const quadrantLabels = [
   { name: "Tools", displayName: "Tools", position: "top-left" },
   { name: "Techniques", displayName: "Technieken", position: "top-right" },
   { name: "Platforms", displayName: "Platformen", position: "bottom-left" },
-  { name: "Languages & Frameworks", displayName: "Talen &<br/>Frameworks", position: "bottom-right" },
+  {
+    name: "Languages & Frameworks",
+    displayName: "Talen &<br/>Frameworks",
+    position: "bottom-right",
+  },
 ];
 ---
 
@@ -232,6 +236,38 @@ const quadrantLabels = [
     </div>
   </div>
 
+  <!-- Quadrant Rectangles for mobile (hidden by default, shown below 870px) -->
+  <div class="quadrant-rectangles" style="display: none;">
+    <div
+      class="quadrant-rect"
+      data-quadrant-rect="tools"
+      style={`background-color: ${quadrantColors["Tools"]};`}
+    >
+      {quadrantTranslations["Tools"]}
+    </div>
+    <div
+      class="quadrant-rect"
+      data-quadrant-rect="techniques"
+      style={`background-color: ${quadrantColors["Techniques"]};`}
+    >
+      {quadrantTranslations["Techniques"]}
+    </div>
+    <div
+      class="quadrant-rect"
+      data-quadrant-rect="platforms"
+      style={`background-color: ${quadrantColors["Platforms"]};`}
+    >
+      {quadrantTranslations["Platforms"]}
+    </div>
+    <div
+      class="quadrant-rect"
+      data-quadrant-rect="frameworks"
+      style={`background-color: ${quadrantColors["Languages & Frameworks"]};`}
+    >
+      {quadrantTranslations["Languages & Frameworks"]}
+    </div>
+  </div>
+
   <!-- Quadrant Item Lists (hidden by default) -->
   <RadarQuadrantItemList
     items={itemsByQuadrant["Tools"]}
@@ -265,6 +301,9 @@ const quadrantLabels = [
     justify-content: center;
     align-items: flex-start;
     position: relative;
+    width: 100%;
+    max-width: 100%;
+    --fade-out-duration: 300ms;
   }
 
   .radar-chart-container {
@@ -284,6 +323,157 @@ const quadrantLabels = [
     position: absolute;
     left: calc(50% + 220px);
     top: 0;
+  }
+
+  @media (max-width: 1280px) {
+    .radar-chart-wrapper :global(.quadrant-item-list) {
+      left: 57vw;
+    }
+  }
+
+  @media (max-width: 1090px) {
+    .radar-chart-wrapper.list-visible .radar-chart-container {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--fade-out-duration) cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .radar-chart-wrapper.list-animation-complete .radar-chart-container {
+      display: none;
+    }
+
+    .radar-chart-wrapper.list-animation-complete :global(.quadrant-item-list) {
+      position: static;
+    }
+
+    .radar-chart-wrapper :global(.quadrant-item-list) {
+      left: auto;
+      margin: 0;
+      padding-left: 0;
+      padding-right: 0;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .radar-chart-wrapper :global(.quadrant-item-list > div) {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .radar-chart-wrapper.list-visible .radar-chart-container {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 870px) {
+    .radar-chart-container {
+      display: none;
+    }
+
+    .quadrant-rectangles {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 0 auto;
+    }
+
+    .radar-chart-wrapper.list-visible .quadrant-rectangles {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--fade-out-duration) cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .radar-chart-wrapper.list-animation-complete .quadrant-rectangles {
+      display: none !important;
+    }
+
+    .radar-chart-wrapper.list-animation-complete :global(.quadrant-item-list) {
+      position: static;
+    }
+
+    .quadrant-rect {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 1.125rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .quadrant-rect:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Hover dim effect for rectangles */
+    .quadrant-rectangles.hovering .quadrant-rect {
+      opacity: 0.5;
+    }
+
+    .quadrant-rectangles.hovering .quadrant-rect.active {
+      opacity: 1;
+    }
+
+    /* Zoom effect for rectangles */
+    .quadrant-rectangles.zoomed .quadrant-rect {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .quadrant-rectangles.zoomed .quadrant-rect.zoomed-in {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Transform origins for each corner */
+    .quadrant-rect[data-quadrant-rect="tools"] {
+      transform-origin: top left;
+    }
+
+    .quadrant-rect[data-quadrant-rect="techniques"] {
+      transform-origin: top right;
+    }
+
+    .quadrant-rect[data-quadrant-rect="platforms"] {
+      transform-origin: bottom left;
+    }
+
+    .quadrant-rect[data-quadrant-rect="frameworks"] {
+      transform-origin: bottom right;
+    }
+
+    /* Zoom transformations - scale to fill entire grid (2x2 + gap) */
+    .quadrant-rectangles.zoomed
+      .quadrant-rect.zoomed-in[data-quadrant-rect="tools"] {
+      transform: scale(2.05);
+    }
+
+    .quadrant-rectangles.zoomed
+      .quadrant-rect.zoomed-in[data-quadrant-rect="techniques"] {
+      transform: scale(2.05);
+    }
+
+    .quadrant-rectangles.zoomed
+      .quadrant-rect.zoomed-in[data-quadrant-rect="platforms"] {
+      transform: scale(2.05);
+    }
+
+    .quadrant-rectangles.zoomed
+      .quadrant-rect.zoomed-in[data-quadrant-rect="frameworks"] {
+      transform: scale(2.05);
+    }
+  }
+
+  @media (max-width: 360px) {
+    .quadrant-rectangles {
+      grid-template-columns: 1fr;
+    }
   }
 
   .radar-chart.hovering .quadrant-wrapper {
@@ -319,7 +509,6 @@ const quadrantLabels = [
     opacity: 1;
     pointer-events: auto;
     transform: scale(1.75) translate(0, 0);
-    z-index: 10;
   }
 
   /* Position adjustments for each quadrant when zoomed */
@@ -427,6 +616,15 @@ const quadrantLabels = [
       const labels = chart.querySelectorAll(".quadrant-label");
       const wrapper = chart.closest(".radar-chart-wrapper");
 
+      // Get fade-out duration from CSS variable
+      const fadeOutDuration = wrapper
+        ? parseInt(
+            getComputedStyle(wrapper)
+              .getPropertyValue("--fade-out-duration")
+              .replace("ms", "")
+          )
+        : 300;
+
       // Get all quadrant item lists in this wrapper
       const itemLists = wrapper?.querySelectorAll(".quadrant-item-list");
 
@@ -456,6 +654,7 @@ const quadrantLabels = [
               list.classList.remove("visible");
             });
             wrapper?.classList.remove("list-visible");
+            wrapper?.classList.remove("list-animation-complete");
 
             // Wait for list animation to complete before zooming out
             setTimeout(() => {
@@ -491,6 +690,11 @@ const quadrantLabels = [
             setTimeout(() => {
               // Slide wrapper and show list simultaneously
               wrapper?.classList.add("list-visible");
+
+              // Add list-animation-complete after fade-out completes
+              setTimeout(() => {
+                wrapper?.classList.add("list-animation-complete");
+              }, fadeOutDuration);
 
               itemLists?.forEach((list) => {
                 const listQuadrant = list
@@ -529,6 +733,7 @@ const quadrantLabels = [
             list.classList.remove("visible");
           });
           wrapper?.classList.remove("list-visible");
+          wrapper?.classList.remove("list-animation-complete");
 
           // Wait for list animation to complete before zooming out
           setTimeout(() => {
@@ -541,6 +746,182 @@ const quadrantLabels = [
             );
             quadrants.forEach((q) => q.classList.remove("zoomed-in"));
             labels.forEach((l) => l.classList.remove("zoomed-in"));
+            itemLists?.forEach((list) => list.classList.add("hidden"));
+          }, 400);
+        });
+      });
+    });
+  };
+
+  const initQuadrantRectangles = () => {
+    const wrappers = document.querySelectorAll(".radar-chart-wrapper");
+
+    wrappers.forEach((wrapper) => {
+      // Get fade-out duration from CSS variable
+      const fadeOutDuration = parseInt(
+        getComputedStyle(wrapper)
+          .getPropertyValue("--fade-out-duration")
+          .replace("ms", "")
+      );
+
+      const rectangles = wrapper.querySelectorAll(".quadrant-rect");
+      const rectanglesContainer = wrapper.querySelector(".quadrant-rectangles");
+      const itemLists = wrapper.querySelectorAll(".quadrant-item-list");
+      const chart = wrapper.querySelector(".radar-chart");
+      const quadrants = wrapper.querySelectorAll(".quadrant-wrapper");
+      const labels = wrapper.querySelectorAll(".quadrant-label");
+
+      rectangles.forEach((rect) => {
+        const quadrantKey = rect.getAttribute("data-quadrant-rect");
+
+        // Hover effects
+        const handleMouseEnter = () => {
+          // Only show hover effect if not zoomed
+          if (!rectanglesContainer?.classList.contains("zoomed")) {
+            rectanglesContainer?.classList.add("hovering");
+            rect.classList.add("active");
+          }
+        };
+
+        const handleMouseLeave = () => {
+          rectanglesContainer?.classList.remove("hovering");
+          rect.classList.remove("active");
+        };
+
+        rect.addEventListener("mouseenter", handleMouseEnter);
+        rect.addEventListener("mouseleave", handleMouseLeave);
+
+        rect.addEventListener("click", () => {
+          // Check if currently zoomed
+          const isCurrentlyZoomed = rect.classList.contains("zoomed-in");
+
+          if (isCurrentlyZoomed) {
+            // Zoom out - hide list and remove zoom
+            itemLists?.forEach((list) => {
+              list.classList.remove("visible");
+            });
+            wrapper.classList.remove("list-visible");
+            wrapper.classList.remove("list-animation-complete");
+
+            // Wait for list animation to complete before zooming out
+            setTimeout(() => {
+              rectanglesContainer?.classList.remove("zoomed");
+              rectangles.forEach((r) => r.classList.remove("zoomed-in"));
+
+              // Also clear radar chart zoom state
+              if (chart) {
+                chart.classList.remove("zoomed");
+                chart.classList.remove(
+                  "zoom-tools",
+                  "zoom-techniques",
+                  "zoom-platforms",
+                  "zoom-frameworks"
+                );
+                quadrants.forEach((q) => q.classList.remove("zoomed-in"));
+                labels.forEach((l) => l.classList.remove("zoomed-in"));
+              }
+            }, 400);
+          } else {
+            // Zoom in - add zoom class to rectangles container and this rectangle
+            rectanglesContainer?.classList.add("zoomed");
+            rectangles.forEach((r) => r.classList.remove("zoomed-in"));
+            rect.classList.add("zoomed-in");
+
+            // Set up zoom state for the radar chart (for when screen size increases)
+            if (chart) {
+              chart.classList.add("zoomed");
+              chart.classList.remove(
+                "zoom-tools",
+                "zoom-techniques",
+                "zoom-platforms",
+                "zoom-frameworks"
+              );
+              chart.classList.add(`zoom-${quadrantKey}`);
+
+              // Find and zoom the corresponding quadrant
+              quadrants.forEach((q) => {
+                const qKey = q.getAttribute("data-quadrant");
+                if (qKey === quadrantKey) {
+                  q.classList.add("zoomed-in");
+                } else {
+                  q.classList.remove("zoomed-in");
+                }
+              });
+
+              // Update labels
+              labels.forEach((l) => {
+                const lKey = l.getAttribute("data-label-quadrant");
+                if (lKey === quadrantKey) {
+                  l.classList.add("zoomed-in");
+                } else {
+                  l.classList.remove("zoomed-in");
+                }
+              });
+            }
+
+            // Show the corresponding item list after zoom animation completes
+            setTimeout(() => {
+              wrapper.classList.add("list-visible");
+
+              // Add list-animation-complete after fade-out completes
+              setTimeout(() => {
+                wrapper.classList.add("list-animation-complete");
+              }, fadeOutDuration);
+
+              itemLists?.forEach((list) => {
+                const listQuadrant = list
+                  .querySelector("h3")
+                  ?.textContent?.trim();
+                const quadrantNameMap: Record<string, string> = {
+                  tools: "Tools",
+                  techniques: "Technieken",
+                  platforms: "Platformen",
+                  frameworks: "Talen & Frameworks",
+                };
+                const quadrantName = quadrantNameMap[quadrantKey || ""] || "";
+                if (listQuadrant === quadrantName) {
+                  list.classList.remove("hidden");
+                  requestAnimationFrame(() => {
+                    list.classList.add("visible");
+                  });
+                } else {
+                  list.classList.add("hidden");
+                  list.classList.remove("visible");
+                }
+              });
+            }, 500); // Wait for zoom animation (500ms) to complete
+          }
+        });
+      });
+
+      // Handle back to radar button clicks for rectangles
+      const backButtons = wrapper.querySelectorAll(".back-to-radar");
+      backButtons?.forEach((button) => {
+        button.addEventListener("click", () => {
+          // Hide list
+          itemLists?.forEach((list) => {
+            list.classList.remove("visible");
+          });
+          wrapper.classList.remove("list-visible");
+          wrapper.classList.remove("list-animation-complete");
+
+          // Wait for list animation to complete before zooming out
+          setTimeout(() => {
+            rectanglesContainer?.classList.remove("zoomed");
+            rectangles.forEach((r) => r.classList.remove("zoomed-in"));
+
+            // Also clear radar chart zoom state
+            if (chart) {
+              chart.classList.remove("zoomed");
+              chart.classList.remove(
+                "zoom-tools",
+                "zoom-techniques",
+                "zoom-platforms",
+                "zoom-frameworks"
+              );
+              quadrants?.forEach((q) => q.classList.remove("zoomed-in"));
+              labels?.forEach((l) => l.classList.remove("zoomed-in"));
+            }
             itemLists?.forEach((list) => list.classList.add("hidden"));
           }, 400);
         });
@@ -569,7 +950,9 @@ const quadrantLabels = [
           const matchingRadarItem = Array.from(radarItems).find((item) => {
             const itemLink = item.querySelector("a");
             const itemHref = itemLink?.getAttribute("href");
-            const itemSlug = itemHref?.split("?")[0].replace("/radar-items/", "");
+            const itemSlug = itemHref
+              ?.split("?")[0]
+              .replace("/radar-items/", "");
             return itemSlug === slug;
           });
 
@@ -590,6 +973,7 @@ const quadrantLabels = [
   const initRadar = () => {
     initRadarHover();
     initRadarZoom();
+    initQuadrantRectangles();
     initItemListHover();
   };
 

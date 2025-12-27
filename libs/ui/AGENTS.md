@@ -415,7 +415,7 @@ import { TechnologyRadar } from "@xprtz/ui";
 
 ### RadarChart Component
 
-The main radar visualization that combines four quadrants into a complete circle.
+The main radar visualization that combines four quadrants into a complete circle with full responsive design support.
 
 **Props:**
 - `items?: RadarItem[]` - Array of radar items from CMS
@@ -435,6 +435,62 @@ The main radar visualization that combines four quadrants into a complete circle
 - Transform-based container slide (200px left) prevents layout reflow
 - List slides in from right after zoom completes
 - Synchronized animations create smooth push-effect without jumping
+
+**Responsive Design:**
+
+The RadarChart implements a three-tier responsive strategy:
+
+1. **Desktop/Tablet View (> 1090px width)**
+   - Full radar chart with four quadrants displayed
+   - Hover effects dim non-hovered quadrants to 50% opacity
+   - Click to zoom individual quadrants (1.75x scale)
+   - Quadrant slides/transforms to center when zoomed
+   - Ring labels (Adopt, Trial, Assess, Hold) transform with zoomed quadrant
+   - Item list appears to the right of radar after zoom animation
+
+2. **Medium Screens (870px - 1090px width)**
+   - Full radar chart visible
+   - When quadrant is clicked and list appears:
+     - Radar chart fades out smoothly (300ms opacity transition)
+     - After fade-out completes, radar switches from `position: absolute` to `display: none`
+     - Item list switches from `position: absolute` to `position: static`
+     - Item list takes full width and flows naturally in page layout
+   - Smooth fade-out prevents abrupt disappearance
+   - No blank space remains after animation completes
+
+3. **Mobile View (< 870px width)**
+   - Radar chart hidden (`display: none`)
+   - Four colored rectangles displayed in 2x2 grid
+   - Each rectangle represents a quadrant with matching colors
+   - Hover effects dim non-hovered rectangles to 50% opacity
+   - Click to zoom rectangle (2.05x scale from corner origin)
+   - Zoomed rectangle expands to fill entire 2x2 grid area
+   - When rectangle is clicked and list appears:
+     - Rectangles fade out smoothly (300ms opacity transition)
+     - After fade-out completes, rectangles switch from `position: absolute` to `display: none`
+     - Item list switches from `position: absolute` to `position: static`
+     - Item list takes full width
+   - Smooth animations prevent jarring layout shifts
+   - Transform origins set to corners (top-left, top-right, bottom-left, bottom-right)
+   - Very small screens (< 360px): Rectangles stack in single column
+
+**Animation Configuration:**
+
+The component uses a CSS variable `--fade-out-duration` (default: 300ms) to control all fade-out timings:
+- CSS transitions read the variable for consistent animation duration
+- JavaScript reads the same variable to time class additions
+- Changing the variable in one place updates both CSS and JavaScript timing
+- Ensures synchronization between opacity fade-out and layout changes
+
+**State Management:**
+
+The component uses CSS classes to manage animation states:
+- `list-visible` - Triggers opacity fade-out of radar/rectangles
+- `list-animation-complete` - Applied after fade completes, sets `display: none` and `position: static`
+- `zoomed` - Applied to radar chart when any quadrant is zoomed
+- `zoomed-in` - Applied to the specific quadrant/rectangle being zoomed
+- `visible` - Applied to item list to trigger slide-in animation
+- `hidden` - Applied to item list to hide it with `display: none`
 
 **Usage:**
 ```astro
@@ -542,6 +598,14 @@ List view displaying all items within a selected quadrant, grouped by ring.
 - Appears after quadrant zoom animation completes (500ms delay)
 - Coordinated slide-out animation when zooming out
 - **Interactive hover**: Hovering over list items highlights the corresponding radar item on the chart with enhanced visual effects
+
+**Animation Behavior:**
+- Starts with `position: absolute` overlaying the radar/rectangles
+- Slides in from right with opacity fade-in (400ms)
+- When radar/rectangles complete their fade-out (300ms), switches to `position: static`
+- Becomes part of normal document flow without causing layout jumps
+- Takes full width on smaller screens for optimal readability
+- Custom scrollbar styling for better UX in scrollable content
 
 ### Integration Example
 
