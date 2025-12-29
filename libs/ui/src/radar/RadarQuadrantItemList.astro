@@ -1,5 +1,6 @@
 ---
 import type { RadarItemWithNumber } from "@xprtz/cms";
+import { buildRadarItemLink, RINGS } from "./radarUtils";
 
 interface Props {
   /**
@@ -26,12 +27,11 @@ interface Props {
 const { items, quadrantName, color, parentPageSlug } = Astro.props;
 
 // Group items by ring
-const ringOrder = ["Adopt", "Trial", "Assess", "Hold"];
-const itemsByRing = ringOrder.reduce(
-  (acc, ring) => {
-    const ringItems = items.filter((item) => item.ring === ring);
+const itemsByRing = RINGS.reduce(
+  (acc, { label }) => {
+    const ringItems = items.filter((item) => item.ring === label);
     if (ringItems.length > 0) {
-      acc[ring] = ringItems;
+      acc[label] = ringItems;
     }
     return acc;
   },
@@ -78,10 +78,7 @@ const itemsByRing = ringOrder.reduce(
             </h4>
             <ul class="space-y-2">
               {ringItems.map((item) => {
-                // Build the link with optional parent page query parameter
-                const itemLink = parentPageSlug
-                  ? `/radar-items/${item.slug}?from=${encodeURIComponent(parentPageSlug)}`
-                  : `/radar-items/${item.slug}`;
+                const itemLink = buildRadarItemLink(item.slug, parentPageSlug);
 
                 return (
                   <li>
@@ -115,8 +112,8 @@ const itemsByRing = ringOrder.reduce(
     transform: translateX(100%);
     opacity: 0;
     transition:
-      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+      transform var(--slide-duration, 400ms) cubic-bezier(0.4, 0, 0.2, 1),
+      opacity var(--fade-out-duration, 300ms) cubic-bezier(0.4, 0, 0.2, 1) var(--fade-out-delay, 100ms);
   }
 
   .quadrant-item-list.hidden {
@@ -127,8 +124,8 @@ const itemsByRing = ringOrder.reduce(
     transform: translateX(0);
     opacity: 1;
     transition:
-      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform var(--slide-duration, 400ms) cubic-bezier(0.4, 0, 0.2, 1),
+      opacity var(--fade-in-duration, 400ms) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .line-clamp-2 {

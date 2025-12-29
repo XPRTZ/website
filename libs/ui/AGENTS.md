@@ -387,6 +387,8 @@ The main CMS component that can be added to any page to display the technology r
 - Clicking the same tag again removes the filter
 - Smooth opacity transitions for filtered items
 - **Hover highlighting**: When hovering over an item in the quadrant list, the corresponding radar item on the chart is highlighted with enhanced visual effects (larger size, color fill, and glow)
+- **Tag filtering**: Stores tag information in `data-tags` attributes on radar items for client-side filtering
+- Uses `initializeOnReady` utility from radarUtils for consistent initialization across page loads
 
 **Usage in CMS:**
 Add the component to any page's components array in Strapi with:
@@ -476,11 +478,19 @@ The RadarChart implements a three-tier responsive strategy:
 
 **Animation Configuration:**
 
-The component uses a CSS variable `--fade-out-duration` (default: 300ms) to control all fade-out timings:
-- CSS transitions read the variable for consistent animation duration
-- JavaScript reads the same variable to time class additions
-- Changing the variable in one place updates both CSS and JavaScript timing
-- Ensures synchronization between opacity fade-out and layout changes
+The component uses CSS variables to control all animation timings (defined in `.radar-chart-wrapper`):
+- `--fade-out-duration: 300ms` - Duration for fading out radar/rectangles when list appears
+- `--fade-out-delay: 100ms` - Delay before fade-out animation starts
+- `--fade-in-duration: 400ms` - Duration for fading in the item list
+- `--zoom-duration: 500ms` - Duration for quadrant zoom animations
+- `--slide-duration: 400ms` - Duration for container and list slide animations
+
+Benefits:
+- CSS transitions read variables for consistent animation duration
+- JavaScript reads the same variables to time class additions
+- Single source of truth - changing a variable updates both CSS and JavaScript
+- All radar components inherit these variables for synchronized animations
+- Ensures perfect synchronization between opacity, transforms, and layout changes
 
 **State Management:**
 
@@ -491,6 +501,13 @@ The component uses CSS classes to manage animation states:
 - `zoomed-in` - Applied to the specific quadrant/rectangle being zoomed
 - `visible` - Applied to item list to trigger slide-in animation
 - `hidden` - Applied to item list to hide it with `display: none`
+
+**Initialization:**
+
+The component uses the `initializeOnReady` utility function from `radarUtils.ts` for consistent initialization:
+- Handles both Astro page-load events and initial page load
+- Ensures initialization runs exactly once per page load
+- Shared pattern across all radar components
 
 **Usage:**
 ```astro
@@ -504,13 +521,14 @@ import { RadarChart } from "@xprtz/ui";
 Individual quadrant representing 90° of the radar (one quarter circle).
 
 **Props:**
-- `position: 0 | 1 | 2 | 3` - Quadrant position (0: 0-90°, 1: 90-180°, 2: 180-270°, 3: 270-360°)
+- `gridPosition: "top-left" | "top-right" | "bottom-left" | "bottom-right"` - Position in the 2x2 grid layout
 - `color: string` - Color for the quadrant
 - `size?: number` - Size in pixels (default: 400)
 - `items?: RadarItemWithNumber[]` - Radar items to display
+- `parentPageSlug?: string` - Slug of the parent page for back navigation (optional)
 
 **Features:**
-- Four concentric rings representing adoption stages:
+- Four concentric rings representing adoption stages (defined in `radarUtils.ts`):
   - **Adopt** (innermost, 25% radius)
   - **Trial** (50% radius)
   - **Assess** (75% radius)
@@ -522,7 +540,8 @@ Individual quadrant representing 90° of the radar (one quarter circle).
   - Click to navigate to item detail page
   - Hover effects (gray background on hover)
   - Highlight effects when item in list is hovered (colored fill, larger size, glow)
-- Origin point positioned at appropriate corner based on position
+- Origin point positioned at appropriate corner based on grid position
+- **Tag data**: Each radar item includes a `data-tags` attribute with JSON-serialized tag titles for filtering
 
 **Item Positioning Algorithm:**
 - Items placed within their ring based on `item.ring` value
@@ -533,6 +552,7 @@ Individual quadrant representing 90° of the radar (one quarter circle).
 
 **Item Links:**
 - Items link to `/radar-items/{slug}` for individual radar item pages
+- Uses `buildRadarItemLink` utility from `radarUtils.ts` for consistent link generation
 - If `parentPageSlug` is provided, adds `?from={parentPageSlug}` query parameter for back navigation
 - The radar item page reads this parameter to create a dynamic back link
 
@@ -541,10 +561,11 @@ Individual quadrant representing 90° of the radar (one quarter circle).
 import { RadarQuadrant } from "@xprtz/ui";
 
 <RadarQuadrant
-  position={0}
+  gridPosition="top-left"
   color="#3b82f6"
   size={400}
   items={itemsWithNumbers}
+  parentPageSlug="expertise"
 />
 ```
 
@@ -588,15 +609,19 @@ List view displaying all items within a selected quadrant, grouped by ring.
 - `parentPageSlug?: string` - Slug of the parent page for back navigation (optional)
 
 **Features:**
-- Groups items by ring (Adopt, Trial, Assess, Hold)
+- Groups items by ring (Adopt, Trial, Assess, Hold) using `RINGS` constant from `radarUtils.ts`
 - Displays item number, title, and description
-- Links to item detail pages with `from` query parameter for back navigation
+- Links to item detail pages with `from` query parameter using `buildRadarItemLink` utility
 - Scrollable list with sticky ring headers
 - "Back to radar" button to return to main view
 - Hidden by default, shown when quadrant is clicked
-- Smooth slide-in animation from right (400ms duration)
-- Appears after quadrant zoom animation completes (500ms delay)
+- Smooth slide-in animation from right
+- Appears after quadrant zoom animation completes
 - Coordinated slide-out animation when zooming out
+- **CSS variable-based animations**: All animation timings use CSS variables inherited from parent wrapper
+  - Transform duration: `var(--slide-duration, 400ms)`
+  - Fade-out duration: `var(--fade-out-duration, 300ms)` with delay `var(--fade-out-delay, 100ms)`
+  - Fade-in duration: `var(--fade-in-duration, 400ms)`
 - **Interactive hover**: Hovering over list items highlights the corresponding radar item on the chart with enhanced visual effects
 
 **Animation Behavior:**
@@ -606,6 +631,35 @@ List view displaying all items within a selected quadrant, grouped by ring.
 - Becomes part of normal document flow without causing layout jumps
 - Takes full width on smaller screens for optimal readability
 - Custom scrollbar styling for better UX in scrollable content
+
+### Shared Utilities (radarUtils.ts)
+
+The radar components share common utilities defined in `radarUtils.ts`:
+
+**Constants:**
+```typescript
+export const RINGS: readonly { readonly label: RadarRing; readonly radiusPosition: number }[] = [
+  { label: "Adopt", radiusPosition: 25 },
+  { label: "Trial", radiusPosition: 50 },
+  { label: "Assess", radiusPosition: 75 },
+  { label: "Hold", radiusPosition: 100 },
+] as const;
+```
+- Single source of truth for ring configuration
+- Used by RadarChart, RadarQuadrant, and RadarQuadrantItemList
+- Ensures consistent ring ordering and positioning across all components
+
+**Functions:**
+
+`buildRadarItemLink(slug: string, parentPageSlug?: string): string`
+- Builds consistent links to radar item pages
+- Adds optional `?from={parentPageSlug}` query parameter for back navigation
+- Used by RadarQuadrant and RadarQuadrantItemList
+
+`initializeOnReady(callback: () => void): void`
+- Handles both Astro page-load events and initial page load
+- Ensures callback runs exactly once when page is ready
+- Used by RadarChart and TechnologyRadar for consistent initialization
 
 ### Integration Example
 
@@ -635,7 +689,7 @@ const allRadarItems = await fetchData<Array<RadarItem>>({
 });
 ---
 
-<RadarChart items={allRadarItems} />
+<RadarChart items={allRadarItems} parentPageSlug="expertise" />
 ```
 
 ## Important Notes
@@ -656,3 +710,6 @@ const allRadarItems = await fetchData<Array<RadarItem>>({
 - Test in multiple contexts
 - Ensure accessibility
 - Export all new components from index.ts
+- Use shared utilities from radarUtils.ts for radar components
+- Use CSS variables for animation timings to maintain consistency
+- Use `initializeOnReady` for client-side initialization in Astro components

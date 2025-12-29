@@ -19,10 +19,10 @@ import Listing from "./src/Listing.astro";
 import SubtitleWithText from "./src/SubtitleWithText.astro";
 import Quote from "./src/Quote.astro";
 import Blogs from "./src/Blogs.astro";
-import TechnologyRadar from "./src/TechnologyRadar.astro";
-import RadarQuadrant from "./src/RadarQuadrant.astro";
-import RadarChart from "./src/RadarChart.astro";
-import RadarQuadrantItemList from "./src/RadarQuadrantItemList.astro";
+import TechnologyRadar from "./src/radar/TechnologyRadar.astro";
+import RadarQuadrant from "./src/radar/RadarQuadrant.astro";
+import RadarChart from "./src/radar/RadarChart.astro";
+import RadarQuadrantItemList from "./src/radar/RadarQuadrantItemList.astro";
 
 import ComponentRenderer from "./src/ComponentRenderer.astro";
 
