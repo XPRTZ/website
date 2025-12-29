@@ -1,7 +1,7 @@
 ---
 import Layout from "../../layouts/layout.astro";
 import { fetchData, type RadarItem } from "@xprtz/cms";
-import { Container } from "@xprtz/ui";
+import { Container, Text, QUADRANTS } from "@xprtz/ui";
 
 export async function getStaticPaths() {
   const pageData = await fetchData<Array<RadarItem>>({
@@ -28,33 +28,9 @@ export async function getStaticPaths() {
 
 const radarItem: RadarItem = Astro.props;
 
-// Get the parent page from query parameter (if provided)
-const parentPageSlug = Astro.url.searchParams.get("from");
-const backLink = parentPageSlug ? `/${parentPageSlug}` : "/expertise";
-
-// Define colors for each quadrant (matching RadarChart)
-const quadrantColors = {
-  Techniques: "#3b82f6", // blue
-  Tools: "#10b981", // green
-  Platforms: "#f59e0b", // amber
-  "Languages & Frameworks": "#ef4444", // red
-};
-
-// Dutch translations for quadrant names
-const quadrantTranslations = {
-  Techniques: "Technieken",
-  Tools: "Tools",
-  Platforms: "Platformen",
-  "Languages & Frameworks": "Talen & Frameworks",
-};
-
-const quadrantColor =
-  quadrantColors[radarItem.quadrant as keyof typeof quadrantColors] ||
-  "#3b82f6";
-const quadrantDisplayName =
-  quadrantTranslations[
-    radarItem.quadrant as keyof typeof quadrantTranslations
-  ] || radarItem.quadrant;
+// Get quadrant configuration from QUADRANTS
+const quadrantConfig = QUADRANTS[radarItem.quadrant];
+const quadrantColor = quadrantConfig?.color || "#3b82f6"; // Default: blue
 ---
 
 <Layout title={radarItem.title} description={radarItem.description}>
@@ -119,7 +95,7 @@ const quadrantDisplayName =
                   class="inline-flex items-center rounded-xl px-4 py-1 text-sm/6 font-medium"
                   style={`background-color: ${quadrantColor}20; color: ${quadrantColor};`}
                 >
-                  {quadrantDisplayName}
+                  {radarItem.quadrant}
                 </span>
               </div>
               <div class="inline-flex">
@@ -145,9 +121,9 @@ const quadrantDisplayName =
               )
             }
 
-            <p class="mt-6 text-lg/8">
-              {radarItem.description}
-            </p>
+            {radarItem.description && (
+              <Text content={radarItem.description} __component="ui.text" id={0} />
+            )}
 
             {
               (radarItem.pros && radarItem.pros.length > 0) ||
@@ -260,14 +236,15 @@ const quadrantDisplayName =
                   <h2 class="text-2xl font-bold tracking-tight text-gray-900">
                     Conclusie
                   </h2>
-                  <p class="mt-4 text-base/7">{radarItem.conclusion}</p>
+                  <Text content={radarItem.conclusion} __component="ui.text" id={0} />
                 </div>
               )
             }
 
             <div class="mt-10">
               <a
-                href={backLink}
+                id="back-link"
+                href="/"
                 class="text-base/7 font-semibold text-primary-600 hover:text-primary-500"
               >
                 &larr; Terug naar radar
@@ -279,3 +256,22 @@ const quadrantDisplayName =
     </div>
   </Container>
 </Layout>
+
+<script>
+  import { initializeOnReady } from "@xprtz/ui";
+
+  // Update back link based on query parameter (client-side only since pages are statically generated)
+  const updateBackLink = () => {
+    const backLink = document.getElementById("back-link") as HTMLAnchorElement;
+    if (backLink) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const parentPageSlug = urlParams.get("from");
+      if (parentPageSlug) {
+        backLink.href = `/${parentPageSlug}`;
+      }
+    }
+  };
+
+  // Initialize on page load
+  initializeOnReady(updateBackLink);
+</script>
