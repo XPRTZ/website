@@ -113,8 +113,8 @@ const itemsByRing = RINGS.reduce(
     transform: translateX(100%);
     opacity: 0;
     transition:
-      transform var(--slide-duration, 400ms) cubic-bezier(0.4, 0, 0.2, 1),
-      opacity var(--fade-out-duration, 300ms) cubic-bezier(0.4, 0, 0.2, 1)
+      transform var(--slide-duration, 400ms) var(--transition-easing, cubic-bezier(0.4, 0, 0.2, 1)),
+      opacity var(--fade-out-duration, 300ms) var(--transition-easing, cubic-bezier(0.4, 0, 0.2, 1))
         var(--fade-out-delay, 100ms);
   }
 
@@ -126,8 +126,8 @@ const itemsByRing = RINGS.reduce(
     transform: translateX(0);
     opacity: 1;
     transition:
-      transform var(--slide-duration, 400ms) cubic-bezier(0.4, 0, 0.2, 1),
-      opacity var(--fade-in-duration, 400ms) cubic-bezier(0.4, 0, 0.2, 1);
+      transform var(--slide-duration, 400ms) var(--transition-easing, cubic-bezier(0.4, 0, 0.2, 1)),
+      opacity var(--fade-in-duration, 400ms) var(--transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .line-clamp-2 {

@@ -214,6 +214,10 @@ const ringLabelData = RINGS.map((ring, index) => {
     --fade-in-duration: 400ms;
     --zoom-duration: 500ms;
     --slide-duration: 400ms;
+    /* Reusable style values */
+    --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    --zoom-scale: 1.75;
+    --hover-dim-opacity: 0.5;
   }
 
   .radar-chart-container {
@@ -221,7 +225,7 @@ const ringLabelData = RINGS.map((ring, index) => {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: transform var(--slide-duration) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform var(--slide-duration) var(--transition-easing);
   }
 
   .radar-chart-wrapper.list-visible .radar-chart-container {
@@ -245,7 +249,7 @@ const ringLabelData = RINGS.map((ring, index) => {
     .radar-chart-wrapper.list-visible .radar-chart-container {
       opacity: 0;
       pointer-events: none;
-      transition: opacity var(--fade-out-duration) cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity var(--fade-out-duration) var(--transition-easing);
     }
 
     .radar-chart-wrapper.list-animation-complete .radar-chart-container {
@@ -290,7 +294,7 @@ const ringLabelData = RINGS.map((ring, index) => {
     .radar-chart-wrapper.list-visible .quadrant-rectangles {
       opacity: 0;
       pointer-events: none;
-      transition: opacity var(--fade-out-duration) cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity var(--fade-out-duration) var(--transition-easing);
     }
 
     .radar-chart-wrapper.list-animation-complete .quadrant-rectangles {
@@ -306,7 +310,7 @@ const ringLabelData = RINGS.map((ring, index) => {
       border-radius: 8px;
       padding: 20px;
       cursor: pointer;
-      transition: all var(--zoom-duration) cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all var(--zoom-duration) var(--transition-easing);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -322,7 +326,7 @@ const ringLabelData = RINGS.map((ring, index) => {
 
     /* Hover dim effect for rectangles */
     .quadrant-rectangles.hovering .quadrant-rect {
-      opacity: 0.5;
+      opacity: var(--hover-dim-opacity);
     }
 
     .quadrant-rectangles.hovering .quadrant-rect.active {
@@ -438,7 +442,7 @@ const ringLabelData = RINGS.map((ring, index) => {
   }
 
   .radar-chart.hovering .quadrant-wrapper {
-    opacity: 0.5;
+    opacity: var(--hover-dim-opacity);
   }
 
   .radar-chart.hovering .quadrant-wrapper.active {
@@ -446,7 +450,7 @@ const ringLabelData = RINGS.map((ring, index) => {
   }
 
   .radar-chart.hovering .quadrant-label {
-    opacity: 0.5;
+    opacity: var(--hover-dim-opacity);
   }
 
   .radar-chart.hovering .quadrant-label.active {
@@ -456,7 +460,7 @@ const ringLabelData = RINGS.map((ring, index) => {
   /* Zoom functionality */
   .quadrant-wrapper {
     cursor: pointer;
-    transition: all var(--zoom-duration) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--zoom-duration) var(--transition-easing);
     transform-origin: center;
     position: relative;
   }
@@ -469,24 +473,24 @@ const ringLabelData = RINGS.map((ring, index) => {
   .radar-chart.zoomed .quadrant-wrapper.zoomed-in {
     opacity: 1;
     pointer-events: auto;
-    transform: scale(1.75) translate(0, 0);
+    transform: scale(var(--zoom-scale)) translate(0, 0);
   }
 
   /* Position adjustments for each quadrant when zoomed */
   .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="tools"] {
-    transform: scale(1.75) translate(25%, 25%);
+    transform: scale(var(--zoom-scale)) translate(25%, 25%);
   }
 
   .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="techniques"] {
-    transform: scale(1.75) translate(-25%, 25%);
+    transform: scale(var(--zoom-scale)) translate(-25%, 25%);
   }
 
   .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="platforms"] {
-    transform: scale(1.75) translate(25%, calc(-25% - 15px));
+    transform: scale(var(--zoom-scale)) translate(25%, calc(-25% - 15px));
   }
 
   .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="frameworks"] {
-    transform: scale(1.75) translate(-25%, calc(-25% - 15px));
+    transform: scale(var(--zoom-scale)) translate(-25%, calc(-25% - 15px));
   }
 
   .radar-chart.zoomed .quadrant-label {
@@ -495,7 +499,7 @@ const ringLabelData = RINGS.map((ring, index) => {
 
   /* Ring labels positioning and transitions */
   .ring-labels {
-    transition: all var(--zoom-duration) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--zoom-duration) var(--transition-easing);
     transform-origin: center;
   }
 
@@ -508,25 +512,25 @@ const ringLabelData = RINGS.map((ring, index) => {
   /* Show and transform ring labels for Tools quadrant (top-left) */
   .radar-chart.zoomed.zoom-tools .ring-labels[data-ring-labels="left"] {
     opacity: 1;
-    transform: scale(1.75) translate(25%, 190px);
+    transform: scale(var(--zoom-scale)) translate(25%, 190px);
   }
 
   /* Show and transform ring labels for Platforms quadrant (bottom-left) */
   .radar-chart.zoomed.zoom-platforms .ring-labels[data-ring-labels="left"] {
     opacity: 1;
-    transform: scale(1.75) translate(25%, -205px);
+    transform: scale(var(--zoom-scale)) translate(25%, -205px);
   }
 
   /* Show and transform ring labels for Techniques quadrant (top-right) */
   .radar-chart.zoomed.zoom-techniques .ring-labels[data-ring-labels="right"] {
     opacity: 1;
-    transform: scale(1.75) translate(-25%, 190px);
+    transform: scale(var(--zoom-scale)) translate(-25%, 190px);
   }
 
   /* Show and transform ring labels for Frameworks quadrant (bottom-right) */
   .radar-chart.zoomed.zoom-frameworks .ring-labels[data-ring-labels="right"] {
     opacity: 1;
-    transform: scale(1.75) translate(-25%, -205px);
+    transform: scale(var(--zoom-scale)) translate(-25%, -205px);
   }
 </style>
 
