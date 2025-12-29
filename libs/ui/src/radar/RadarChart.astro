@@ -56,6 +56,24 @@ const labelPositionMap: Record<string, { style: string; align: string }> = {
   "bottom-left": { style: "bottom: 0; left: 0;", align: "text-left" },
   "bottom-right": { style: "bottom: 0; right: 0;", align: "text-right" },
 };
+
+// Pre-calculate ring label positions and styles
+const ringLabelData = RINGS.map((ring, index) => {
+  const radius = quadrantSize * (ring.radiusPosition / 100);
+  const prevRadius =
+    index > 0
+      ? quadrantSize * (RINGS[index - 1].radiusPosition / 100)
+      : 0;
+  const ringCenter = prevRadius + (radius - prevRadius) / 2;
+  // Calculate opacity: inner rings (Adopt) darker, outer rings (Hold) lighter
+  const opacity = 1 - (index * 0.1);
+
+  return {
+    label: ring.label,
+    ringCenter,
+    opacity,
+  };
+});
 ---
 
 <div class="radar-chart-wrapper">
@@ -96,22 +114,16 @@ const labelPositionMap: Record<string, { style: string; align: string }> = {
         style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}
       >
         {
-          RINGS.map((ring, index) => {
-            const radius = quadrantSize * (ring.radiusPosition / 100);
-            const prevRadius =
-              index > 0
-                ? quadrantSize * (RINGS[index - 1].radiusPosition / 100)
-                : 0;
-            const ringCenter = prevRadius + (radius - prevRadius) / 2;
-            const leftPosition = quadrantSize - ringCenter;
-            const labelStyle = `left: ${leftPosition}px; height: ${margin}px;`;
+          ringLabelData.map((data) => {
+            const leftPosition = quadrantSize - data.ringCenter;
+            const labelStyle = `left: ${leftPosition}px; height: ${margin}px; opacity: ${data.opacity};`;
 
             return (
               <div
                 class="absolute text-xs font-bold text-gray-600 flex items-center -translate-x-1/2"
                 style={labelStyle}
               >
-                {ring.label}
+                {data.label}
               </div>
             );
           })
@@ -125,21 +137,15 @@ const labelPositionMap: Record<string, { style: string; align: string }> = {
         style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}
       >
         {
-          RINGS.map((ring, index) => {
-            const radius = quadrantSize * (ring.radiusPosition / 100);
-            const prevRadius =
-              index > 0
-                ? quadrantSize * (RINGS[index - 1].radiusPosition / 100)
-                : 0;
-            const ringCenter = prevRadius + (radius - prevRadius) / 2;
-            const labelStyle = `left: ${ringCenter}px; height: ${margin}px;`;
+          ringLabelData.map((data) => {
+            const labelStyle = `left: ${data.ringCenter}px; height: ${margin}px; opacity: ${data.opacity};`;
 
             return (
               <div
                 class="absolute text-xs font-bold text-gray-600 flex items-center -translate-x-1/2"
                 style={labelStyle}
               >
-                {ring.label}
+                {data.label}
               </div>
             );
           })
