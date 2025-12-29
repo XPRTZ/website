@@ -85,6 +85,8 @@ const generateQuarterCirclePath = (radiusPercent: number): string => {
 
 // Circle radius for items (scaled for 20-30 items)
 const circleRadius = 12;
+// Maximum radius when hovering: radius 14 + stroke-width 3 = 17
+const maxCircleRadius = 17;
 
 // Function to get radius range for each ring
 const getRingRadiusRange = (ring: RadarRing): { min: number; max: number } => {
@@ -134,9 +136,9 @@ const positionedItems = items.map((item, index) => {
     y = origin.y + radius * Math.sin(angle);
   }
 
-  // Clamp positions to keep circles within SVG bounds (considering circle radius)
-  x = Math.max(circleRadius, Math.min(size - circleRadius, x));
-  y = Math.max(circleRadius, Math.min(size - circleRadius, y));
+  // Clamp positions to keep circles within SVG bounds (considering max radius with hover state)
+  x = Math.max(maxCircleRadius, Math.min(size - maxCircleRadius, x));
+  y = Math.max(maxCircleRadius, Math.min(size - maxCircleRadius, y));
 
   return { ...item, x, y };
 });
@@ -201,7 +203,7 @@ const positionedItems = items.map((item, index) => {
               y={item.y + 1}
               text-anchor="middle"
               dominant-baseline="middle"
-              class="text-sm font-semibold pointer-events-none"
+              class="text-sm font-semibold pointer-events-none radar-item-text transition-all"
               fill={color}
               style="font-family: system-ui, -apple-system, sans-serif;"
             >
@@ -223,10 +225,21 @@ const positionedItems = items.map((item, index) => {
     transition: all 0.2s ease;
   }
 
+  .radar-item-text {
+    transition: all 0.2s ease;
+  }
+
+  /* Hover effect: invert colors - colored fill, white text and border */
   .radar-item:hover .radar-item-circle,
   .radar-item.highlighted .radar-item-circle {
-    fill: color-mix(in srgb, var(--quadrant-color) 10%, white);
+    fill: var(--quadrant-color);
+    stroke: white;
     stroke-width: 3;
     r: 14;
+  }
+
+  .radar-item:hover .radar-item-text,
+  .radar-item.highlighted .radar-item-text {
+    fill: white;
   }
 </style>
