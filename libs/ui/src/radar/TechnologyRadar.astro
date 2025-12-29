@@ -105,21 +105,21 @@ const allTags = Array.from(
   };
 
   const filterRadarItems = (tag: string | null) => {
+    // Filter both radar chart items and list items
     const radarItems = document.querySelectorAll(".radar-item");
+    const listItems = document.querySelectorAll(".list-radar-item");
 
+    // Filter radar chart items (dim and disable when not matching)
     radarItems.forEach((item) => {
-      // Get tags from data attribute
       const tagsAttr = item.getAttribute("data-tags");
       const tags: string[] = tagsAttr ? JSON.parse(tagsAttr) : [];
 
       if (!tag) {
-        // Show all items
         item.setAttribute(
           "style",
           "transition: opacity 0.3s ease; opacity: 1; pointer-events: auto;"
         );
       } else {
-        // Check if item has the selected tag
         const hasTag = tags.includes(tag);
         if (hasTag) {
           item.setAttribute(
@@ -130,6 +130,32 @@ const allTags = Array.from(
           item.setAttribute(
             "style",
             "transition: opacity 0.3s ease; opacity: 0.2; pointer-events: none;"
+          );
+        }
+      }
+    });
+
+    // Filter list items (subtle dim but keep selectable)
+    listItems.forEach((item) => {
+      const tagsAttr = item.getAttribute("data-tags");
+      const tags: string[] = tagsAttr ? JSON.parse(tagsAttr) : [];
+
+      if (!tag) {
+        item.setAttribute(
+          "style",
+          "transition: opacity 0.3s ease; opacity: 1;"
+        );
+      } else {
+        const hasTag = tags.includes(tag);
+        if (hasTag) {
+          item.setAttribute(
+            "style",
+            "transition: opacity 0.3s ease; opacity: 1;"
+          );
+        } else {
+          item.setAttribute(
+            "style",
+            "transition: opacity 0.3s ease; opacity: 0.5;"
           );
         }
       }

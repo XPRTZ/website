@@ -79,9 +79,10 @@ const itemsByRing = RINGS.reduce(
             <ul class="divide-y divide-gray-200">
               {ringItems.map((item) => {
                 const itemLink = buildRadarItemLink(item.slug, parentPageSlug);
+                const tagsJson = JSON.stringify(item.tags?.map(t => t.title) || []);
 
                 return (
-                  <li>
+                  <li class="list-radar-item" data-tags={tagsJson}>
                     <a
                       href={itemLink}
                       class="item-link block py-3 transition-all"
