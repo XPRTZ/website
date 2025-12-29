@@ -27,18 +27,10 @@ const margin = 20;
 
 // Define colors for each quadrant
 const quadrantColors = {
-  Techniques: "#3b82f6", // blue
+  Technieken: "#3b82f6", // blue
   Tools: "#10b981", // green
-  Platforms: "#f59e0b", // amber
-  "Languages & Frameworks": "#ef4444", // red
-};
-
-// Dutch translations for quadrant names
-const quadrantTranslations = {
-  Techniques: "Technieken",
-  Tools: "Tools",
-  Platforms: "Platformen",
-  "Languages & Frameworks": "Talen & Frameworks",
+  Platformen: "#f59e0b", // amber
+  "Talen & Frameworks": "#ef4444", // red
 };
 
 // Add numbers to items and group by quadrant
@@ -48,11 +40,11 @@ const itemsWithNumbers: RadarItemWithNumber[] = items.map((item, index) => ({
 }));
 
 const itemsByQuadrant = {
-  Techniques: itemsWithNumbers.filter((item) => item.quadrant === "Techniques"),
+  Technieken: itemsWithNumbers.filter((item) => item.quadrant === "Technieken"),
   Tools: itemsWithNumbers.filter((item) => item.quadrant === "Tools"),
-  Platforms: itemsWithNumbers.filter((item) => item.quadrant === "Platforms"),
-  "Languages & Frameworks": itemsWithNumbers.filter(
-    (item) => item.quadrant === "Languages & Frameworks"
+  Platformen: itemsWithNumbers.filter((item) => item.quadrant === "Platformen"),
+  "Talen & Frameworks": itemsWithNumbers.filter(
+    (item) => item.quadrant === "Talen & Frameworks"
   ),
 };
 
@@ -67,10 +59,10 @@ const ringRadii = [0.25, 0.5, 0.75, 1.0]; // Percentages of quadrant size
 // Quadrant labels and their positions
 const quadrantLabels = [
   { name: "Tools", displayName: "Tools", position: "top-left" },
-  { name: "Techniques", displayName: "Technieken", position: "top-right" },
-  { name: "Platforms", displayName: "Platformen", position: "bottom-left" },
+  { name: "Technieken", displayName: "Technieken", position: "top-right" },
+  { name: "Platformen", displayName: "Platformen", position: "bottom-left" },
   {
-    name: "Languages & Frameworks",
+    name: "Talen & Frameworks",
     displayName: "Talen &<br/>Frameworks",
     position: "bottom-right",
   },
@@ -102,44 +94,44 @@ const quadrantLabels = [
           />
         </div>
 
-        <!-- Top Right: Position 0 (0-90°) - Techniques -->
+        <!-- Top Right: Position 0 (0-90°) - Technieken -->
         <div
           class="flex justify-start items-end quadrant-wrapper transition-opacity duration-300"
           data-quadrant="techniques"
         >
           <RadarQuadrant
             position={0}
-            color={quadrantColors["Techniques"]}
+            color={quadrantColors["Technieken"]}
             size={quadrantSize}
-            items={itemsByQuadrant["Techniques"]}
+            items={itemsByQuadrant["Technieken"]}
             parentPageSlug={parentPageSlug}
           />
         </div>
 
-        <!-- Bottom Left: Position 2 (180-270°) - Platforms -->
+        <!-- Bottom Left: Position 2 (180-270°) - Platformen -->
         <div
           class="flex justify-end items-start quadrant-wrapper transition-opacity duration-300"
           data-quadrant="platforms"
         >
           <RadarQuadrant
             position={2}
-            color={quadrantColors["Platforms"]}
+            color={quadrantColors["Platformen"]}
             size={quadrantSize}
-            items={itemsByQuadrant["Platforms"]}
+            items={itemsByQuadrant["Platformen"]}
             parentPageSlug={parentPageSlug}
           />
         </div>
 
-        <!-- Bottom Right: Position 3 (270-360°) - Languages & Frameworks -->
+        <!-- Bottom Right: Position 3 (270-360°) - Talen & Frameworks -->
         <div
           class="flex justify-start items-start quadrant-wrapper transition-opacity duration-300"
           data-quadrant="frameworks"
         >
           <RadarQuadrant
             position={3}
-            color={quadrantColors["Languages & Frameworks"]}
+            color={quadrantColors["Talen & Frameworks"]}
             size={quadrantSize}
-            items={itemsByQuadrant["Languages & Frameworks"]}
+            items={itemsByQuadrant["Talen & Frameworks"]}
             parentPageSlug={parentPageSlug}
           />
         </div>
@@ -243,54 +235,54 @@ const quadrantLabels = [
       data-quadrant-rect="tools"
       style={`background-color: ${quadrantColors["Tools"]};`}
     >
-      {quadrantTranslations["Tools"]}
+      Tools
     </div>
     <div
       class="quadrant-rect"
       data-quadrant-rect="techniques"
-      style={`background-color: ${quadrantColors["Techniques"]};`}
+      style={`background-color: ${quadrantColors["Technieken"]};`}
     >
-      {quadrantTranslations["Techniques"]}
+      Technieken
     </div>
     <div
       class="quadrant-rect"
       data-quadrant-rect="platforms"
-      style={`background-color: ${quadrantColors["Platforms"]};`}
+      style={`background-color: ${quadrantColors["Platformen"]};`}
     >
-      {quadrantTranslations["Platforms"]}
+      Platformen
     </div>
     <div
       class="quadrant-rect"
       data-quadrant-rect="frameworks"
-      style={`background-color: ${quadrantColors["Languages & Frameworks"]};`}
+      style={`background-color: ${quadrantColors["Talen & Frameworks"]};`}
     >
-      {quadrantTranslations["Languages & Frameworks"]}
+      Talen & Frameworks
     </div>
   </div>
 
   <!-- Quadrant Item Lists (hidden by default) -->
   <RadarQuadrantItemList
     items={itemsByQuadrant["Tools"]}
-    quadrantName={quadrantTranslations["Tools"]}
+    quadrantName="Tools"
     color={quadrantColors["Tools"]}
     parentPageSlug={parentPageSlug}
   />
   <RadarQuadrantItemList
-    items={itemsByQuadrant["Techniques"]}
-    quadrantName={quadrantTranslations["Techniques"]}
-    color={quadrantColors["Techniques"]}
+    items={itemsByQuadrant["Technieken"]}
+    quadrantName="Technieken"
+    color={quadrantColors["Technieken"]}
     parentPageSlug={parentPageSlug}
   />
   <RadarQuadrantItemList
-    items={itemsByQuadrant["Platforms"]}
-    quadrantName={quadrantTranslations["Platforms"]}
-    color={quadrantColors["Platforms"]}
+    items={itemsByQuadrant["Platformen"]}
+    quadrantName="Platformen"
+    color={quadrantColors["Platformen"]}
     parentPageSlug={parentPageSlug}
   />
   <RadarQuadrantItemList
-    items={itemsByQuadrant["Languages & Frameworks"]}
-    quadrantName={quadrantTranslations["Languages & Frameworks"]}
-    color={quadrantColors["Languages & Frameworks"]}
+    items={itemsByQuadrant["Talen & Frameworks"]}
+    quadrantName="Talen & Frameworks"
+    color={quadrantColors["Talen & Frameworks"]}
     parentPageSlug={parentPageSlug}
   />
 </div>
