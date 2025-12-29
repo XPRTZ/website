@@ -131,6 +131,15 @@ const itemsByRing = RINGS.reduce(
       opacity var(--fade-in-duration, 400ms) var(--transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
+  .list-radar-item {
+    transition: opacity 0.3s ease;
+  }
+
+  /* Filtered out state: dim but keep clickable */
+  .list-radar-item.filtered-out {
+    opacity: 0.5;
+  }
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;

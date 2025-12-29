@@ -221,12 +221,21 @@ const positionedItems = items.map((item, index) => {
     display: block;
   }
 
+  .radar-item {
+    transition: opacity 0.3s ease;
+  }
+
   .radar-item-circle {
     transition: all 0.2s ease;
   }
 
   .radar-item-text {
     transition: all 0.2s ease;
+  }
+
+  /* Filtered out state: dim but keep clickable */
+  .radar-item.filtered-out {
+    opacity: 0.3;
   }
 
   /* Hover effect: invert colors - colored fill, white text and border */

@@ -108,56 +108,17 @@ const allTags = Array.from(
     // Filter both radar chart items and list items
     const radarItems = document.querySelectorAll(".radar-item");
     const listItems = document.querySelectorAll(".list-radar-item");
+    const allItems = [...Array.from(radarItems), ...Array.from(listItems)];
 
-    // Filter radar chart items (dim and disable when not matching)
-    radarItems.forEach((item) => {
+    // Filter all items (dim but keep clickable)
+    allItems.forEach((item) => {
       const tagsAttr = item.getAttribute("data-tags");
       const tags: string[] = tagsAttr ? JSON.parse(tagsAttr) : [];
 
-      if (!tag) {
-        item.setAttribute(
-          "style",
-          "transition: opacity 0.3s ease; opacity: 1; pointer-events: auto;"
-        );
+      if (!tag || tags.includes(tag)) {
+        item.classList.remove("filtered-out");
       } else {
-        const hasTag = tags.includes(tag);
-        if (hasTag) {
-          item.setAttribute(
-            "style",
-            "transition: opacity 0.3s ease; opacity: 1; pointer-events: auto;"
-          );
-        } else {
-          item.setAttribute(
-            "style",
-            "transition: opacity 0.3s ease; opacity: 0.2; pointer-events: none;"
-          );
-        }
-      }
-    });
-
-    // Filter list items (subtle dim but keep selectable)
-    listItems.forEach((item) => {
-      const tagsAttr = item.getAttribute("data-tags");
-      const tags: string[] = tagsAttr ? JSON.parse(tagsAttr) : [];
-
-      if (!tag) {
-        item.setAttribute(
-          "style",
-          "transition: opacity 0.3s ease; opacity: 1;"
-        );
-      } else {
-        const hasTag = tags.includes(tag);
-        if (hasTag) {
-          item.setAttribute(
-            "style",
-            "transition: opacity 0.3s ease; opacity: 1;"
-          );
-        } else {
-          item.setAttribute(
-            "style",
-            "transition: opacity 0.3s ease; opacity: 0.5;"
-          );
-        }
+        item.classList.add("filtered-out");
       }
     });
   };
