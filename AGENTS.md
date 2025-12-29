@@ -162,6 +162,30 @@ Provides shared TypeScript configuration for all workspaces with strict mode ena
 - Recent commits focus on Astro upgrades and feature additions
 - Deleted `pnpm-lock.yaml` (using npm instead of pnpm)
 
+## Astro-Specific Configuration
+
+### Hot Module Replacement (HMR) for Workspace Dependencies
+The Astro dev server may not properly hot-reload CSS changes from workspace dependencies (`@xprtz/ui`, `@xprtz/cms`). This has been resolved by configuring Vite in each app's `astro.config.mjs`:
+
+```js
+export default defineConfig({
+  vite: {
+    server: {
+      watch: {
+        // Force Vite to watch workspace dependencies
+        ignored: ['!**/node_modules/@xprtz/ui/**']
+      }
+    },
+    optimizeDeps: {
+      // Prevent pre-bundling of workspace dependencies
+      exclude: ['@xprtz/ui']
+    }
+  }
+})
+```
+
+This configuration ensures that changes to UI library files trigger proper hot reloads without requiring dev server restarts.
+
 ## Important Notes
 
 ### When Adding New Features

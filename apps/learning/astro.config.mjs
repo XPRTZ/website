@@ -7,4 +7,16 @@ export default defineConfig({
     components: {
       'Collapsible': './src/components/Collapsible.astro'
     }})],
+  vite: {
+    server: {
+      watch: {
+        // Force Vite to watch workspace dependencies
+        ignored: ['!**/node_modules/@xprtz/ui/**']
+      }
+    },
+    optimizeDeps: {
+      // Prevent pre-bundling of workspace dependencies
+      exclude: ['@xprtz/ui']
+    }
+  }
 });
