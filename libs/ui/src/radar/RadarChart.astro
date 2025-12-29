@@ -2,7 +2,7 @@
 import RadarQuadrant from "./RadarQuadrant.astro";
 import RadarQuadrantItemList from "./RadarQuadrantItemList.astro";
 import type { RadarItem, RadarItemWithNumber } from "@xprtz/cms";
-import { RINGS } from "./radarUtils";
+import { RINGS, QUADRANTS, type QuadrantName } from "./radarUtils";
 
 interface Props {
   /**
@@ -25,32 +25,6 @@ const { items = [], quadrantSize = 400, parentPageSlug } = Astro.props;
 
 // Margin between quadrants
 const margin = 20;
-
-// Quadrant configuration
-const QUADRANTS = {
-  Tools: {
-    color: "#10b981", // green
-    key: "tools",
-    gridPosition: "top-left" as const,
-  },
-  Technieken: {
-    color: "#3b82f6", // blue
-    key: "techniques",
-    gridPosition: "top-right" as const,
-  },
-  Platformen: {
-    color: "#f59e0b", // amber
-    key: "platforms",
-    gridPosition: "bottom-left" as const,
-  },
-  "Talen & Frameworks": {
-    color: "#ef4444", // red
-    key: "frameworks",
-    gridPosition: "bottom-right" as const,
-  },
-} as const;
-
-type QuadrantName = keyof typeof QUADRANTS;
 
 // Add numbers to items and group by quadrant
 const itemsWithNumbers: RadarItemWithNumber[] = items.map((item, index) => ({
@@ -104,8 +78,7 @@ const labelPositionMap: Record<string, { style: string; align: string }> = {
                 data-quadrant={config.key}
               >
                 <RadarQuadrant
-                  gridPosition={config.gridPosition}
-                  color={config.color}
+                  quadrantName={name as QuadrantName}
                   size={quadrantSize}
                   items={itemsByQuadrant[name as QuadrantName]}
                   parentPageSlug={parentPageSlug}
@@ -552,27 +525,7 @@ const labelPositionMap: Record<string, { style: string; align: string }> = {
 </style>
 
 <script>
-  import { initializeOnReady } from "./radarUtils";
-
-  // Consolidated quadrant configuration - matches the Astro frontmatter
-  const QUADRANTS = {
-    Tools: {
-      color: "#10b981",
-      key: "tools",
-    },
-    Technieken: {
-      color: "#3b82f6",
-      key: "techniques",
-    },
-    Platformen: {
-      color: "#f59e0b",
-      key: "platforms",
-    },
-    "Talen & Frameworks": {
-      color: "#ef4444",
-      key: "frameworks",
-    },
-  } as const;
+  import { initializeOnReady, QUADRANTS } from "./radarUtils";
 
   // Create reverse mapping: key -> name
   const quadrantNameMap: Record<string, string> = Object.fromEntries(

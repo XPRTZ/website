@@ -1,23 +1,16 @@
 ---
 import type { RadarRing, RadarItem } from "@xprtz/cms";
-import { buildRadarItemLink, RINGS } from "./radarUtils";
+import { buildRadarItemLink, RINGS, QUADRANTS, type QuadrantName, type GridPosition } from "./radarUtils";
 
 interface ItemWithNumber extends RadarItem {
   number: number;
 }
 
-type GridPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";
-
 interface Props {
   /**
-   * Grid position of the quadrant
+   * Name of the quadrant
    */
-  gridPosition: GridPosition;
-
-  /**
-   * The color of the quadrant
-   */
-  color: string;
+  quadrantName: QuadrantName;
 
   /**
    * Size of the quadrant in pixels
@@ -35,7 +28,10 @@ interface Props {
   parentPageSlug?: string;
 }
 
-const { gridPosition, color, size = 400, items = [], parentPageSlug } = Astro.props;
+const { quadrantName, size = 400, items = [], parentPageSlug } = Astro.props;
+
+// Get configuration from QUADRANTS
+const { color, gridPosition } = QUADRANTS[quadrantName];
 
 // Map grid positions to SVG positions (internal mapping)
 // Grid position describes where the quadrant appears in the 2x2 grid

@@ -12,6 +12,39 @@ export const RINGS: readonly { readonly label: RadarRing; readonly radiusPositio
 ] as const;
 
 /**
+ * Grid position type for quadrants in the 2x2 grid layout
+ */
+export type GridPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";
+
+/**
+ * Quadrant configuration with colors, keys, and grid positions
+ */
+export const QUADRANTS: Record<string, { color: string; key: string; gridPosition: GridPosition }> = {
+  Tools: {
+    color: "#10b981", // green
+    key: "tools",
+    gridPosition: "top-left",
+  },
+  Technieken: {
+    color: "#3b82f6", // blue
+    key: "techniques",
+    gridPosition: "top-right",
+  },
+  Platformen: {
+    color: "#f59e0b", // amber
+    key: "platforms",
+    gridPosition: "bottom-left",
+  },
+  "Talen & Frameworks": {
+    color: "#ef4444", // red
+    key: "frameworks",
+    gridPosition: "bottom-right",
+  },
+};
+
+export type QuadrantName = keyof typeof QUADRANTS;
+
+/**
  * Builds a link to a radar item page with optional back navigation
  * @param slug - The slug of the radar item
  * @param parentPageSlug - Optional slug of the parent page for back navigation
