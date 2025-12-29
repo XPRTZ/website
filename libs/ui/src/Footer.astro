@@ -25,7 +25,7 @@ const settings = globalSettings[0];
       {settings.socials.map(s => (
         s.isEnabled && <a href={s.link} class="text-gray-400 hover:text-gray-500">
           <span class="sr-only">{s.title}</span>
-          <img class="pt-4" src=`${imagesUrl}${s.icon.url}` />
+          <img class="pt-4" src=`${imagesUrl}${s.icon.url}` alt={s.title} />
         </a>
       ))}
     </div>

@@ -185,7 +185,7 @@ const positionedItems = items.map((item, index) => {
 
       return (
         <g class="radar-item" style="transition: opacity 0.3s ease;" data-tags={tagsJson}>
-          <a href={itemLink}>
+          <a href={itemLink} aria-label={`${item.number}. ${item.title}`}>
             <title>
               {item.number}. {item.title}
             </title>
