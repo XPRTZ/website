@@ -172,13 +172,13 @@ const ringLabelData = RINGS.map((ring, index) => {
     </div>
   </div>
 
-  <!-- Quadrant Rectangles for mobile (hidden by default, shown below 870px) -->
-  <div class="quadrant-rectangles" style="display: none;">
+  <!-- Quadrant Tiles for mobile (hidden by default, shown below 870px) -->
+  <div class="quadrant-tiles" style="display: none;">
     {
       Object.entries(QUADRANTS).map(([name, config]) => (
         <div
-          class="quadrant-rect"
-          data-quadrant-rect={config.key}
+          class="quadrant-tile"
+          data-quadrant-tile={config.key}
           style={`background-color: ${config.color};`}
         >
           {name}
@@ -237,6 +237,7 @@ const ringLabelData = RINGS.map((ring, index) => {
     position: absolute;
     left: calc(50% + 220px);
     top: 0;
+    z-index: 20;
   }
 
   @media (max-width: 1280px) {
@@ -284,20 +285,20 @@ const ringLabelData = RINGS.map((ring, index) => {
       display: none;
     }
 
-    .quadrant-rectangles {
+    .quadrant-tiles {
       display: grid !important;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin: 0 auto;
     }
 
-    .radar-chart-wrapper.list-visible .quadrant-rectangles {
+    .radar-chart-wrapper.list-visible .quadrant-tiles {
       opacity: 0;
       pointer-events: none;
       transition: opacity var(--fade-out-duration) var(--transition-easing);
     }
 
-    .radar-chart-wrapper.list-animation-complete .quadrant-rectangles {
+    .radar-chart-wrapper.list-animation-complete .quadrant-tiles {
       display: none !important;
     }
 
@@ -305,7 +306,7 @@ const ringLabelData = RINGS.map((ring, index) => {
       position: static;
     }
 
-    .quadrant-rect {
+    .quadrant-tile {
       aspect-ratio: 1;
       border-radius: 8px;
       padding: 20px;
@@ -318,84 +319,87 @@ const ringLabelData = RINGS.map((ring, index) => {
       font-size: 1.125rem;
       font-weight: bold;
       color: white;
+      position: relative;
+      z-index: 1;
     }
 
-    .quadrant-rect:hover {
+    .quadrant-tile:hover {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    /* Hover dim effect for rectangles */
-    .quadrant-rectangles.hovering .quadrant-rect {
+    /* Hover dim effect for tiles */
+    .quadrant-tiles.hovering .quadrant-tile {
       opacity: var(--hover-dim-opacity);
     }
 
-    .quadrant-rectangles.hovering .quadrant-rect.active {
+    .quadrant-tiles.hovering .quadrant-tile.active {
       opacity: 1;
     }
 
-    /* Zoom effect for rectangles */
-    .quadrant-rectangles.zoomed .quadrant-rect {
+    /* Zoom effect for tiles */
+    .quadrant-tiles.zoomed .quadrant-tile {
       opacity: 0;
       pointer-events: none;
     }
 
-    .quadrant-rectangles.zoomed .quadrant-rect.zoomed-in {
+    .quadrant-tiles.zoomed .quadrant-tile.zoomed-in {
       opacity: 1;
       pointer-events: auto;
+      z-index: 10;
     }
 
     /* Transform origins for each corner */
-    .quadrant-rect[data-quadrant-rect="tools"] {
+    .quadrant-tile[data-quadrant-tile="tools"] {
       transform-origin: top left;
     }
 
-    .quadrant-rect[data-quadrant-rect="techniques"] {
+    .quadrant-tile[data-quadrant-tile="techniques"] {
       transform-origin: top right;
     }
 
-    .quadrant-rect[data-quadrant-rect="platforms"] {
+    .quadrant-tile[data-quadrant-tile="platforms"] {
       transform-origin: bottom left;
     }
 
-    .quadrant-rect[data-quadrant-rect="frameworks"] {
+    .quadrant-tile[data-quadrant-tile="frameworks"] {
       transform-origin: bottom right;
     }
 
     /* Zoom transformations - scale to fill entire grid (2x2 + gap) */
-    .quadrant-rectangles.zoomed
-      .quadrant-rect.zoomed-in[data-quadrant-rect="tools"] {
+    .quadrant-tiles.zoomed
+      .quadrant-tile.zoomed-in[data-quadrant-tile="tools"] {
       transform: scale(2.05);
     }
 
-    .quadrant-rectangles.zoomed
-      .quadrant-rect.zoomed-in[data-quadrant-rect="techniques"] {
+    .quadrant-tiles.zoomed
+      .quadrant-tile.zoomed-in[data-quadrant-tile="techniques"] {
       transform: scale(2.05);
     }
 
-    .quadrant-rectangles.zoomed
-      .quadrant-rect.zoomed-in[data-quadrant-rect="platforms"] {
+    .quadrant-tiles.zoomed
+      .quadrant-tile.zoomed-in[data-quadrant-tile="platforms"] {
       transform: scale(2.05);
     }
 
-    .quadrant-rectangles.zoomed
-      .quadrant-rect.zoomed-in[data-quadrant-rect="frameworks"] {
+    .quadrant-tiles.zoomed
+      .quadrant-tile.zoomed-in[data-quadrant-tile="frameworks"] {
       transform: scale(2.05);
     }
   }
 
   @media (max-width: 360px) {
-    .quadrant-rectangles {
+    .quadrant-tiles {
       grid-template-columns: 1fr;
     }
 
     /* Disable zoom animation in single column layout */
-    .quadrant-rectangles.zoomed .quadrant-rect {
+    .quadrant-tiles.zoomed .quadrant-tile {
       opacity: 0.3 !important;
       pointer-events: auto !important;
       transition: opacity 0.3s ease-in-out;
     }
 
-    .quadrant-rectangles.zoomed .quadrant-rect.zoomed-in {
+    .quadrant-tiles.zoomed .quadrant-tile.zoomed-in {
       transform: none !important;
       opacity: 1 !important;
       box-shadow:
@@ -405,19 +409,19 @@ const ringLabelData = RINGS.map((ring, index) => {
     }
 
     /* Override all specific quadrant zoom transforms */
-    .quadrant-rectangles.zoomed
-      .quadrant-rect.zoomed-in[data-quadrant-rect="tools"],
-    .quadrant-rectangles.zoomed
-      .quadrant-rect.zoomed-in[data-quadrant-rect="techniques"],
-    .quadrant-rectangles.zoomed
-      .quadrant-rect.zoomed-in[data-quadrant-rect="platforms"],
-    .quadrant-rectangles.zoomed
-      .quadrant-rect.zoomed-in[data-quadrant-rect="frameworks"] {
+    .quadrant-tiles.zoomed
+      .quadrant-tile.zoomed-in[data-quadrant-tile="tools"],
+    .quadrant-tiles.zoomed
+      .quadrant-tile.zoomed-in[data-quadrant-tile="techniques"],
+    .quadrant-tiles.zoomed
+      .quadrant-tile.zoomed-in[data-quadrant-tile="platforms"],
+    .quadrant-tiles.zoomed
+      .quadrant-tile.zoomed-in[data-quadrant-tile="frameworks"] {
       transform: none !important;
     }
 
     /* Disable hover effects in single column */
-    .quadrant-rectangles.hovering .quadrant-rect {
+    .quadrant-tiles.hovering .quadrant-tile {
       opacity: 1 !important;
     }
 
@@ -549,8 +553,8 @@ const ringLabelData = RINGS.map((ring, index) => {
     const chart = wrapper.querySelector(".radar-chart");
     const quadrants = wrapper.querySelectorAll(".quadrant-wrapper");
     const labels = wrapper.querySelectorAll(".quadrant-label");
-    const rectangles = wrapper.querySelectorAll(".quadrant-rect");
-    const rectanglesContainer = wrapper.querySelector(".quadrant-rectangles");
+    const tiles = wrapper.querySelectorAll(".quadrant-tile");
+    const tilesContainer = wrapper.querySelector(".quadrant-tiles");
 
     // Set up hover for radar quadrants
     quadrants.forEach((quadrant) => {
@@ -582,23 +586,23 @@ const ringLabelData = RINGS.map((ring, index) => {
       quadrant.addEventListener("mouseleave", handleMouseLeave);
     });
 
-    // Set up hover for rectangles (mobile view)
-    rectangles.forEach((rect) => {
+    // Set up hover for tiles (mobile view)
+    tiles.forEach((tile) => {
       const handleMouseEnter = () => {
         // Only show hover effect if not zoomed
-        if (!rectanglesContainer?.classList.contains("zoomed")) {
-          rectanglesContainer?.classList.add("hovering");
-          rect.classList.add("active");
+        if (!tilesContainer?.classList.contains("zoomed")) {
+          tilesContainer?.classList.add("hovering");
+          tile.classList.add("active");
         }
       };
 
       const handleMouseLeave = () => {
-        rectanglesContainer?.classList.remove("hovering");
-        rect.classList.remove("active");
+        tilesContainer?.classList.remove("hovering");
+        tile.classList.remove("active");
       };
 
-      rect.addEventListener("mouseenter", handleMouseEnter);
-      rect.addEventListener("mouseleave", handleMouseLeave);
+      tile.addEventListener("mouseenter", handleMouseEnter);
+      tile.addEventListener("mouseleave", handleMouseLeave);
     });
   };
 
@@ -627,8 +631,8 @@ const ringLabelData = RINGS.map((ring, index) => {
     const chart = wrapper.querySelector(".radar-chart");
     const quadrants = wrapper.querySelectorAll(".quadrant-wrapper");
     const labels = wrapper.querySelectorAll(".quadrant-label");
-    const rectangles = wrapper.querySelectorAll(".quadrant-rect");
-    const rectanglesContainer = wrapper.querySelector(".quadrant-rectangles");
+    const tiles = wrapper.querySelectorAll(".quadrant-tile");
+    const tilesContainer = wrapper.querySelector(".quadrant-tiles");
     const itemLists = wrapper.querySelectorAll(".quadrant-item-list");
 
     // Set up zoom for radar quadrants
@@ -721,13 +725,13 @@ const ringLabelData = RINGS.map((ring, index) => {
       });
     });
 
-    // Set up zoom for rectangles (mobile view)
-    rectangles.forEach((rect) => {
-      const quadrantKey = rect.getAttribute("data-quadrant-rect");
+    // Set up zoom for tiles (mobile view)
+    tiles.forEach((tile) => {
+      const quadrantKey = tile.getAttribute("data-quadrant-tile");
 
-      rect.addEventListener("click", () => {
+      tile.addEventListener("click", () => {
         // Check if currently zoomed
-        const isCurrentlyZoomed = rect.classList.contains("zoomed-in");
+        const isCurrentlyZoomed = tile.classList.contains("zoomed-in");
 
         if (isCurrentlyZoomed) {
           // Zoom out - hide list and remove zoom
@@ -739,8 +743,7 @@ const ringLabelData = RINGS.map((ring, index) => {
 
           // Wait for list animation to complete before zooming out
           setTimeout(() => {
-            rectanglesContainer?.classList.remove("zoomed");
-            rectangles.forEach((r) => r.classList.remove("zoomed-in"));
+            tilesContainer?.classList.remove("zoomed");
 
             // Also clear radar chart zoom state
             chart?.classList.remove("zoomed");
@@ -752,12 +755,17 @@ const ringLabelData = RINGS.map((ring, index) => {
             );
             quadrants.forEach((q) => q.classList.remove("zoomed-in"));
             labels.forEach((l) => l.classList.remove("zoomed-in"));
+
+            // Wait for zoom-out animation to complete before removing zoomed-in class (and z-index)
+            setTimeout(() => {
+              tiles.forEach((t) => t.classList.remove("zoomed-in"));
+            }, zoomDuration);
           }, slideDuration);
         } else {
-          // Zoom in - add zoom class to rectangles container and this rectangle
-          rectanglesContainer?.classList.add("zoomed");
-          rectangles.forEach((r) => r.classList.remove("zoomed-in"));
-          rect.classList.add("zoomed-in");
+          // Zoom in - add zoom class to tiles container and this tile
+          tilesContainer?.classList.add("zoomed");
+          tiles.forEach((t) => t.classList.remove("zoomed-in"));
+          tile.classList.add("zoomed-in");
 
           // Set up zoom state for the radar chart (for when screen size increases)
           chart?.classList.add("zoomed");
@@ -831,7 +839,7 @@ const ringLabelData = RINGS.map((ring, index) => {
 
         // Wait for list animation to complete before zooming out
         setTimeout(() => {
-          // Clear both radar and rectangle zoom state
+          // Clear both radar and tile zoom state
           chart?.classList.remove("zoomed");
           chart?.classList.remove(
             "zoom-tools",
@@ -841,9 +849,13 @@ const ringLabelData = RINGS.map((ring, index) => {
           );
           quadrants.forEach((q) => q.classList.remove("zoomed-in"));
           labels.forEach((l) => l.classList.remove("zoomed-in"));
-          rectanglesContainer?.classList.remove("zoomed");
-          rectangles.forEach((r) => r.classList.remove("zoomed-in"));
+          tilesContainer?.classList.remove("zoomed");
           itemLists.forEach((list) => list.classList.add("hidden"));
+
+          // Wait for zoom-out animation to complete before removing zoomed-in class (and z-index)
+          setTimeout(() => {
+            tiles.forEach((t) => t.classList.remove("zoomed-in"));
+          }, zoomDuration);
         }, slideDuration);
       });
     });
