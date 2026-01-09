@@ -462,24 +462,29 @@ The RadarChart implements a three-tier responsive strategy:
 
 3. **Mobile View (< 870px width)**
    - Radar chart hidden (`display: none`)
-   - Four colored rectangles displayed in 2x2 grid
-   - Each rectangle represents a quadrant with matching colors
-   - Hover effects dim non-hovered rectangles to 50% opacity
-   - Click to zoom rectangle (2.05x scale from corner origin)
-   - Zoomed rectangle expands to fill entire 2x2 grid area
-   - When rectangle is clicked and list appears:
-     - Rectangles fade out smoothly (300ms opacity transition)
-     - After fade-out completes, rectangles switch from `position: absolute` to `display: none`
+   - Four colored tiles displayed in 2x2 grid
+   - Each tile represents a quadrant with matching colors
+   - Hover effects dim non-hovered tiles to 50% opacity
+   - Click to zoom tile (2.05x scale from corner origin)
+   - Zoomed tile expands to fill entire 2x2 grid area
+   - **Z-index layering**: Tiles use z-index to ensure proper stacking during zoom animations
+     - Regular tiles: `z-index: 1`
+     - Zoomed tile: `z-index: 10` (appears above other tiles)
+     - Item list: `z-index: 20` (always on top, including during zoom-out)
+     - Z-index is maintained during zoom-out animation, then removed after animation completes
+   - When tile is clicked and list appears:
+     - Tiles fade out smoothly (300ms opacity transition)
+     - After fade-out completes, tiles switch from `position: absolute` to `display: none`
      - Item list switches from `position: absolute` to `position: static`
      - Item list takes full width
    - Smooth animations prevent jarring layout shifts
    - Transform origins set to corners (top-left, top-right, bottom-left, bottom-right)
-   - Very small screens (< 360px): Rectangles stack in single column
+   - Very small screens (< 360px): Tiles stack in single column
 
 **Animation Configuration:**
 
 The component uses CSS variables to control all animation timings (defined in `.radar-chart-wrapper`):
-- `--fade-out-duration: 300ms` - Duration for fading out radar/rectangles when list appears
+- `--fade-out-duration: 300ms` - Duration for fading out radar/tiles when list appears
 - `--fade-out-delay: 100ms` - Delay before fade-out animation starts
 - `--fade-in-duration: 400ms` - Duration for fading in the item list
 - `--zoom-duration: 500ms` - Duration for quadrant zoom animations
@@ -495,10 +500,10 @@ Benefits:
 **State Management:**
 
 The component uses CSS classes to manage animation states:
-- `list-visible` - Triggers opacity fade-out of radar/rectangles
+- `list-visible` - Triggers opacity fade-out of radar/tiles
 - `list-animation-complete` - Applied after fade completes, sets `display: none` and `position: static`
 - `zoomed` - Applied to radar chart when any quadrant is zoomed
-- `zoomed-in` - Applied to the specific quadrant/rectangle being zoomed
+- `zoomed-in` - Applied to the specific quadrant/tile being zoomed
 - `visible` - Applied to item list to trigger slide-in animation
 - `hidden` - Applied to item list to hide it with `display: none`
 
@@ -625,9 +630,9 @@ List view displaying all items within a selected quadrant, grouped by ring.
 - **Interactive hover**: Hovering over list items highlights the corresponding radar item on the chart with enhanced visual effects
 
 **Animation Behavior:**
-- Starts with `position: absolute` overlaying the radar/rectangles
+- Starts with `position: absolute` overlaying the radar/tiles
 - Slides in from right with opacity fade-in (400ms)
-- When radar/rectangles complete their fade-out (300ms), switches to `position: static`
+- When radar/tiles complete their fade-out (300ms), switches to `position: static`
 - Becomes part of normal document flow without causing layout jumps
 - Takes full width on smaller screens for optimal readability
 - Custom scrollbar styling for better UX in scrollable content
