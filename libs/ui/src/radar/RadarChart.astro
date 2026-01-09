@@ -39,9 +39,6 @@ const itemsByQuadrant = Object.fromEntries(
   ])
 ) as Record<QuadrantName, RadarItemWithNumber[]>;
 
-// Calculate total size
-const totalSize = quadrantSize * 2 + margin;
-
 // Helper maps for positioning
 const flexClassMap: Record<string, string> = {
   "top-left": "flex justify-end items-end",
@@ -61,12 +58,10 @@ const labelPositionMap: Record<string, { style: string; align: string }> = {
 const ringLabelData = RINGS.map((ring, index) => {
   const radius = quadrantSize * (ring.radiusPosition / 100);
   const prevRadius =
-    index > 0
-      ? quadrantSize * (RINGS[index - 1].radiusPosition / 100)
-      : 0;
+    index > 0 ? quadrantSize * (RINGS[index - 1].radiusPosition / 100) : 0;
   const ringCenter = prevRadius + (radius - prevRadius) / 2;
   // Calculate opacity: inner rings (Adopt) darker, outer rings (Hold) lighter
-  const opacity = 1 - (index * 0.1);
+  const opacity = 1 - index * 0.1;
 
   return {
     label: ring.label,
@@ -77,14 +72,8 @@ const ringLabelData = RINGS.map((ring, index) => {
 ---
 
 <div class="radar-chart-wrapper">
-  <div
-    class="radar-chart-container"
-    style={`width: ${totalSize}px; height: ${totalSize}px;`}
-  >
-    <div
-      class="relative radar-chart"
-      style={`width: ${totalSize}px; height: ${totalSize}px;`}
-    >
+  <div class="radar-chart-container">
+    <div class="relative radar-chart">
       <!-- Quadrants Grid -->
       <div class="grid grid-cols-2 grid-rows-2" style={`gap: ${margin}px;`}>
         {
@@ -218,6 +207,7 @@ const ringLabelData = RINGS.map((ring, index) => {
     --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
     --zoom-scale: 1.75;
     --hover-dim-opacity: 0.5;
+    transform-origin: center top;
   }
 
   .radar-chart-container {
@@ -240,49 +230,23 @@ const ringLabelData = RINGS.map((ring, index) => {
     z-index: 20;
   }
 
-  @media (max-width: 1280px) {
-    .radar-chart-wrapper :global(.quadrant-item-list) {
-      left: 57vw;
+  @media (max-width: 1280px) and (min-width: 1001px) {
+    .radar-chart-wrapper {
+      transform: scale(calc(100vw / 1350px));
+      /* Dynamically adjust height to match the scaled visual height */
+      height: calc(820px * (100vw / 1350px));
     }
   }
 
-  @media (max-width: 1090px) {
-    .radar-chart-wrapper.list-visible .radar-chart-container {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity var(--fade-out-duration) var(--transition-easing);
-    }
-
-    .radar-chart-wrapper.list-animation-complete .radar-chart-container {
-      display: none;
-    }
-
-    .radar-chart-wrapper.list-animation-complete :global(.quadrant-item-list) {
-      position: static;
-    }
-
-    .radar-chart-wrapper :global(.quadrant-item-list) {
-      left: auto;
-      margin: 0;
-      padding-left: 0;
-      padding-right: 0;
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .radar-chart-wrapper :global(.quadrant-item-list > div) {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .radar-chart-wrapper.list-visible .radar-chart-container {
-      transform: none;
-    }
-  }
-
-  @media (max-width: 870px) {
+  @media (max-width: 1000px) {
     .radar-chart-container {
       display: none;
+    }
+
+    /* Override list positioning for mobile - ensure it ends up centered */
+    .radar-chart-wrapper :global(.quadrant-item-list) {
+      left: 50%;
+      margin-left: -192px; /* Half of list width (384px / 2) */
     }
 
     .quadrant-tiles {
@@ -290,20 +254,31 @@ const ringLabelData = RINGS.map((ring, index) => {
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin: 0 auto;
+      transition:
+        transform var(--slide-duration) var(--transition-easing),
+        opacity var(--slide-duration) var(--transition-easing);
     }
 
-    .radar-chart-wrapper.list-visible .quadrant-tiles {
+    .quadrant-tiles.sliding-out {
+      transform: translateX(-100%);
       opacity: 0;
-      pointer-events: none;
-      transition: opacity var(--fade-out-duration) var(--transition-easing);
+    }
+
+    .quadrant-tiles.sliding-in {
+      transform: translateX(-100%);
+      opacity: 0;
     }
 
     .radar-chart-wrapper.list-animation-complete .quadrant-tiles {
       display: none !important;
     }
 
+    /* Keep list centered even after animation completes */
     .radar-chart-wrapper.list-animation-complete :global(.quadrant-item-list) {
       position: static;
+      transform: none;
+      left: auto;
+      margin-left: 0;
     }
 
     .quadrant-tile {
@@ -409,8 +384,7 @@ const ringLabelData = RINGS.map((ring, index) => {
     }
 
     /* Override all specific quadrant zoom transforms */
-    .quadrant-tiles.zoomed
-      .quadrant-tile.zoomed-in[data-quadrant-tile="tools"],
+    .quadrant-tiles.zoomed .quadrant-tile.zoomed-in[data-quadrant-tile="tools"],
     .quadrant-tiles.zoomed
       .quadrant-tile.zoomed-in[data-quadrant-tile="techniques"],
     .quadrant-tiles.zoomed
@@ -610,21 +584,26 @@ const ringLabelData = RINGS.map((ring, index) => {
     const wrapper = document.querySelector(".radar-chart-wrapper");
     if (!wrapper) return;
 
-    // Get animation durations from CSS variables (once for the entire wrapper)
-    const fadeOutDuration = parseInt(
-      getComputedStyle(wrapper)
-        .getPropertyValue("--fade-out-duration")
-        .replace("ms", "")
+    // Get animation durations from CSS variables
+    const computedStyle = getComputedStyle(wrapper);
+
+    // Helper to safely parse CSS variable durations
+    const parseDuration = (value: string, fallback: number): number => {
+      const parsed = parseInt(value.replace("ms", "").trim());
+      return isNaN(parsed) ? fallback : parsed;
+    };
+
+    const fadeOutDuration = parseDuration(
+      computedStyle.getPropertyValue("--fade-out-duration"),
+      300
     );
-    const zoomDuration = parseInt(
-      getComputedStyle(wrapper)
-        .getPropertyValue("--zoom-duration")
-        .replace("ms", "")
+    const zoomDuration = parseDuration(
+      computedStyle.getPropertyValue("--zoom-duration"),
+      500
     );
-    const slideDuration = parseInt(
-      getComputedStyle(wrapper)
-        .getPropertyValue("--slide-duration")
-        .replace("ms", "")
+    const slideDuration = parseDuration(
+      computedStyle.getPropertyValue("--slide-duration"),
+      400
     );
 
     // Get all elements once
@@ -734,14 +713,27 @@ const ringLabelData = RINGS.map((ring, index) => {
         const isCurrentlyZoomed = tile.classList.contains("zoomed-in");
 
         if (isCurrentlyZoomed) {
-          // Zoom out - hide list and remove zoom
+          // Zoom out - slide list out right and tiles in from left simultaneously
+          wrapper.classList.remove("list-animation-complete");
+
+          // Show tiles positioned off-screen left and start sliding in
+          tilesContainer?.classList.remove("sliding-out");
+          tilesContainer?.classList.add("sliding-in");
+
+          // Slide list out to right
           itemLists.forEach((list) => {
             list.classList.remove("visible");
           });
           wrapper.classList.remove("list-visible");
-          wrapper.classList.remove("list-animation-complete");
 
-          // Wait for list animation to complete before zooming out
+          // Use requestAnimationFrame to ensure sliding-in class is applied before removing it
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              tilesContainer?.classList.remove("sliding-in");
+            });
+          });
+
+          // After slide animation completes, zoom out the tile
           setTimeout(() => {
             tilesContainer?.classList.remove("zoomed");
 
@@ -755,6 +747,7 @@ const ringLabelData = RINGS.map((ring, index) => {
             );
             quadrants.forEach((q) => q.classList.remove("zoomed-in"));
             labels.forEach((l) => l.classList.remove("zoomed-in"));
+            itemLists.forEach((list) => list.classList.add("hidden"));
 
             // Wait for zoom-out animation to complete before removing zoomed-in class (and z-index)
             setTimeout(() => {
@@ -797,14 +790,13 @@ const ringLabelData = RINGS.map((ring, index) => {
             }
           });
 
-          // Show the corresponding item list after zoom animation completes
+          // After zoom completes, slide tiles out left and list in from right simultaneously
           setTimeout(() => {
-            wrapper.classList.add("list-visible");
+            // Start sliding tiles out to the left
+            tilesContainer?.classList.add("sliding-out");
 
-            // Add list-animation-complete after fade-out completes
-            setTimeout(() => {
-              wrapper.classList.add("list-animation-complete");
-            }, fadeOutDuration);
+            // Prepare and slide list in from right
+            wrapper.classList.add("list-visible");
 
             itemLists.forEach((list) => {
               const listQuadrant = list
@@ -821,6 +813,11 @@ const ringLabelData = RINGS.map((ring, index) => {
                 list.classList.remove("visible");
               }
             });
+
+            // After slide completes, hide tiles completely
+            setTimeout(() => {
+              wrapper.classList.add("list-animation-complete");
+            }, slideDuration);
           }, zoomDuration);
         }
       });
@@ -830,14 +827,27 @@ const ringLabelData = RINGS.map((ring, index) => {
     const backButtons = wrapper.querySelectorAll(".back-to-radar");
     backButtons.forEach((button) => {
       button.addEventListener("click", () => {
-        // Hide list and slide wrapper back simultaneously
+        // Slide list out right and tiles in from left simultaneously
+        wrapper.classList.remove("list-animation-complete");
+
+        // Show tiles positioned off-screen left and start sliding in
+        tilesContainer?.classList.remove("sliding-out");
+        tilesContainer?.classList.add("sliding-in");
+
+        // Slide list out to right
         itemLists.forEach((list) => {
           list.classList.remove("visible");
         });
         wrapper.classList.remove("list-visible");
-        wrapper.classList.remove("list-animation-complete");
 
-        // Wait for list animation to complete before zooming out
+        // Use requestAnimationFrame to ensure sliding-in class is applied before removing it
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            tilesContainer?.classList.remove("sliding-in");
+          });
+        });
+
+        // After slide animation completes, zoom out
         setTimeout(() => {
           // Clear both radar and tile zoom state
           chart?.classList.remove("zoomed");
@@ -879,9 +889,7 @@ const ringLabelData = RINGS.map((ring, index) => {
       const matchingRadarItem = Array.from(radarItems).find((item) => {
         const itemLink = item.querySelector("a");
         const itemHref = itemLink?.getAttribute("href");
-        const itemSlug = itemHref
-          ?.split("?")[0]
-          .replace("/radar-items/", "");
+        const itemSlug = itemHref?.split("?")[0].replace("/radar-items/", "");
         return itemSlug === slug;
       });
 

@@ -158,9 +158,9 @@ Provides shared TypeScript configuration for all workspaces with strict mode ena
 ## Git Workflow
 
 ### Recent Activity
-- Current branch: `main`
-- Recent commits focus on Astro upgrades and feature additions
-- Deleted `pnpm-lock.yaml` (using npm instead of pnpm)
+- Current branch: `feature/technology-radar`
+- Recent commits focus on radar chart animation improvements and accessibility enhancements
+- Fixed tile zoom and list slide animations for mobile view
 
 ## Astro-Specific Configuration
 
@@ -185,6 +185,69 @@ export default defineConfig({
 ```
 
 This configuration ensures that changes to UI library files trigger proper hot reloads without requiring dev server restarts.
+
+## Radar Chart Component
+
+### Overview
+The Technology Radar chart ([RadarChart.astro](libs/ui/src/radar/RadarChart.astro)) is a complex interactive component that displays technology items organized by quadrants and rings. It has different behaviors for desktop and mobile viewports.
+
+### Architecture
+- **Desktop (>1000px)**: Full radar chart with quadrants that can zoom
+- **Mobile (≤1000px)**: Colored tiles representing each quadrant
+
+### Animation System
+
+#### Desktop Radar Animations
+1. **Hover Effect**: Non-hovered quadrants dim to 50% opacity
+2. **Zoom In**:
+   - Clicked quadrant scales to 1.75x and centers
+   - Other quadrants fade to opacity 0
+   - Ring labels transform with the zoomed quadrant
+   - Duration: 500ms
+3. **List Slide**:
+   - After zoom, wrapper translates left by 200px
+   - Item list slides in from right
+   - Duration: 400ms
+
+#### Mobile Tile Animations
+The mobile animations were redesigned to create smooth cross-slide transitions:
+
+1. **Opening (Tile → List)**:
+   - Tile zooms in (scale 2.05) - 500ms
+   - After zoom: Tile slides left AND fades out while list slides in from right - 400ms
+   - Both elements pass each other smoothly
+   - After slide completes, tile becomes `display: none`
+
+2. **Closing (List → Tile)**:
+   - Tile positioned off-screen left with opacity 0
+   - List slides right while tile slides in from left AND fades in - 400ms
+   - After slide: Tile zooms out - 500ms
+
+#### Key CSS Classes for Mobile
+- `.sliding-out`: Tiles slide left with `translateX(-100%)` and fade to `opacity: 0`
+- `.sliding-in`: Tiles positioned at `translateX(-100%)` ready to slide in
+- `.list-visible`: Triggers list slide animation
+- `.list-animation-complete`: Switches list to `position: static` after animation
+
+#### Animation Timing Variables
+Defined in [RadarChart.astro:200-205](libs/ui/src/radar/RadarChart.astro#L200-L205):
+```css
+--fade-out-duration: 300ms;
+--fade-out-delay: 100ms;
+--fade-in-duration: 400ms;
+--zoom-duration: 500ms;
+--slide-duration: 400ms;
+--transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+```
+
+### Important Constraints
+1. **DO NOT** change the `position: static` rule for `.list-animation-complete` on mobile - this is required to prevent content overlap
+2. List positioning uses `left: 50%` with `margin-left: -192px` (half of 384px width) to ensure proper centering during animation
+
+### Related Components
+- [RadarQuadrant.astro](libs/ui/src/radar/RadarQuadrant.astro) - Individual quadrant rendering
+- [RadarQuadrantItemList.astro](libs/ui/src/radar/RadarQuadrantItemList.astro) - Item list with slide animations
+- [radarUtils.ts](libs/ui/src/radar/radarUtils.ts) - Shared constants and utilities
 
 ## Important Notes
 
