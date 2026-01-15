@@ -343,13 +343,15 @@ const ringLabelData = RINGS.map((ring, index) => {
 
     /* Zoom in animation - applied when zooming in */
     .quadrant-tile.zooming-in {
-      animation: tileZoomIn var(--zoom-duration) var(--transition-easing) forwards;
+      animation: tileZoomIn var(--zoom-duration) var(--transition-easing)
+        forwards;
       z-index: 10;
     }
 
     /* Zoom out animation - applied when zooming out */
     .quadrant-tile.zooming-out {
-      animation: tileZoomOut var(--zoom-duration) var(--transition-easing) forwards;
+      animation: tileZoomOut var(--zoom-duration) var(--transition-easing)
+        forwards;
       z-index: 10;
     }
 
@@ -386,23 +388,33 @@ const ringLabelData = RINGS.map((ring, index) => {
       grid-template-columns: 1fr;
     }
 
-    /* Disable zoom animation in single column layout */
+    /* Disable hover effects in single column */
+    .quadrant-tiles.hovering .quadrant-tile {
+      opacity: 1 !important;
+    }
+
+    /*
+     * Single column layout: replace zoom animation with subtle pulse effect.
+     * - Dims non-selected tiles instead of hiding them
+     * - Selected tile gets a pulse animation instead of scaling
+     */
+    .quadrant-tile.zooming-in {
+      animation: pulse-subtle 0.5s ease-in-out !important;
+      transform: none !important;
+    }
+
+    .quadrant-tile.zooming-out {
+      animation: none !important;
+      transform: none !important;
+    }
+
     .quadrant-tiles.zoomed .quadrant-tile {
       opacity: 0.3 !important;
       pointer-events: auto !important;
       transition: opacity 0.3s ease-in-out;
     }
 
-    .quadrant-tiles.zoomed .quadrant-tile.zoomed-in {
-      transform: none !important;
-      opacity: 1 !important;
-      box-shadow:
-        0 0 0 3px rgba(255, 255, 255, 0.5),
-        0 0 20px rgba(0, 0, 0, 0.3);
-      animation: pulse-subtle 0.5s ease-in-out;
-    }
-
-    /* Override all specific quadrant zoom transforms */
+    .quadrant-tiles.zoomed .quadrant-tile.zoomed-in,
     .quadrant-tiles.zoomed .quadrant-tile.zoomed-in[data-quadrant-tile="tools"],
     .quadrant-tiles.zoomed
       .quadrant-tile.zoomed-in[data-quadrant-tile="techniques"],
@@ -411,28 +423,26 @@ const ringLabelData = RINGS.map((ring, index) => {
     .quadrant-tiles.zoomed
       .quadrant-tile.zoomed-in[data-quadrant-tile="frameworks"] {
       transform: none !important;
-    }
-
-    /* Disable hover effects in single column */
-    .quadrant-tiles.hovering .quadrant-tile {
       opacity: 1 !important;
+      box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.5),
+        0 0 20px rgba(0, 0, 0, 0.3);
     }
 
-    /* Subtle pulse animation */
     @keyframes pulse-subtle {
       0% {
         box-shadow:
-          0 0 0 0 rgba(255, 255, 255, 0.7),
+          0 0 8px 0 rgba(0, 0, 0, 0.4),
           0 0 20px rgba(0, 0, 0, 0.3);
       }
       50% {
         box-shadow:
-          0 0 0 6px rgba(255, 255, 255, 0.3),
-          0 0 25px rgba(0, 0, 0, 0.4);
+          0 0 12px 6px rgba(0, 0, 0, 0.3),
+          0 0 25px rgba(0, 0, 0, 0.5);
       }
       100% {
         box-shadow:
-          0 0 0 3px rgba(255, 255, 255, 0.5),
+          0 0 10px 3px rgba(0, 0, 0, 0.35),
           0 0 20px rgba(0, 0, 0, 0.3);
       }
     }
