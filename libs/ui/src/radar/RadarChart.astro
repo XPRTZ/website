@@ -245,8 +245,10 @@ const ringLabelData = RINGS.map((ring, index) => {
 
     /* Override list positioning for mobile - ensure it ends up centered */
     .radar-chart-wrapper :global(.quadrant-item-list) {
-      left: 50%;
-      margin-left: -192px; /* Half of list width (384px / 2) */
+      left: 0;
+      right: 0;
+      width: min(100%, 24rem);
+      margin-inline: auto;
     }
 
     .quadrant-tiles {
@@ -277,8 +279,8 @@ const ringLabelData = RINGS.map((ring, index) => {
     .radar-chart-wrapper.list-animation-complete :global(.quadrant-item-list) {
       position: static;
       transform: none;
-      left: auto;
-      margin-left: 0;
+      width: min(100%, 24rem);
+      margin-inline: auto;
     }
 
     .quadrant-tile {
