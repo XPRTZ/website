@@ -224,10 +224,17 @@ The mobile animations were redesigned to create smooth cross-slide transitions:
    - After slide: Tile zooms out - 500ms
 
 #### Key CSS Classes for Mobile
-- `.sliding-out`: Tiles slide left with `translateX(-100%)` and fade to `opacity: 0`
+- `.sliding-out`: Tiles slide left with `translateX(-100%)` and fade to `opacity: 0`. For lists, triggers `slideOut` keyframe animation
 - `.sliding-in`: Tiles positioned at `translateX(-100%)` ready to slide in
-- `.list-visible`: Triggers list slide animation
+- `.list-visible`: Triggers list `slideIn` keyframe animation
 - `.list-animation-complete`: Switches list to `position: static` after animation
+
+#### Animation Implementation
+The quadrant item list uses CSS **keyframe animations** instead of transitions for better mobile compatibility:
+- **slideIn keyframe**: Animates list from `translateX(100%)` opacity 0 to `translateX(0)` opacity 1
+- **slideOut keyframe**: Animates list from `translateX(0)` opacity 1 to `translateX(100%)` opacity 0
+- Keyframes are more reliable on mobile devices than CSS transitions
+- Defined in [RadarQuadrantItemList.astro](libs/ui/src/radar/RadarQuadrantItemList.astro)
 
 #### Animation Timing Variables
 Defined in [RadarChart.astro:200-205](libs/ui/src/radar/RadarChart.astro#L200-L205):

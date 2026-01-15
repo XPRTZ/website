@@ -639,6 +639,7 @@ const ringLabelData = RINGS.map((ring, index) => {
           // Zoom out - hide list and slide wrapper back, then zoom out
           itemLists.forEach((list) => {
             list.classList.remove("visible");
+            list.classList.add("sliding-out");
           });
           wrapper.classList.remove("list-visible");
           wrapper.classList.remove("list-animation-complete");
@@ -654,7 +655,10 @@ const ringLabelData = RINGS.map((ring, index) => {
             );
             quadrants.forEach((q) => q.classList.remove("zoomed-in"));
             labels.forEach((l) => l.classList.remove("zoomed-in"));
-            itemLists.forEach((list) => list.classList.add("hidden"));
+            itemLists.forEach((list) => {
+              list.classList.add("hidden");
+              list.classList.remove("sliding-out");
+            });
           }, slideDuration);
         } else {
           // Zoom in - add zoom class to chart and this quadrant
@@ -723,6 +727,7 @@ const ringLabelData = RINGS.map((ring, index) => {
           // Slide list out to right
           itemLists.forEach((list) => {
             list.classList.remove("visible");
+            list.classList.add("sliding-out");
           });
           wrapper.classList.remove("list-visible");
 
@@ -747,7 +752,10 @@ const ringLabelData = RINGS.map((ring, index) => {
             );
             quadrants.forEach((q) => q.classList.remove("zoomed-in"));
             labels.forEach((l) => l.classList.remove("zoomed-in"));
-            itemLists.forEach((list) => list.classList.add("hidden"));
+            itemLists.forEach((list) => {
+              list.classList.add("hidden");
+              list.classList.remove("sliding-out");
+            });
 
             // Wait for zoom-out animation to complete before removing zoomed-in class (and z-index)
             setTimeout(() => {
@@ -837,6 +845,7 @@ const ringLabelData = RINGS.map((ring, index) => {
         // Slide list out to right
         itemLists.forEach((list) => {
           list.classList.remove("visible");
+          list.classList.add("sliding-out");
         });
         wrapper.classList.remove("list-visible");
 
@@ -860,7 +869,10 @@ const ringLabelData = RINGS.map((ring, index) => {
           quadrants.forEach((q) => q.classList.remove("zoomed-in"));
           labels.forEach((l) => l.classList.remove("zoomed-in"));
           tilesContainer?.classList.remove("zoomed");
-          itemLists.forEach((list) => list.classList.add("hidden"));
+          itemLists.forEach((list) => {
+            list.classList.add("hidden");
+            list.classList.remove("sliding-out");
+          });
 
           // Wait for zoom-out animation to complete before removing zoomed-in class (and z-index)
           setTimeout(() => {

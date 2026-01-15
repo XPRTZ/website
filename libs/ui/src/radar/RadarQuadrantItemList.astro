@@ -120,10 +120,6 @@ const itemsByRing = RINGS.reduce(
     position: relative;
     transform: translateX(100%);
     opacity: 0;
-    transition:
-      transform var(--slide-duration) var(--transition-easing),
-      opacity var(--fade-out-duration) var(--transition-easing)
-        var(--fade-out-delay);
   }
 
   .quadrant-item-list.hidden {
@@ -131,11 +127,33 @@ const itemsByRing = RINGS.reduce(
   }
 
   .quadrant-item-list.visible {
-    transform: translateX(0);
-    opacity: 1;
-    transition:
-      transform var(--slide-duration) var(--transition-easing),
-      opacity var(--fade-in-duration) var(--transition-easing);
+    animation: slideIn var(--slide-duration) var(--transition-easing) forwards;
+  }
+
+  .quadrant-item-list.sliding-out {
+    animation: slideOut var(--slide-duration) var(--transition-easing) forwards;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
   }
 
   .list-radar-item {
