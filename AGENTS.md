@@ -213,7 +213,7 @@ The Technology Radar chart ([RadarChart.astro](libs/ui/src/radar/RadarChart.astr
 The mobile animations were redesigned to create smooth cross-slide transitions:
 
 1. **Opening (Tile → List)**:
-   - Tile zooms in (scale 2.05) - 500ms
+   - Tile zooms in via `tileZoomIn` keyframe (scale 2.05) - 500ms
    - After zoom: Tile slides left AND fades out while list slides in from right - 400ms
    - Both elements pass each other smoothly
    - After slide completes, tile becomes `display: none`
@@ -221,20 +221,23 @@ The mobile animations were redesigned to create smooth cross-slide transitions:
 2. **Closing (List → Tile)**:
    - Tile positioned off-screen left with opacity 0
    - List slides right while tile slides in from left AND fades in - 400ms
-   - After slide: Tile zooms out - 500ms
+   - After slide: Tile zooms out via `tileZoomOut` keyframe - 500ms
 
 #### Key CSS Classes for Mobile
 - `.sliding-out`: Tiles slide left with `translateX(-100%)` and fade to `opacity: 0`. For lists, triggers `slideOut` keyframe animation
 - `.sliding-in`: Tiles positioned at `translateX(-100%)` ready to slide in
+- `.zooming-in`: Triggers `tileZoomIn` keyframe animation on tiles
+- `.zooming-out`: Triggers `tileZoomOut` keyframe animation on tiles
 - `.list-visible`: Triggers list `slideIn` keyframe animation
 - `.list-animation-complete`: Switches list to `position: static` after animation
 
 #### Animation Implementation
-The quadrant item list uses CSS **keyframe animations** instead of transitions for better mobile compatibility:
-- **slideIn keyframe**: Animates list from `translateX(100%)` opacity 0 to `translateX(0)` opacity 1
-- **slideOut keyframe**: Animates list from `translateX(0)` opacity 1 to `translateX(100%)` opacity 0
+All mobile animations use CSS **keyframe animations** instead of transitions for better mobile compatibility:
+- **tileZoomIn keyframe**: Animates tile from `scale(1)` to `scale(2.05)` - defined in [RadarChart.astro](libs/ui/src/radar/RadarChart.astro)
+- **tileZoomOut keyframe**: Animates tile from `scale(2.05)` to `scale(1)` - defined in [RadarChart.astro](libs/ui/src/radar/RadarChart.astro)
+- **slideIn keyframe**: Animates list from `translateX(100%)` opacity 0 to `translateX(0)` opacity 1 - defined in [RadarQuadrantItemList.astro](libs/ui/src/radar/RadarQuadrantItemList.astro)
+- **slideOut keyframe**: Animates list from `translateX(0)` opacity 1 to `translateX(100%)` opacity 0 - defined in [RadarQuadrantItemList.astro](libs/ui/src/radar/RadarQuadrantItemList.astro)
 - Keyframes are more reliable on mobile devices than CSS transitions
-- Defined in [RadarQuadrantItemList.astro](libs/ui/src/radar/RadarQuadrantItemList.astro)
 
 #### Animation Timing Variables
 Defined in [RadarChart.astro:200-205](libs/ui/src/radar/RadarChart.astro#L200-L205):

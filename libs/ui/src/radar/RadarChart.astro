@@ -286,7 +286,6 @@ const ringLabelData = RINGS.map((ring, index) => {
       border-radius: 8px;
       padding: 20px;
       cursor: pointer;
-      transition: all var(--zoom-duration) var(--transition-easing);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -296,6 +295,8 @@ const ringLabelData = RINGS.map((ring, index) => {
       color: white;
       position: relative;
       z-index: 1;
+      /* Use transition only for hover effects, not zoom */
+      transition: box-shadow 0.3s ease;
     }
 
     .quadrant-tile:hover {
@@ -340,25 +341,43 @@ const ringLabelData = RINGS.map((ring, index) => {
       transform-origin: bottom right;
     }
 
-    /* Zoom transformations - scale to fill entire grid (2x2 + gap) */
-    .quadrant-tiles.zoomed
-      .quadrant-tile.zoomed-in[data-quadrant-tile="tools"] {
+    /* Zoom in animation - applied when zooming in */
+    .quadrant-tile.zooming-in {
+      animation: tileZoomIn var(--zoom-duration) var(--transition-easing) forwards;
+      z-index: 10;
+    }
+
+    /* Zoom out animation - applied when zooming out */
+    .quadrant-tile.zooming-out {
+      animation: tileZoomOut var(--zoom-duration) var(--transition-easing) forwards;
+      z-index: 10;
+    }
+
+    /* Keep zoomed state after animation completes */
+    .quadrant-tiles.zoomed .quadrant-tile.zoomed-in {
       transform: scale(2.05);
     }
 
-    .quadrant-tiles.zoomed
-      .quadrant-tile.zoomed-in[data-quadrant-tile="techniques"] {
-      transform: scale(2.05);
+    @keyframes tileZoomIn {
+      from {
+        transform: scale(1);
+        opacity: 1;
+      }
+      to {
+        transform: scale(2.05);
+        opacity: 1;
+      }
     }
 
-    .quadrant-tiles.zoomed
-      .quadrant-tile.zoomed-in[data-quadrant-tile="platforms"] {
-      transform: scale(2.05);
-    }
-
-    .quadrant-tiles.zoomed
-      .quadrant-tile.zoomed-in[data-quadrant-tile="frameworks"] {
-      transform: scale(2.05);
+    @keyframes tileZoomOut {
+      from {
+        transform: scale(2.05);
+        opacity: 1;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
   }
 
@@ -740,7 +759,12 @@ const ringLabelData = RINGS.map((ring, index) => {
 
           // After slide animation completes, zoom out the tile
           setTimeout(() => {
+            // Remove .zoomed to show all tiles, then start zoom-out animation
             tilesContainer?.classList.remove("zoomed");
+
+            // Start zoom out animation
+            tile.classList.remove("zooming-in");
+            tile.classList.add("zooming-out");
 
             // Also clear radar chart zoom state
             chart?.classList.remove("zoomed");
@@ -757,16 +781,23 @@ const ringLabelData = RINGS.map((ring, index) => {
               list.classList.remove("sliding-out");
             });
 
-            // Wait for zoom-out animation to complete before removing zoomed-in class (and z-index)
+            // Wait for zoom-out animation to complete before removing classes
             setTimeout(() => {
-              tiles.forEach((t) => t.classList.remove("zoomed-in"));
+              tiles.forEach((t) => {
+                t.classList.remove("zoomed-in");
+                t.classList.remove("zooming-out");
+              });
             }, zoomDuration);
           }, slideDuration);
         } else {
-          // Zoom in - add zoom class to tiles container and this tile
-          tilesContainer?.classList.add("zoomed");
-          tiles.forEach((t) => t.classList.remove("zoomed-in"));
+          // Zoom in - start animation first, add .zoomed after animation completes
+          tiles.forEach((t) => {
+            t.classList.remove("zoomed-in");
+            t.classList.remove("zooming-in");
+            t.classList.remove("zooming-out");
+          });
           tile.classList.add("zoomed-in");
+          tile.classList.add("zooming-in");
 
           // Set up zoom state for the radar chart (for when screen size increases)
           chart?.classList.add("zoomed");
@@ -800,6 +831,10 @@ const ringLabelData = RINGS.map((ring, index) => {
 
           // After zoom completes, slide tiles out left and list in from right simultaneously
           setTimeout(() => {
+            // Remove zooming-in class and add .zoomed to hide other tiles
+            tile.classList.remove("zooming-in");
+            tilesContainer?.classList.add("zoomed");
+
             // Start sliding tiles out to the left
             tilesContainer?.classList.add("sliding-out");
 
@@ -858,7 +893,10 @@ const ringLabelData = RINGS.map((ring, index) => {
 
         // After slide animation completes, zoom out
         setTimeout(() => {
-          // Clear both radar and tile zoom state
+          // Remove .zoomed to show all tiles, then start zoom-out animation
+          tilesContainer?.classList.remove("zoomed");
+
+          // Clear radar chart zoom state
           chart?.classList.remove("zoomed");
           chart?.classList.remove(
             "zoom-tools",
@@ -868,15 +906,25 @@ const ringLabelData = RINGS.map((ring, index) => {
           );
           quadrants.forEach((q) => q.classList.remove("zoomed-in"));
           labels.forEach((l) => l.classList.remove("zoomed-in"));
-          tilesContainer?.classList.remove("zoomed");
           itemLists.forEach((list) => {
             list.classList.add("hidden");
             list.classList.remove("sliding-out");
           });
 
-          // Wait for zoom-out animation to complete before removing zoomed-in class (and z-index)
+          // Start zoom out animation on the currently zoomed tile
+          tiles.forEach((t) => {
+            if (t.classList.contains("zoomed-in")) {
+              t.classList.remove("zooming-in");
+              t.classList.add("zooming-out");
+            }
+          });
+
+          // Wait for zoom-out animation to complete before removing classes
           setTimeout(() => {
-            tiles.forEach((t) => t.classList.remove("zoomed-in"));
+            tiles.forEach((t) => {
+              t.classList.remove("zoomed-in");
+              t.classList.remove("zooming-out");
+            });
           }, zoomDuration);
         }, slideDuration);
       });
