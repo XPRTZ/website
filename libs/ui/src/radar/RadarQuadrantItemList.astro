@@ -39,7 +39,7 @@ const itemsByRing = RINGS.reduce(
 );
 ---
 
-<div class="quadrant-item-list hidden">
+<div class="quadrant-item-list">
   <div class="bg-white rounded-lg shadow-lg p-6 max-w-96 w-full">
     <div class="mb-2">
       <h3 class="text-2xl font-bold" style={`color: ${color};`}>
@@ -79,13 +79,19 @@ const itemsByRing = RINGS.reduce(
             <ul class="divide-y divide-gray-200">
               {ringItems.map((item) => {
                 const itemLink = buildRadarItemLink(item.slug, parentPageSlug);
-                const tagsJson = JSON.stringify(item.tags?.map(t => t.title) || []);
+                const tagsJson = JSON.stringify(
+                  item.tags?.map((t) => t.title) || []
+                );
 
                 return (
-                  <li class="list-radar-item" data-tags={tagsJson}>
+                  <li
+                    class="list-radar-item"
+                    data-tags={tagsJson}
+                    data-item-number={item.number}
+                  >
                     <a
                       href={itemLink}
-                      class="item-link block py-3 transition-all"
+                      class="item-link block py-3"
                       style={`--item-color: ${color};`}
                     >
                       <div class="font-medium text-gray-900">
@@ -110,54 +116,83 @@ const itemsByRing = RINGS.reduce(
 
 <style>
   .quadrant-item-list {
-    /* Define animation timing variables locally to avoid inheritance issues */
-    --fade-out-duration: 300ms;
-    --fade-out-delay: 100ms;
-    --fade-in-duration: 400ms;
-    --slide-duration: 400ms;
-    --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
-
-    position: relative;
-    transform: translateX(100%);
-    opacity: 0;
-  }
-
-  .quadrant-item-list.hidden {
     display: none;
+    --animation-phase-duration: 500ms;
+    --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .quadrant-item-list.visible {
-    animation: slideIn var(--slide-duration) var(--transition-easing) forwards;
+    display: block;
   }
 
-  .quadrant-item-list.sliding-out {
-    animation: slideOut var(--slide-duration) var(--transition-easing) forwards;
+  .quadrant-item-list.visible > div {
+    animation: listContentSlideIn var(--animation-phase-duration)
+      var(--animation-easing);
   }
 
-  @keyframes slideIn {
+  .quadrant-item-list.closing {
+    display: block;
+  }
+
+  .quadrant-item-list.closing > div {
+    animation: listContentSlideOut var(--animation-phase-duration)
+      var(--animation-easing);
+  }
+
+  @keyframes listContentSlideIn {
     from {
-      transform: translateX(100%);
       opacity: 0;
+      transform: translateX(30px);
     }
     to {
-      transform: translateX(0);
       opacity: 1;
+      transform: translateX(0);
     }
   }
 
-  @keyframes slideOut {
+  @keyframes listContentSlideOut {
     from {
-      transform: translateX(0);
       opacity: 1;
+      transform: translateX(0);
     }
     to {
-      transform: translateX(100%);
       opacity: 0;
+      transform: translateX(30px);
     }
   }
 
-  .list-radar-item {
-    transition: opacity 0.3s ease;
+  @media (max-width: 1024px) {
+    .quadrant-item-list.closing > div {
+      animation: listSlideOutMobile var(--animation-phase-duration)
+        var(--animation-easing);
+    }
+
+    .quadrant-item-list.visible > div {
+      animation: listSlideInMobile var(--animation-phase-duration)
+        var(--animation-easing);
+    }
+
+    @keyframes listSlideInMobile {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes listSlideOutMobile {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+    }
   }
 
   /* Filtered out state: dim but keep clickable */

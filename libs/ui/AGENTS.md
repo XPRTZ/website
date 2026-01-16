@@ -433,79 +433,49 @@ The main radar visualization that combines four quadrants into a complete circle
   - **Platforms**: Amber (#f59e0b)
   - **Languages & Frameworks**: Red (#ef4444)
 - 20px margin between quadrants for visual separation
-- Interactive zoom functionality with smooth animations (500ms duration)
-- Transform-based container slide (200px left) prevents layout reflow
-- List slides in from right after zoom completes
-- Synchronized animations create smooth push-effect without jumping
+- Interactive zoom functionality when clicking quadrants
+- Cross-highlighting: hovering list items highlights corresponding radar items
 
-**Responsive Design:**
+**Responsive Design - Three Distinct States:**
 
-The RadarChart implements a three-tier responsive strategy:
+The RadarChart has three distinct view states. **IMPORTANT: Animations for one state must NOT affect animations in other states.**
 
-1. **Desktop/Tablet View (> 1090px width)**
+1. **Full Chart State (> 1024px width)**
    - Full radar chart with four quadrants displayed
    - Hover effects dim non-hovered quadrants to 50% opacity
    - Click to zoom individual quadrants (1.75x scale)
-   - Quadrant slides/transforms to center when zoomed
+   - Zoomed quadrant transforms to center-left position
    - Ring labels (Adopt, Trial, Assess, Hold) transform with zoomed quadrant
-   - Item list appears to the right of radar after zoom animation
+   - Item list appears to the right of the zoomed quadrant
 
-2. **Medium Screens (870px - 1090px width)**
-   - Full radar chart visible
-   - When quadrant is clicked and list appears:
-     - Radar chart fades out smoothly (300ms opacity transition)
-     - After fade-out completes, radar switches from `position: absolute` to `display: none`
-     - Item list switches from `position: absolute` to `position: static`
-     - Item list takes full width and flows naturally in page layout
-   - Smooth fade-out prevents abrupt disappearance
-   - No blank space remains after animation completes
-
-3. **Mobile View (< 870px width)**
+2. **Tiles State (≤ 1024px and > 360px width)**
    - Radar chart hidden (`display: none`)
    - Four colored tiles displayed in 2x2 grid
    - Each tile represents a quadrant with matching colors
    - Hover effects dim non-hovered tiles to 50% opacity
-   - Click to zoom tile (2.05x scale from corner origin)
-   - Zoomed tile expands to fill entire 2x2 grid area
-   - **Z-index layering**: Tiles use z-index to ensure proper stacking during zoom animations
-     - Regular tiles: `z-index: 1`
-     - Zoomed tile: `z-index: 10` (appears above other tiles)
-     - Item list: `z-index: 20` (always on top, including during zoom-out)
-     - Z-index is maintained during zoom-out animation, then removed after animation completes
-   - When tile is clicked and list appears:
-     - Tiles fade out smoothly (300ms opacity transition)
-     - After fade-out completes, tiles switch from `position: absolute` to `display: none`
-     - Item list switches from `position: absolute` to `position: static`
-     - Item list takes full width
-   - Smooth animations prevent jarring layout shifts
-   - Transform origins set to corners (top-left, top-right, bottom-left, bottom-right)
-   - Very small screens (< 360px): Tiles stack in single column
+   - Click shows item list, hides tiles
 
-**Animation Configuration:**
+3. **Single Column Tiles State (≤ 360px width)**
+   - Tiles stack in single column (1x4 grid)
+   - Hover dim effects disabled (doesn't make sense for single column)
+   - Click shows item list, hides tiles
 
-The component uses CSS variables to control all animation timings (defined in `.radar-chart-wrapper`):
-- `--fade-out-duration: 300ms` - Duration for fading out radar/tiles when list appears
-- `--fade-out-delay: 100ms` - Delay before fade-out animation starts
-- `--fade-in-duration: 400ms` - Duration for fading in the item list
-- `--zoom-duration: 500ms` - Duration for quadrant zoom animations
-- `--slide-duration: 400ms` - Duration for container and list slide animations
+**Animation Rules:**
 
-Benefits:
-- CSS transitions read variables for consistent animation duration
-- JavaScript reads the same variables to time class additions
-- Single source of truth - changing a variable updates both CSS and JavaScript
-- All radar components inherit these variables for synchronized animations
-- Ensures perfect synchronization between opacity, transforms, and layout changes
+1. **Always use CSS keyframes for animations** - CSS transitions have caused issues on mobile devices. All animations must be implemented using `@keyframes`.
+
+2. **State isolation** - Animations defined for one state (Full Chart, Tiles, Single Column) must NOT affect other states. Use appropriate media query scoping.
 
 **State Management:**
 
-The component uses CSS classes to manage animation states:
-- `list-visible` - Triggers opacity fade-out of radar/tiles
-- `list-animation-complete` - Applied after fade completes, sets `display: none` and `position: static`
+The component uses CSS classes to manage states:
+- `list-visible` - When item list is shown
 - `zoomed` - Applied to radar chart when any quadrant is zoomed
-- `zoomed-in` - Applied to the specific quadrant/tile being zoomed
-- `visible` - Applied to item list to trigger slide-in animation
-- `hidden` - Applied to item list to hide it with `display: none`
+- `zoom-{quadrant}` - Applied alongside `zoomed` to identify which quadrant (e.g., `zoom-tools`)
+- `zoomed-in` - Applied to the specific quadrant being zoomed
+- `visible` - Applied to item list to show it
+- `hovering` - Applied during hover interactions
+- `active` - Applied to the hovered element
 
 **Initialization:**
 
@@ -619,22 +589,8 @@ List view displaying all items within a selected quadrant, grouped by ring.
 - Links to item detail pages with `from` query parameter using `buildRadarItemLink` utility
 - Scrollable list with sticky ring headers
 - "Back to radar" button to return to main view
-- Hidden by default, shown when quadrant is clicked
-- Smooth slide-in animation from right
-- Appears after quadrant zoom animation completes
-- Coordinated slide-out animation when zooming out
-- **CSS variable-based animations**: All animation timings use CSS variables inherited from parent wrapper
-  - Transform duration: `var(--slide-duration, 400ms)`
-  - Fade-out duration: `var(--fade-out-duration, 300ms)` with delay `var(--fade-out-delay, 100ms)`
-  - Fade-in duration: `var(--fade-in-duration, 400ms)`
-- **Interactive hover**: Hovering over list items highlights the corresponding radar item on the chart with enhanced visual effects
-
-**Animation Behavior:**
-- Starts with `position: absolute` overlaying the radar/tiles
-- Slides in from right with opacity fade-in (400ms)
-- When radar/tiles complete their fade-out (300ms), switches to `position: static`
-- Becomes part of normal document flow without causing layout jumps
-- Takes full width on smaller screens for optimal readability
+- Hidden by default (`display: none`), shown when quadrant is clicked (`.visible` class)
+- **Interactive hover**: Hovering over list items highlights the corresponding radar item on the chart
 - Custom scrollbar styling for better UX in scrollable content
 
 ### Shared Utilities (radarUtils.ts)
@@ -716,5 +672,5 @@ const allRadarItems = await fetchData<Array<RadarItem>>({
 - Ensure accessibility
 - Export all new components from index.ts
 - Use shared utilities from radarUtils.ts for radar components
-- Use CSS variables for animation timings to maintain consistency
 - Use `initializeOnReady` for client-side initialization in Astro components
+- **For radar animations**: Always use CSS keyframes (not transitions) and ensure animations for one responsive state don't affect other states

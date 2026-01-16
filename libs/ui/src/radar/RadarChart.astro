@@ -81,7 +81,7 @@ const ringLabelData = RINGS.map((ring, index) => {
             const flexClasses = flexClassMap[config.gridPosition];
             return (
               <div
-                class={`${flexClasses} quadrant-wrapper transition-opacity duration-300`}
+                class={`${flexClasses} quadrant-wrapper`}
                 data-quadrant={config.key}
               >
                 <RadarQuadrant
@@ -98,7 +98,7 @@ const ringLabelData = RINGS.map((ring, index) => {
 
       <!-- Ring Labels - Horizontal (between Tools and Platforms - left side) -->
       <div
-        class="absolute left-0 flex justify-center items-center ring-labels transition-opacity duration-300"
+        class="absolute left-0 flex justify-center items-center ring-labels"
         data-ring-labels="left"
         style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}
       >
@@ -121,7 +121,7 @@ const ringLabelData = RINGS.map((ring, index) => {
 
       <!-- Ring Labels - Horizontal (between Techniques and Languages & Frameworks - right side) -->
       <div
-        class="absolute right-0 flex justify-center items-center ring-labels transition-opacity duration-300"
+        class="absolute right-0 flex justify-center items-center ring-labels"
         data-ring-labels="right"
         style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}
       >
@@ -149,7 +149,7 @@ const ringLabelData = RINGS.map((ring, index) => {
 
           return (
             <div
-              class={`absolute text-lg font-bold ${position.align} quadrant-label transition-opacity duration-300`}
+              class={`absolute text-lg font-bold ${position.align} quadrant-label`}
               data-label-quadrant={config.key}
               style={labelStyle}
             >
@@ -197,17 +197,13 @@ const ringLabelData = RINGS.map((ring, index) => {
     position: relative;
     width: 100%;
     max-width: 100%;
-    /* Animation timing variables */
-    --fade-out-duration: 300ms;
-    --fade-out-delay: 100ms;
-    --fade-in-duration: 400ms;
-    --zoom-duration: 500ms;
-    --slide-duration: 400ms;
-    /* Reusable style values */
-    --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
-    --zoom-scale: 1.75;
+    /* Shared variables */
     --hover-dim-opacity: 0.5;
-    transform-origin: center top;
+    --zoom-scale: 1.75;
+    /* Animation timing variables */
+    --animation-phase-duration: 500ms;
+    --animation-total-duration: 1000ms;
+    --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .radar-chart-container {
@@ -215,14 +211,13 @@ const ringLabelData = RINGS.map((ring, index) => {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: transform var(--slide-duration) var(--transition-easing);
   }
 
   .radar-chart-wrapper.list-visible .radar-chart-container {
     transform: translateX(-200px);
   }
 
-  /* Position item lists absolutely to prevent layout jump */
+  /* Position item lists */
   .radar-chart-wrapper :global(.quadrant-item-list) {
     position: absolute;
     left: calc(50% + 220px);
@@ -230,23 +225,33 @@ const ringLabelData = RINGS.map((ring, index) => {
     z-index: 20;
   }
 
-  @media (max-width: 1280px) and (min-width: 1001px) {
+  @media (max-width: 1280px) and (min-width: 1025px) {
     .radar-chart-wrapper {
       transform: scale(calc(100vw / 1350px));
-      /* Dynamically adjust height to match the scaled visual height */
+      transform-origin: center top;
       height: calc(820px * (100vw / 1350px));
+    }
+
+    /* Compensate for the wrapper scale to keep the list at a consistent size */
+    .radar-chart-wrapper :global(.quadrant-item-list) {
+      transform: scale(calc(1350px / 100vw));
+      transform-origin: top left;
+    }
+
+    /* Constrain scrollable area so scaled list doesn't overflow the wrapper */
+    .radar-chart-wrapper :global(.quadrant-item-list .space-y-6) {
+      max-height: calc(820px * (100vw / 1350px) * (100vw / 1350px) - 120px);
     }
   }
 
-  @media (max-width: 1000px) {
+  @media (max-width: 1024px) {
     .radar-chart-container {
       display: none;
     }
 
-    /* Override list positioning for mobile - ensure it ends up centered */
     .radar-chart-wrapper :global(.quadrant-item-list) {
-      left: 0;
-      right: 0;
+      position: static;
+      left: auto;
       width: min(100%, 24rem);
       margin-inline: auto;
     }
@@ -256,31 +261,10 @@ const ringLabelData = RINGS.map((ring, index) => {
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin: 0 auto;
-      transition:
-        transform var(--slide-duration) var(--transition-easing),
-        opacity var(--slide-duration) var(--transition-easing);
     }
 
-    .quadrant-tiles.sliding-out {
-      transform: translateX(-100%);
-      opacity: 0;
-    }
-
-    .quadrant-tiles.sliding-in {
-      transform: translateX(-100%);
-      opacity: 0;
-    }
-
-    .radar-chart-wrapper.list-animation-complete .quadrant-tiles {
+    .radar-chart-wrapper.list-visible .quadrant-tiles {
       display: none !important;
-    }
-
-    /* Keep list centered even after animation completes */
-    .radar-chart-wrapper.list-animation-complete :global(.quadrant-item-list) {
-      position: static;
-      transform: none;
-      width: min(100%, 24rem);
-      margin-inline: auto;
     }
 
     .quadrant-tile {
@@ -295,10 +279,9 @@ const ringLabelData = RINGS.map((ring, index) => {
       font-size: 1.125rem;
       font-weight: bold;
       color: white;
-      position: relative;
-      z-index: 1;
-      /* Use transition only for hover effects, not zoom */
-      transition: box-shadow 0.3s ease;
+      transition:
+        opacity var(--animation-phase-duration) var(--animation-easing),
+        transform var(--animation-phase-duration) var(--animation-easing);
     }
 
     .quadrant-tile:hover {
@@ -314,74 +297,15 @@ const ringLabelData = RINGS.map((ring, index) => {
       opacity: 1;
     }
 
-    /* Zoom effect for tiles */
-    .quadrant-tiles.zoomed .quadrant-tile {
+    /* Selection animation for tiles */
+    .quadrant-tiles.selecting .quadrant-tile {
       opacity: 0;
-      pointer-events: none;
+      transform: scale(0.95);
     }
 
-    .quadrant-tiles.zoomed .quadrant-tile.zoomed-in {
+    .quadrant-tiles.selecting .quadrant-tile.selected {
       opacity: 1;
-      pointer-events: auto;
-      z-index: 10;
-    }
-
-    /* Transform origins for each corner */
-    .quadrant-tile[data-quadrant-tile="tools"] {
-      transform-origin: top left;
-    }
-
-    .quadrant-tile[data-quadrant-tile="techniques"] {
-      transform-origin: top right;
-    }
-
-    .quadrant-tile[data-quadrant-tile="platforms"] {
-      transform-origin: bottom left;
-    }
-
-    .quadrant-tile[data-quadrant-tile="frameworks"] {
-      transform-origin: bottom right;
-    }
-
-    /* Zoom in animation - applied when zooming in */
-    .quadrant-tile.zooming-in {
-      animation: tileZoomIn var(--zoom-duration) var(--transition-easing)
-        forwards;
-      z-index: 10;
-    }
-
-    /* Zoom out animation - applied when zooming out */
-    .quadrant-tile.zooming-out {
-      animation: tileZoomOut var(--zoom-duration) var(--transition-easing)
-        forwards;
-      z-index: 10;
-    }
-
-    /* Keep zoomed state after animation completes */
-    .quadrant-tiles.zoomed .quadrant-tile.zoomed-in {
-      transform: scale(2.05);
-    }
-
-    @keyframes tileZoomIn {
-      from {
-        transform: scale(1);
-        opacity: 1;
-      }
-      to {
-        transform: scale(2.05);
-        opacity: 1;
-      }
-    }
-
-    @keyframes tileZoomOut {
-      from {
-        transform: scale(2.05);
-        opacity: 1;
-      }
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
+      transform: scale(1.05);
     }
   }
 
@@ -393,60 +317,6 @@ const ringLabelData = RINGS.map((ring, index) => {
     /* Disable hover effects in single column */
     .quadrant-tiles.hovering .quadrant-tile {
       opacity: 1 !important;
-    }
-
-    /*
-     * Single column layout: replace zoom animation with subtle pulse effect.
-     * - Dims non-selected tiles instead of hiding them
-     * - Selected tile gets a pulse animation instead of scaling
-     */
-    .quadrant-tile.zooming-in {
-      animation: pulse-subtle 0.5s ease-in-out !important;
-      transform: none !important;
-    }
-
-    .quadrant-tile.zooming-out {
-      animation: none !important;
-      transform: none !important;
-    }
-
-    .quadrant-tiles.zoomed .quadrant-tile {
-      opacity: 0.3 !important;
-      pointer-events: auto !important;
-      transition: opacity 0.3s ease-in-out;
-    }
-
-    .quadrant-tiles.zoomed .quadrant-tile.zoomed-in,
-    .quadrant-tiles.zoomed .quadrant-tile.zoomed-in[data-quadrant-tile="tools"],
-    .quadrant-tiles.zoomed
-      .quadrant-tile.zoomed-in[data-quadrant-tile="techniques"],
-    .quadrant-tiles.zoomed
-      .quadrant-tile.zoomed-in[data-quadrant-tile="platforms"],
-    .quadrant-tiles.zoomed
-      .quadrant-tile.zoomed-in[data-quadrant-tile="frameworks"] {
-      transform: none !important;
-      opacity: 1 !important;
-      box-shadow:
-        0 0 0 3px rgba(255, 255, 255, 0.5),
-        0 0 20px rgba(0, 0, 0, 0.3);
-    }
-
-    @keyframes pulse-subtle {
-      0% {
-        box-shadow:
-          0 0 8px 0 rgba(0, 0, 0, 0.4),
-          0 0 20px rgba(0, 0, 0, 0.3);
-      }
-      50% {
-        box-shadow:
-          0 0 12px 6px rgba(0, 0, 0, 0.3),
-          0 0 25px rgba(0, 0, 0, 0.5);
-      }
-      100% {
-        box-shadow:
-          0 0 10px 3px rgba(0, 0, 0, 0.35),
-          0 0 20px rgba(0, 0, 0, 0.3);
-      }
     }
   }
 
@@ -466,14 +336,29 @@ const ringLabelData = RINGS.map((ring, index) => {
     opacity: 1;
   }
 
-  /* Zoom functionality */
   .quadrant-wrapper {
     cursor: pointer;
-    transition: all var(--zoom-duration) var(--transition-easing);
-    transform-origin: center;
-    position: relative;
+    transition:
+      opacity var(--animation-phase-duration) var(--animation-easing),
+      transform var(--animation-phase-duration) var(--animation-easing);
   }
 
+  .quadrant-label {
+    transition: opacity var(--animation-phase-duration) var(--animation-easing);
+  }
+
+  .ring-labels {
+    transition:
+      opacity var(--animation-phase-duration) var(--animation-easing),
+      transform var(--animation-phase-duration) var(--animation-easing);
+  }
+
+  .radar-chart-container {
+    transition: transform var(--animation-phase-duration)
+      var(--animation-easing);
+  }
+
+  /* Zoomed state - hide non-selected quadrants */
   .radar-chart.zoomed .quadrant-wrapper {
     opacity: 0;
     pointer-events: none;
@@ -482,7 +367,6 @@ const ringLabelData = RINGS.map((ring, index) => {
   .radar-chart.zoomed .quadrant-wrapper.zoomed-in {
     opacity: 1;
     pointer-events: auto;
-    transform: scale(var(--zoom-scale)) translate(0, 0);
   }
 
   /* Position adjustments for each quadrant when zoomed */
@@ -502,41 +386,32 @@ const ringLabelData = RINGS.map((ring, index) => {
     transform: scale(var(--zoom-scale)) translate(-25%, calc(-25% - 15px));
   }
 
+  /* Hide labels when zoomed */
   .radar-chart.zoomed .quadrant-label {
     display: none;
   }
 
-  /* Ring labels positioning and transitions */
-  .ring-labels {
-    transition: all var(--zoom-duration) var(--transition-easing);
-    transform-origin: center;
-  }
-
-  /* Hide ring labels by default when zoomed */
+  /* Hide ring labels when zoomed, show relevant ones */
   .radar-chart.zoomed .ring-labels {
     opacity: 0;
     pointer-events: none;
   }
 
-  /* Show and transform ring labels for Tools quadrant (top-left) */
   .radar-chart.zoomed.zoom-tools .ring-labels[data-ring-labels="left"] {
     opacity: 1;
     transform: scale(var(--zoom-scale)) translate(25%, 190px);
   }
 
-  /* Show and transform ring labels for Platforms quadrant (bottom-left) */
   .radar-chart.zoomed.zoom-platforms .ring-labels[data-ring-labels="left"] {
     opacity: 1;
     transform: scale(var(--zoom-scale)) translate(25%, -205px);
   }
 
-  /* Show and transform ring labels for Techniques quadrant (top-right) */
   .radar-chart.zoomed.zoom-techniques .ring-labels[data-ring-labels="right"] {
     opacity: 1;
     transform: scale(var(--zoom-scale)) translate(-25%, 190px);
   }
 
-  /* Show and transform ring labels for Frameworks quadrant (bottom-right) */
   .radar-chart.zoomed.zoom-frameworks .ring-labels[data-ring-labels="right"] {
     opacity: 1;
     transform: scale(var(--zoom-scale)) translate(-25%, -205px);
@@ -546,442 +421,301 @@ const ringLabelData = RINGS.map((ring, index) => {
 <script>
   import { initializeOnReady, QUADRANTS } from "./radarUtils";
 
+  // =============================================================================
+  // Types and Constants
+  // =============================================================================
+
+  type ResponsiveState = "fullchart" | "tiles" | "singlecol";
+
+  // Media query breakpoints (must match CSS)
+  const BREAKPOINTS = {
+    fullchart: "(min-width: 1025px)",
+    tiles: "(max-width: 1024px) and (min-width: 361px)",
+    singlecol: "(max-width: 360px)",
+  } as const;
+
   // Create reverse mapping: key -> name
   const quadrantNameMap: Record<string, string> = Object.fromEntries(
     Object.entries(QUADRANTS).map(([name, config]) => [config.key, name])
   );
 
-  const initRadarHover = () => {
+  // =============================================================================
+  // Responsive State Detection
+  // =============================================================================
+
+  function getResponsiveState(): ResponsiveState {
+    if (window.matchMedia(BREAKPOINTS.fullchart).matches) return "fullchart";
+    if (window.matchMedia(BREAKPOINTS.tiles).matches) return "tiles";
+    return "singlecol";
+  }
+
+  // =============================================================================
+  // Shared DOM References
+  // =============================================================================
+
+  interface RadarElements {
+    wrapper: Element;
+    chart: Element | null;
+    quadrants: NodeListOf<Element>;
+    labels: NodeListOf<Element>;
+    tiles: NodeListOf<Element>;
+    tilesContainer: Element | null;
+    itemLists: NodeListOf<Element>;
+    backButtons: NodeListOf<Element>;
+  }
+
+  function getRadarElements(): RadarElements | null {
     const wrapper = document.querySelector(".radar-chart-wrapper");
-    if (!wrapper) return;
+    if (!wrapper) return null;
 
-    const chart = wrapper.querySelector(".radar-chart");
-    const quadrants = wrapper.querySelectorAll(".quadrant-wrapper");
-    const labels = wrapper.querySelectorAll(".quadrant-label");
-    const tiles = wrapper.querySelectorAll(".quadrant-tile");
-    const tilesContainer = wrapper.querySelector(".quadrant-tiles");
+    return {
+      wrapper,
+      chart: wrapper.querySelector(".radar-chart"),
+      quadrants: wrapper.querySelectorAll(".quadrant-wrapper"),
+      labels: wrapper.querySelectorAll(".quadrant-label"),
+      tiles: wrapper.querySelectorAll(".quadrant-tile"),
+      tilesContainer: wrapper.querySelector(".quadrant-tiles"),
+      itemLists: wrapper.querySelectorAll(".quadrant-item-list"),
+      backButtons: wrapper.querySelectorAll(".back-to-radar"),
+    };
+  }
 
-    // Set up hover for radar quadrants
-    quadrants.forEach((quadrant) => {
-      const quadrantKey = quadrant.getAttribute("data-quadrant");
-      const correspondingLabel = Array.from(labels).find(
-        (label) => label.getAttribute("data-label-quadrant") === quadrantKey
-      );
+  // =============================================================================
+  // Shared Utilities
+  // =============================================================================
 
-      const handleMouseEnter = () => {
-        // Only show hover effect if not zoomed
-        if (!chart?.classList.contains("zoomed")) {
-          chart?.classList.add("hovering");
-          quadrant.classList.add("active");
-          if (correspondingLabel) {
-            correspondingLabel.classList.add("active");
-          }
-        }
-      };
+  function showItemList(elements: RadarElements, quadrantKey: string) {
+    const { itemLists } = elements;
+    const quadrantName = quadrantNameMap[quadrantKey] || "";
 
-      const handleMouseLeave = () => {
-        chart?.classList.remove("hovering");
-        quadrant.classList.remove("active");
-        if (correspondingLabel) {
-          correspondingLabel.classList.remove("active");
-        }
-      };
-
-      quadrant.addEventListener("mouseenter", handleMouseEnter);
-      quadrant.addEventListener("mouseleave", handleMouseLeave);
+    itemLists.forEach((list) => {
+      const listQuadrant = list.querySelector("h3")?.textContent?.trim();
+      if (listQuadrant === quadrantName) {
+        list.classList.add("visible");
+      } else {
+        list.classList.remove("visible");
+      }
     });
+  }
 
-    // Set up hover for tiles (mobile view)
-    tiles.forEach((tile) => {
-      const handleMouseEnter = () => {
-        // Only show hover effect if not zoomed
-        if (!tilesContainer?.classList.contains("zoomed")) {
-          tilesContainer?.classList.add("hovering");
-          tile.classList.add("active");
-        }
-      };
+  function hideItemList(elements: RadarElements, quadrantKey: string) {
+    const { itemLists } = elements;
+    const quadrantName = quadrantNameMap[quadrantKey] || "";
 
-      const handleMouseLeave = () => {
-        tilesContainer?.classList.remove("hovering");
-        tile.classList.remove("active");
-      };
+    itemLists.forEach((list) => {
+      list.classList.remove("visible");
 
-      tile.addEventListener("mouseenter", handleMouseEnter);
-      tile.addEventListener("mouseleave", handleMouseLeave);
+      const listQuadrant = list.querySelector("h3")?.textContent?.trim();
+      if (listQuadrant === quadrantName) {
+        // Trigger closing animation
+        list.classList.add("closing");
+        setTimeout(() => {
+          list.classList.remove("closing");
+        }, ANIMATION_DURATION);
+      }
     });
-  };
+  }
 
-  const initRadarZoom = () => {
-    const wrapper = document.querySelector(".radar-chart-wrapper");
-    if (!wrapper) return;
+  // =============================================================================
+  // Quadrant Selection
+  // =============================================================================
 
-    // Get animation durations from CSS variables
-    const computedStyle = getComputedStyle(wrapper);
+  // Animation duration (must match CSS --animation-phase-duration)
+  const ANIMATION_DURATION = 500;
 
-    // Helper to safely parse CSS variable durations
-    const parseDuration = (value: string, fallback: number): number => {
-      const parsed = parseInt(value.replace("ms", "").trim());
-      return isNaN(parsed) ? fallback : parsed;
+  function initQuadrantSelection(elements: RadarElements) {
+    const { wrapper, chart, quadrants, tiles, tilesContainer } = elements;
+    let isAnimating = false;
+    let currentQuadrantKey: string | null = null;
+
+    const showList = async (quadrantKey: string, element: Element) => {
+      if (isAnimating) return;
+      isAnimating = true;
+
+      const state = getResponsiveState();
+
+      // For tiles/singlecol: animate tile selection before hiding
+      if (state === "tiles" || state === "singlecol") {
+        element.classList.add("selected");
+        tilesContainer?.classList.add("selecting");
+
+        // Wait for tile animation
+        await new Promise((r) => setTimeout(r, ANIMATION_DURATION));
+
+        // Clean up tile classes (they'll be hidden by display:none anyway)
+        tilesContainer?.classList.remove("selecting");
+        element.classList.remove("selected");
+      }
+
+      // Show the list
+      wrapper.classList.add("list-visible");
+      currentQuadrantKey = quadrantKey;
+
+      if (chart) {
+        chart.classList.add("zoomed", `zoom-${quadrantKey}`);
+        element.classList.add("zoomed-in");
+      }
+
+      showItemList(elements, quadrantKey);
+      isAnimating = false;
     };
 
-    const fadeOutDuration = parseDuration(
-      computedStyle.getPropertyValue("--fade-out-duration"),
-      300
-    );
-    const zoomDuration = parseDuration(
-      computedStyle.getPropertyValue("--zoom-duration"),
-      500
-    );
-    const slideDuration = parseDuration(
-      computedStyle.getPropertyValue("--slide-duration"),
-      400
-    );
+    const hideList = () => {
+      const state = getResponsiveState();
 
-    // Get all elements once
-    const chart = wrapper.querySelector(".radar-chart");
-    const quadrants = wrapper.querySelectorAll(".quadrant-wrapper");
-    const labels = wrapper.querySelectorAll(".quadrant-label");
-    const tiles = wrapper.querySelectorAll(".quadrant-tile");
-    const tilesContainer = wrapper.querySelector(".quadrant-tiles");
-    const itemLists = wrapper.querySelectorAll(".quadrant-item-list");
+      if (chart) {
+        chart.classList.remove(
+          "zoomed",
+          "zoom-tools",
+          "zoom-techniques",
+          "zoom-platforms",
+          "zoom-frameworks"
+        );
+      }
+      quadrants.forEach((q) => q.classList.remove("zoomed-in"));
 
-    // Set up zoom for radar quadrants
+      if (currentQuadrantKey) {
+        hideItemList(elements, currentQuadrantKey);
+        currentQuadrantKey = null;
+      }
+
+      // For tiles/singlecol: delay showing tiles until closing animation completes
+      if (state === "tiles" || state === "singlecol") {
+        setTimeout(() => {
+          wrapper.classList.remove("list-visible");
+        }, ANIMATION_DURATION);
+      } else {
+        wrapper.classList.remove("list-visible");
+      }
+    };
+
+    // Click handlers for quadrants
     quadrants.forEach((quadrant) => {
       const quadrantKey = quadrant.getAttribute("data-quadrant");
-      const correspondingLabel = Array.from(labels).find(
-        (label) => label.getAttribute("data-label-quadrant") === quadrantKey
-      );
 
       quadrant.addEventListener("click", (e) => {
-        // Check if the click is on a radar item (link)
         const target = e.target as HTMLElement;
-        if (target.closest("a")) {
-          // Let the link handle the click
-          return;
-        }
-
-        // Prevent the click from bubbling
+        if (target.closest("a")) return;
         e.stopPropagation();
 
-        // Toggle zoom state
-        const isCurrentlyZoomed = quadrant.classList.contains("zoomed-in");
-
-        if (isCurrentlyZoomed) {
-          // Zoom out - hide list and slide wrapper back, then zoom out
-          itemLists.forEach((list) => {
-            list.classList.remove("visible");
-            list.classList.add("sliding-out");
-          });
-          wrapper.classList.remove("list-visible");
-          wrapper.classList.remove("list-animation-complete");
-
-          // Wait for list animation to complete before zooming out
-          setTimeout(() => {
-            chart?.classList.remove("zoomed");
-            chart?.classList.remove(
-              "zoom-tools",
-              "zoom-techniques",
-              "zoom-platforms",
-              "zoom-frameworks"
-            );
-            quadrants.forEach((q) => q.classList.remove("zoomed-in"));
-            labels.forEach((l) => l.classList.remove("zoomed-in"));
-            itemLists.forEach((list) => {
-              list.classList.add("hidden");
-              list.classList.remove("sliding-out");
-            });
-          }, slideDuration);
-        } else {
-          // Zoom in - add zoom class to chart and this quadrant
-          chart?.classList.add("zoomed");
-          chart?.classList.remove(
-            "zoom-tools",
-            "zoom-techniques",
-            "zoom-platforms",
-            "zoom-frameworks"
-          );
-          chart?.classList.add(`zoom-${quadrantKey}`);
-          quadrants.forEach((q) => q.classList.remove("zoomed-in"));
-          labels.forEach((l) => l.classList.remove("zoomed-in"));
-          quadrant.classList.add("zoomed-in");
-          if (correspondingLabel) {
-            correspondingLabel.classList.add("zoomed-in");
-          }
-
-          // Show the corresponding item list after zoom animation completes
-          setTimeout(() => {
-            // Slide wrapper and show list simultaneously
-            wrapper.classList.add("list-visible");
-
-            // Add list-animation-complete after fade-out completes
-            setTimeout(() => {
-              wrapper.classList.add("list-animation-complete");
-            }, fadeOutDuration);
-
-            itemLists.forEach((list) => {
-              const listQuadrant = list
-                .querySelector("h3")
-                ?.textContent?.trim();
-              const quadrantName = quadrantNameMap[quadrantKey || ""] || "";
-              if (listQuadrant === quadrantName) {
-                list.classList.remove("hidden");
-                // Use requestAnimationFrame to ensure display:block is applied before animation
-                requestAnimationFrame(() => {
-                  list.classList.add("visible");
-                });
-              } else {
-                list.classList.add("hidden");
-                list.classList.remove("visible");
-              }
-            });
-          }, zoomDuration);
+        if (wrapper.classList.contains("list-visible")) {
+          hideList();
+        } else if (quadrantKey) {
+          showList(quadrantKey, quadrant);
         }
       });
     });
 
-    // Set up zoom for tiles (mobile view)
+    // Click handlers for tiles
     tiles.forEach((tile) => {
       const quadrantKey = tile.getAttribute("data-quadrant-tile");
 
       tile.addEventListener("click", () => {
-        // Check if currently zoomed
-        const isCurrentlyZoomed = tile.classList.contains("zoomed-in");
-
-        if (isCurrentlyZoomed) {
-          // Zoom out - slide list out right and tiles in from left simultaneously
-          wrapper.classList.remove("list-animation-complete");
-
-          // Show tiles positioned off-screen left and start sliding in
-          tilesContainer?.classList.remove("sliding-out");
-          tilesContainer?.classList.add("sliding-in");
-
-          // Slide list out to right
-          itemLists.forEach((list) => {
-            list.classList.remove("visible");
-            list.classList.add("sliding-out");
-          });
-          wrapper.classList.remove("list-visible");
-
-          // Use requestAnimationFrame to ensure sliding-in class is applied before removing it
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              tilesContainer?.classList.remove("sliding-in");
-            });
-          });
-
-          // After slide animation completes, zoom out the tile
-          setTimeout(() => {
-            // Remove .zoomed to show all tiles, then start zoom-out animation
-            tilesContainer?.classList.remove("zoomed");
-
-            // Start zoom out animation
-            tile.classList.remove("zooming-in");
-            tile.classList.add("zooming-out");
-
-            // Also clear radar chart zoom state
-            chart?.classList.remove("zoomed");
-            chart?.classList.remove(
-              "zoom-tools",
-              "zoom-techniques",
-              "zoom-platforms",
-              "zoom-frameworks"
-            );
-            quadrants.forEach((q) => q.classList.remove("zoomed-in"));
-            labels.forEach((l) => l.classList.remove("zoomed-in"));
-            itemLists.forEach((list) => {
-              list.classList.add("hidden");
-              list.classList.remove("sliding-out");
-            });
-
-            // Wait for zoom-out animation to complete before removing classes
-            setTimeout(() => {
-              tiles.forEach((t) => {
-                t.classList.remove("zoomed-in");
-                t.classList.remove("zooming-out");
-              });
-            }, zoomDuration);
-          }, slideDuration);
-        } else {
-          // Zoom in - start animation first, add .zoomed after animation completes
-          tiles.forEach((t) => {
-            t.classList.remove("zoomed-in");
-            t.classList.remove("zooming-in");
-            t.classList.remove("zooming-out");
-          });
-          tile.classList.add("zoomed-in");
-          tile.classList.add("zooming-in");
-
-          // Set up zoom state for the radar chart (for when screen size increases)
-          chart?.classList.add("zoomed");
-          chart?.classList.remove(
-            "zoom-tools",
-            "zoom-techniques",
-            "zoom-platforms",
-            "zoom-frameworks"
-          );
-          chart?.classList.add(`zoom-${quadrantKey}`);
-
-          // Find and zoom the corresponding quadrant
-          quadrants.forEach((q) => {
-            const qKey = q.getAttribute("data-quadrant");
-            if (qKey === quadrantKey) {
-              q.classList.add("zoomed-in");
-            } else {
-              q.classList.remove("zoomed-in");
-            }
-          });
-
-          // Update labels
-          labels.forEach((l) => {
-            const lKey = l.getAttribute("data-label-quadrant");
-            if (lKey === quadrantKey) {
-              l.classList.add("zoomed-in");
-            } else {
-              l.classList.remove("zoomed-in");
-            }
-          });
-
-          // After zoom completes, slide tiles out left and list in from right simultaneously
-          setTimeout(() => {
-            // Remove zooming-in class and add .zoomed to hide other tiles
-            tile.classList.remove("zooming-in");
-            tilesContainer?.classList.add("zoomed");
-
-            // Start sliding tiles out to the left
-            tilesContainer?.classList.add("sliding-out");
-
-            // Prepare and slide list in from right
-            wrapper.classList.add("list-visible");
-
-            itemLists.forEach((list) => {
-              const listQuadrant = list
-                .querySelector("h3")
-                ?.textContent?.trim();
-              const quadrantName = quadrantNameMap[quadrantKey || ""] || "";
-              if (listQuadrant === quadrantName) {
-                list.classList.remove("hidden");
-                requestAnimationFrame(() => {
-                  list.classList.add("visible");
-                });
-              } else {
-                list.classList.add("hidden");
-                list.classList.remove("visible");
-              }
-            });
-
-            // After slide completes, hide tiles completely
-            setTimeout(() => {
-              wrapper.classList.add("list-animation-complete");
-            }, slideDuration);
-          }, zoomDuration);
+        if (quadrantKey) {
+          showList(quadrantKey, tile);
         }
       });
     });
 
-    // Handle back to radar button clicks (once for all back buttons)
-    const backButtons = wrapper.querySelectorAll(".back-to-radar");
-    backButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        // Slide list out right and tiles in from left simultaneously
-        wrapper.classList.remove("list-animation-complete");
+    // Back button handlers
+    elements.backButtons.forEach((button) => {
+      button.addEventListener("click", () => hideList());
+    });
+  }
 
-        // Show tiles positioned off-screen left and start sliding in
-        tilesContainer?.classList.remove("sliding-out");
-        tilesContainer?.classList.add("sliding-in");
+  // =============================================================================
+  // Hover Effects
+  // =============================================================================
 
-        // Slide list out to right
-        itemLists.forEach((list) => {
-          list.classList.remove("visible");
-          list.classList.add("sliding-out");
-        });
-        wrapper.classList.remove("list-visible");
+  function initRadarHover(elements: RadarElements) {
+    const { wrapper, chart, quadrants, labels, tiles, tilesContainer } =
+      elements;
 
-        // Use requestAnimationFrame to ensure sliding-in class is applied before removing it
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            tilesContainer?.classList.remove("sliding-in");
-          });
-        });
+    // Hover for radar quadrants (desktop)
+    quadrants.forEach((quadrant) => {
+      const quadrantKey = quadrant.getAttribute("data-quadrant");
+      const correspondingLabel = Array.from(labels).find(
+        (label) => label.getAttribute("data-label-quadrant") === quadrantKey
+      );
 
-        // After slide animation completes, zoom out
-        setTimeout(() => {
-          // Remove .zoomed to show all tiles, then start zoom-out animation
-          tilesContainer?.classList.remove("zoomed");
+      quadrant.addEventListener("mouseenter", () => {
+        if (!wrapper.classList.contains("list-visible")) {
+          chart?.classList.add("hovering");
+          quadrant.classList.add("active");
+          correspondingLabel?.classList.add("active");
+        }
+      });
 
-          // Clear radar chart zoom state
-          chart?.classList.remove("zoomed");
-          chart?.classList.remove(
-            "zoom-tools",
-            "zoom-techniques",
-            "zoom-platforms",
-            "zoom-frameworks"
-          );
-          quadrants.forEach((q) => q.classList.remove("zoomed-in"));
-          labels.forEach((l) => l.classList.remove("zoomed-in"));
-          itemLists.forEach((list) => {
-            list.classList.add("hidden");
-            list.classList.remove("sliding-out");
-          });
-
-          // Start zoom out animation on the currently zoomed tile
-          tiles.forEach((t) => {
-            if (t.classList.contains("zoomed-in")) {
-              t.classList.remove("zooming-in");
-              t.classList.add("zooming-out");
-            }
-          });
-
-          // Wait for zoom-out animation to complete before removing classes
-          setTimeout(() => {
-            tiles.forEach((t) => {
-              t.classList.remove("zoomed-in");
-              t.classList.remove("zooming-out");
-            });
-          }, zoomDuration);
-        }, slideDuration);
+      quadrant.addEventListener("mouseleave", () => {
+        chart?.classList.remove("hovering");
+        quadrant.classList.remove("active");
+        correspondingLabel?.classList.remove("active");
       });
     });
-  };
 
-  const initItemListHover = () => {
-    const wrapper = document.querySelector(".radar-chart-wrapper");
-    if (!wrapper) return;
+    // Hover for tiles (mobile)
+    tiles.forEach((tile) => {
+      tile.addEventListener("mouseenter", () => {
+        if (!wrapper.classList.contains("list-visible")) {
+          tilesContainer?.classList.add("hovering");
+          tile.classList.add("active");
+        }
+      });
 
+      tile.addEventListener("mouseleave", () => {
+        tilesContainer?.classList.remove("hovering");
+        tile.classList.remove("active");
+      });
+    });
+  }
+
+  // =============================================================================
+  // Cross-Highlight (list item <-> radar item)
+  // =============================================================================
+
+  function initCrossHighlight(elements: RadarElements) {
+    const { wrapper } = elements;
+    const listItems = wrapper.querySelectorAll(".list-radar-item");
     const radarItems = wrapper.querySelectorAll(".radar-item");
-    const listItems = wrapper.querySelectorAll(".quadrant-item-list li a");
 
-    listItems.forEach((link) => {
-      const href = link.getAttribute("href");
-      if (!href) return;
+    listItems.forEach((listItem) => {
+      const itemNumber = listItem.getAttribute("data-item-number");
 
-      // Extract slug from the link (handle both with and without query params)
-      const slug = href.split("?")[0].replace("/radar-items/", "");
-
-      // Find corresponding radar item by slug
-      const matchingRadarItem = Array.from(radarItems).find((item) => {
-        const itemLink = item.querySelector("a");
-        const itemHref = itemLink?.getAttribute("href");
-        const itemSlug = itemHref?.split("?")[0].replace("/radar-items/", "");
-        return itemSlug === slug;
+      listItem.addEventListener("mouseenter", () => {
+        const correspondingRadarItem = Array.from(radarItems).find(
+          (item) => item.getAttribute("data-item-number") === itemNumber
+        );
+        correspondingRadarItem?.classList.add("highlighted");
       });
 
-      if (matchingRadarItem) {
-        link.addEventListener("mouseenter", () => {
-          matchingRadarItem.classList.add("highlighted");
-        });
-
-        link.addEventListener("mouseleave", () => {
-          matchingRadarItem.classList.remove("highlighted");
-        });
-      }
+      listItem.addEventListener("mouseleave", () => {
+        const correspondingRadarItem = Array.from(radarItems).find(
+          (item) => item.getAttribute("data-item-number") === itemNumber
+        );
+        correspondingRadarItem?.classList.remove("highlighted");
+      });
     });
-  };
+  }
 
-  const initRadar = () => {
-    initRadarHover();
-    initRadarZoom();
-    initItemListHover();
-  };
+  // =============================================================================
+  // Main Initialization
+  // =============================================================================
+
+  function initRadar() {
+    const elements = getRadarElements();
+    if (!elements) return;
+
+    const state = getResponsiveState();
+
+    // Initialize hover effects
+    initRadarHover(elements);
+
+    // Initialize cross-highlight
+    initCrossHighlight(elements);
+
+    // Initialize selecting quadrants
+    initQuadrantSelection(elements);
+  }
 
   // Initialize on page load
   initializeOnReady(initRadar);

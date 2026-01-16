@@ -184,7 +184,7 @@ const positionedItems = items.map((item, index) => {
       const tagsJson = JSON.stringify(item.tags?.map(t => t.title) || []);
 
       return (
-        <g class="radar-item" style="transition: opacity 0.3s ease;" data-tags={tagsJson}>
+        <g class="radar-item" data-tags={tagsJson} data-item-number={item.number}>
           <a href={itemLink} aria-label={`${item.number}. ${item.title}`}>
             <title>
               {item.number}. {item.title}
@@ -196,14 +196,14 @@ const positionedItems = items.map((item, index) => {
               fill="white"
               stroke={color}
               stroke-width="2"
-              class="cursor-pointer radar-item-circle transition-all"
+              class="cursor-pointer radar-item-circle"
             />
             <text
               x={item.x}
               y={item.y + 1}
               text-anchor="middle"
               dominant-baseline="middle"
-              class="text-sm font-semibold pointer-events-none radar-item-text transition-all"
+              class="text-sm font-semibold pointer-events-none radar-item-text"
               fill={color}
               style="font-family: system-ui, -apple-system, sans-serif;"
             >
@@ -222,16 +222,7 @@ const positionedItems = items.map((item, index) => {
   }
 
   .radar-item {
-    transition: opacity 0.3s ease;
     user-select: none;
-  }
-
-  .radar-item-circle {
-    transition: all 0.2s ease;
-  }
-
-  .radar-item-text {
-    transition: all 0.2s ease;
   }
 
   /* Filtered out state: dim but keep clickable */
