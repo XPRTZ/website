@@ -227,20 +227,20 @@ const ringLabelData = RINGS.map((ring, index) => {
 
   @media (max-width: 1280px) and (min-width: 1025px) {
     .radar-chart-wrapper {
-      transform: scale(calc(100vw / 1350px));
+      transform: scale(var(--radar-scale, 1));
       transform-origin: center top;
-      height: calc(820px * (100vw / 1350px));
+      height: calc(820px * var(--radar-scale, 1));
     }
 
     /* Compensate for the wrapper scale to keep the list at a consistent size */
     .radar-chart-wrapper :global(.quadrant-item-list) {
-      transform: scale(calc(1350px / 100vw));
+      transform: scale(var(--radar-inverse-scale, 1));
       transform-origin: top left;
     }
 
     /* Constrain scrollable area so scaled list doesn't overflow the wrapper */
     .radar-chart-wrapper :global(.quadrant-item-list .space-y-6) {
-      max-height: calc(820px * (100vw / 1350px) * (100vw / 1350px) - 120px);
+      max-height: calc(820px * var(--radar-scale, 1) * var(--radar-scale, 1) - 120px);
     }
   }
 
@@ -447,6 +447,28 @@ const ringLabelData = RINGS.map((ring, index) => {
     if (window.matchMedia(BREAKPOINTS.fullchart).matches) return "fullchart";
     if (window.matchMedia(BREAKPOINTS.tiles).matches) return "tiles";
     return "singlecol";
+  }
+
+  // =============================================================================
+  // Responsive Scaling (1025px - 1280px)
+  // =============================================================================
+
+  const SCALE_BREAKPOINT = "(max-width: 1280px) and (min-width: 1025px)";
+  const SCALE_BASE = 1350;
+
+  function updateRadarScale() {
+    const wrapper = document.querySelector(".radar-chart-wrapper") as HTMLElement | null;
+    if (!wrapper) return;
+
+    if (window.matchMedia(SCALE_BREAKPOINT).matches) {
+      const scale = window.innerWidth / SCALE_BASE;
+      const inverseScale = 1 / scale;
+      wrapper.style.setProperty("--radar-scale", scale.toString());
+      wrapper.style.setProperty("--radar-inverse-scale", inverseScale.toString());
+    } else {
+      wrapper.style.removeProperty("--radar-scale");
+      wrapper.style.removeProperty("--radar-inverse-scale");
+    }
   }
 
   // =============================================================================
@@ -706,6 +728,10 @@ const ringLabelData = RINGS.map((ring, index) => {
     if (!elements) return;
 
     const state = getResponsiveState();
+
+    // Initialize responsive scaling
+    updateRadarScale();
+    window.addEventListener("resize", updateRadarScale);
 
     // Initialize hover effects
     initRadarHover(elements);
