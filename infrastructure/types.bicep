@@ -1,12 +1,11 @@
 @export()
-type domainsType = {
-  rootDomain: string
-  subDomain: string
-  fullDomain: string
+type hostnameType = {
+  dnsZoneName: string
+  hostname: string
 }
 
 @export()
 type validationTokenType = {
-  domain: domainsType
+  hostname: hostnameType
   validationToken: string
 }
