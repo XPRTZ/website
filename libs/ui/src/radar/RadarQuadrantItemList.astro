@@ -1,0 +1,234 @@
+---
+import type { RadarItemWithNumber } from "@xprtz/cms";
+import { buildRadarItemLink, RINGS } from "./radarUtils";
+
+interface Props {
+  /**
+   * Array of radar items for the selected quadrant
+   */
+  items: RadarItemWithNumber[];
+
+  /**
+   * Name of the quadrant
+   */
+  quadrantName: string;
+
+  /**
+   * Color for the quadrant
+   */
+  color: string;
+
+  /**
+   * Slug of the parent page (for back links from radar items)
+   */
+  parentPageSlug?: string;
+}
+
+const { items, quadrantName, color, parentPageSlug } = Astro.props;
+
+// Group items by ring
+const itemsByRing = RINGS.reduce(
+  (acc, { label }) => {
+    const ringItems = items.filter((item) => item.ring === label);
+    if (ringItems.length > 0) {
+      acc[label] = ringItems;
+    }
+    return acc;
+  },
+  {} as Record<string, RadarItemWithNumber[]>
+);
+---
+
+<div class="quadrant-item-list">
+  <div class="bg-white rounded-lg shadow-lg p-6 max-w-96 w-full">
+    <div class="mb-2">
+      <h3 class="text-2xl font-bold" style={`color: ${color};`}>
+        {quadrantName}
+      </h3>
+    </div>
+
+    <div class="mb-4">
+      <button
+        type="button"
+        class="back-to-radar text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-4 h-4"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
+        </svg>
+        Terug naar radar
+      </button>
+    </div>
+
+    <div class="space-y-6 max-h-[600px] overflow-y-auto pr-2">
+      {
+        Object.entries(itemsByRing).map(([ring, ringItems]) => (
+          <div class="ring-group">
+            <h4 class="text-lg font-semibold text-gray-800 mb-2 sticky top-0 bg-white py-1">
+              {ring}
+            </h4>
+            <ul class="divide-y divide-gray-200">
+              {ringItems.map((item) => {
+                const itemLink = buildRadarItemLink(item.slug, parentPageSlug);
+                const tagsJson = JSON.stringify(
+                  item.tags?.map((t) => t.title) || []
+                );
+
+                return (
+                  <li
+                    class="list-radar-item"
+                    data-tags={tagsJson}
+                    data-item-number={item.number}
+                  >
+                    <a
+                      href={itemLink}
+                      class="item-link block py-3"
+                      style={`--item-color: ${color};`}
+                    >
+                      <div class="font-medium text-gray-900">
+                        {item.number}. {item.title}
+                      </div>
+                      {item.description && (
+                        <div class="text-sm text-gray-600 mt-1 line-clamp-2">
+                          {item.description}
+                        </div>
+                      )}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .quadrant-item-list {
+    display: none;
+    --animation-phase-duration: 500ms;
+    --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .quadrant-item-list.visible {
+    display: block;
+  }
+
+  .quadrant-item-list.visible > div {
+    animation: listContentSlideIn var(--animation-phase-duration)
+      var(--animation-easing);
+  }
+
+  .quadrant-item-list.closing {
+    display: block;
+  }
+
+  .quadrant-item-list.closing > div {
+    animation: listContentSlideOut var(--animation-phase-duration)
+      var(--animation-easing);
+  }
+
+  @keyframes listContentSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes listContentSlideOut {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .quadrant-item-list.closing > div {
+      animation: listSlideOutMobile var(--animation-phase-duration)
+        var(--animation-easing);
+    }
+
+    .quadrant-item-list.visible > div {
+      animation: listSlideInMobile var(--animation-phase-duration)
+        var(--animation-easing);
+    }
+
+    @keyframes listSlideInMobile {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes listSlideOutMobile {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+    }
+  }
+
+  /* Filtered out state: dim but keep clickable */
+  .list-radar-item.filtered-out {
+    opacity: 0.5;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Item hover effect */
+  .item-link:hover {
+    background-color: color-mix(in srgb, var(--item-color) 8%, white);
+    padding-left: 0.7rem;
+  }
+
+  /* Custom scrollbar styling */
+  .space-y-6::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .space-y-6::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .space-y-6::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  .space-y-6::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+</style>

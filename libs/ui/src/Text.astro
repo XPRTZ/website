@@ -8,6 +8,6 @@ interface RichTextProps {
 }
 
 const { content } = Astro.props as RichTextProps;
-const htmlContent = marked.parse(content);
+const htmlContent = await marked.parse(content);
 ---
-<div class="mt-8" set:html={htmlContent}></div>
+<div class="mt-8 prose max-w-none" set:html={htmlContent}></div>

@@ -17,6 +17,7 @@ import { Team } from "./models/team.js";
 import { Directors } from "./models/directors.js";
 import { Social } from "./models/social.js";
 import { AlgemeneVoorwaarden } from "./models/algemeneVoorwaarden.js";
+import { RadarItem, RadarItemWithNumber, RadarQuadrant, RadarRing } from "./models/radarItem.js";
 
 import { HomePage } from "./models/homePage.js";
 
@@ -43,6 +44,10 @@ export {
   type Social,
   type AlgemeneVoorwaarden,
   type Directors,
-  type HomePage
+  type HomePage,
+  type RadarItem,
+  type RadarItemWithNumber,
+  type RadarQuadrant,
+  type RadarRing
 };
 

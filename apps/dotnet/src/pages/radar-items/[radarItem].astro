@@ -1,0 +1,277 @@
+---
+import Layout from "../../layouts/layout.astro";
+import { fetchData, type RadarItem } from "@xprtz/cms";
+import { Container, Text, QUADRANTS } from "@xprtz/ui";
+
+export async function getStaticPaths() {
+  const pageData = await fetchData<Array<RadarItem>>({
+    endpoint: "radar-items",
+    wrappedByKey: "data",
+    query: {
+      "populate[pros]": "*",
+      "populate[cons]": "*",
+      "populate[tags][fields][0]": "title",
+      status: "published",
+    },
+  });
+
+  // Return empty array if no items found to prevent build errors
+  if (!pageData || pageData.length === 0) {
+    return [];
+  }
+
+  return pageData.map((data: RadarItem) => ({
+    params: { radarItem: data.slug },
+    props: data,
+  }));
+}
+
+const radarItem: RadarItem = Astro.props;
+
+// Get quadrant configuration from QUADRANTS
+const quadrantConfig = QUADRANTS[radarItem.quadrant];
+const quadrantColor = quadrantConfig?.color || "#3b82f6"; // Default: blue
+---
+
+<Layout title={radarItem.title} description={radarItem.description}>
+  <Container>
+    <svg
+      class="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]"
+      aria-hidden="true"
+    >
+      <defs>
+        <pattern
+          id="1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84"
+          width={200}
+          height={200}
+          x="50%"
+          y={-1}
+          patternUnits="userSpaceOnUse"
+        >
+          <path d="M.5 200V.5H200" fill="none"></path>
+        </pattern>
+      </defs>
+      <svg x="50%" y={-1} class="overflow-visible fill-gray-50">
+        <path
+          d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z"
+          stroke-width={0}></path>
+      </svg>
+      <rect
+        width="100%"
+        height="100%"
+        stroke-width={0}
+        fill="url(#1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84)"></rect>
+    </svg>
+
+    <div
+      class="absolute left-1/2 right-0 top-0 -z-10 -ml-24 transform-gpu overflow-hidden blur-3xl lg:ml-24 xl:ml-48"
+      aria-hidden="true"
+    >
+      <div
+        class="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-primary-100 to-primary-800 opacity-30"
+        style="clip-path: polygon(63.1% 29.5%, 100% 17.1%, 76.6% 3%, 48.4% 0%, 44.6% 4.7%, 54.5% 25.3%, 59.8% 49%, 55.2% 57.8%, 44.4% 57.2%, 27.8% 47.9%, 35.1% 81.5%, 0% 97.7%, 39.2% 100%, 35.2% 81.4%, 97.2% 52.8%, 63.1% 29.5%);"
+      >
+      </div>
+    </div>
+
+    <div class="overflow-hidden">
+      <div class="mx-auto max-w-7xl px-6 pt-20 sm:pt-32 lg:px-8 lg:pt-16">
+        <div
+          class="mx-auto max-w-2xl gap-x-14 lg:mx-0 lg:max-w-none lg:items-center"
+        >
+          <div class="mx-auto lg:mx-0">
+            <p class="text-base/7 font-semibold text-primary-600">
+              Technology Radar
+            </p>
+            <h1
+              class="mt-2 text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
+            >
+              {radarItem.title}
+            </h1>
+
+            <div class="mt-4">
+              <div class="mr-4 inline-flex">
+                <span
+                  class="inline-flex items-center rounded-xl px-4 py-1 text-sm/6 font-medium"
+                  style={`background-color: ${quadrantColor}20; color: ${quadrantColor};`}
+                >
+                  {radarItem.quadrant}
+                </span>
+              </div>
+              <div class="inline-flex">
+                <span
+                  class="inline-flex items-center rounded-xl bg-gray-100 px-4 py-1 text-sm/6 font-medium text-gray-700"
+                >
+                  {radarItem.ring}
+                </span>
+              </div>
+            </div>
+
+            {
+              radarItem.tags && radarItem.tags.length > 0 && (
+                <div class="mt-4">
+                  {radarItem.tags.map((tag) => (
+                    <div class="mr-4 inline-flex">
+                      <span class="inline-flex items-center rounded-xl bg-primary-100 px-4 py-1 text-sm/6 font-medium text-primary-700">
+                        #{tag.title}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )
+            }
+
+            {radarItem.description && (
+              <Text content={radarItem.description} __component="ui.text" id={0} />
+            )}
+
+            {
+              (radarItem.pros && radarItem.pros.length > 0) ||
+              (radarItem.cons && radarItem.cons.length > 0) ? (
+                <div class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  {radarItem.pros && radarItem.pros.length > 0 && (
+                    <div class="rounded-lg bg-green-50 p-6">
+                      <div class="flex items-center gap-3">
+                        <svg
+                          class="size-8 text-green-600"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        <h2 class="text-2xl font-bold tracking-tight text-green-900">
+                          Voordelen
+                        </h2>
+                      </div>
+                      <ul class="mt-4 space-y-4">
+                        {radarItem.pros.map((pro) => (
+                          <li class="flex gap-x-3">
+                            <svg
+                              class="mt-1 size-5 flex-none text-green-600"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              aria-hidden="true"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z"
+                                clip-rule="evenodd"
+                              />
+                            </svg>
+                            <div>
+                              <strong class="font-semibold text-gray-900">
+                                {pro.title.charAt(0).toUpperCase() +
+                                  pro.title.slice(1)}
+                                :
+                              </strong>{" "}
+                              {pro.description.charAt(0).toUpperCase() +
+                                pro.description.slice(1)}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {radarItem.cons && radarItem.cons.length > 0 && (
+                    <div class="rounded-lg bg-red-50 p-6">
+                      <div class="flex items-center gap-3">
+                        <svg
+                          class="size-8 text-red-600"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        <h2 class="text-2xl font-bold tracking-tight text-red-900">
+                          Nadelen
+                        </h2>
+                      </div>
+                      <ul class="mt-4 space-y-4">
+                        {radarItem.cons.map((con) => (
+                          <li class="flex gap-x-3">
+                            <svg
+                              class="mt-1 size-5 flex-none text-red-600"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              aria-hidden="true"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z"
+                                clip-rule="evenodd"
+                              />
+                            </svg>
+                            <div>
+                              <strong class="font-semibold text-gray-900">
+                                {con.title.charAt(0).toUpperCase() +
+                                  con.title.slice(1)}
+                                :
+                              </strong>{" "}
+                              {con.description.charAt(0).toUpperCase() +
+                                con.description.slice(1)}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ) : null
+            }
+
+            {
+              radarItem.conclusion && (
+                <div class="mt-10">
+                  <h2 class="text-2xl font-bold tracking-tight text-gray-900">
+                    Conclusie
+                  </h2>
+                  <Text content={radarItem.conclusion} __component="ui.text" id={0} />
+                </div>
+              )
+            }
+
+            <div class="mt-10">
+              <a
+                id="back-link"
+                href="/"
+                class="text-base/7 font-semibold text-primary-600 hover:text-primary-500"
+              >
+                &larr; Terug naar radar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Container>
+</Layout>
+
+<script>
+  import { initializeOnReady } from "@xprtz/ui";
+
+  // Update back link based on query parameter (client-side only since pages are statically generated)
+  const updateBackLink = () => {
+    const backLink = document.getElementById("back-link") as HTMLAnchorElement;
+    if (backLink) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const parentPageSlug = urlParams.get("from");
+      if (parentPageSlug) {
+        backLink.href = `/${parentPageSlug}`;
+      }
+    }
+  };
+
+  // Initialize on page load
+  initializeOnReady(updateBackLink);
+</script>

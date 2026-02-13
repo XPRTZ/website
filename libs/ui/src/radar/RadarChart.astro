@@ -1,0 +1,748 @@
+---
+import RadarQuadrant from "./RadarQuadrant.astro";
+import RadarQuadrantItemList from "./RadarQuadrantItemList.astro";
+import type { RadarItem, RadarItemWithNumber } from "@xprtz/cms";
+import { RINGS, QUADRANTS, type QuadrantName } from "./radarUtils";
+
+interface Props {
+  /**
+   * Array of radar items to display on the chart
+   */
+  items?: RadarItem[];
+
+  /**
+   * Size of each quadrant in pixels
+   */
+  quadrantSize?: number;
+
+  /**
+   * Slug of the parent page (for back links from radar items)
+   */
+  parentPageSlug?: string;
+}
+
+const { items = [], quadrantSize = 400, parentPageSlug } = Astro.props;
+
+// Margin between quadrants
+const margin = 20;
+
+// Add numbers to items and group by quadrant
+const itemsWithNumbers: RadarItemWithNumber[] = items.map((item, index) => ({
+  ...item,
+  number: index + 1,
+}));
+
+const itemsByQuadrant = Object.fromEntries(
+  Object.keys(QUADRANTS).map((quadrantName) => [
+    quadrantName,
+    itemsWithNumbers.filter((item) => item.quadrant === quadrantName),
+  ])
+) as Record<QuadrantName, RadarItemWithNumber[]>;
+
+// Helper maps for positioning
+const flexClassMap: Record<string, string> = {
+  "top-left": "flex justify-end items-end",
+  "top-right": "flex justify-start items-end",
+  "bottom-left": "flex justify-end items-start",
+  "bottom-right": "flex justify-start items-start",
+};
+
+const labelPositionMap: Record<string, { style: string; align: string }> = {
+  "top-left": { style: "top: 0; left: 0;", align: "text-left" },
+  "top-right": { style: "top: 0; right: 0;", align: "text-right" },
+  "bottom-left": { style: "bottom: 0; left: 0;", align: "text-left" },
+  "bottom-right": { style: "bottom: 0; right: 0;", align: "text-right" },
+};
+
+// Pre-calculate ring label positions and styles
+const ringLabelData = RINGS.map((ring, index) => {
+  const radius = quadrantSize * (ring.radiusPosition / 100);
+  const prevRadius =
+    index > 0 ? quadrantSize * (RINGS[index - 1].radiusPosition / 100) : 0;
+  const ringCenter = prevRadius + (radius - prevRadius) / 2;
+  // Calculate opacity: inner rings (Adopt) darker, outer rings (Hold) lighter
+  const opacity = 1 - index * 0.1;
+
+  return {
+    label: ring.label,
+    ringCenter,
+    opacity,
+  };
+});
+---
+
+<div class="radar-chart-wrapper">
+  <div class="radar-chart-container">
+    <div class="relative radar-chart">
+      <!-- Quadrants Grid -->
+      <div class="grid grid-cols-2 grid-rows-2" style={`gap: ${margin}px;`}>
+        {
+          Object.entries(QUADRANTS).map(([name, config]) => {
+            const flexClasses = flexClassMap[config.gridPosition];
+            return (
+              <div
+                class={`${flexClasses} quadrant-wrapper`}
+                data-quadrant={config.key}
+              >
+                <RadarQuadrant
+                  quadrantName={name as QuadrantName}
+                  size={quadrantSize}
+                  items={itemsByQuadrant[name as QuadrantName]}
+                  parentPageSlug={parentPageSlug}
+                />
+              </div>
+            );
+          })
+        }
+      </div>
+
+      <!-- Ring Labels - Horizontal (between Tools and Platforms - left side) -->
+      <div
+        class="absolute left-0 flex justify-center items-center ring-labels"
+        data-ring-labels="left"
+        style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}
+      >
+        {
+          ringLabelData.map((data) => {
+            const leftPosition = quadrantSize - data.ringCenter;
+            const labelStyle = `left: ${leftPosition}px; height: ${margin}px; opacity: ${data.opacity};`;
+
+            return (
+              <div
+                class="absolute text-xs font-bold text-gray-600 flex items-center -translate-x-1/2"
+                style={labelStyle}
+              >
+                {data.label}
+              </div>
+            );
+          })
+        }
+      </div>
+
+      <!-- Ring Labels - Horizontal (between Techniques and Languages & Frameworks - right side) -->
+      <div
+        class="absolute right-0 flex justify-center items-center ring-labels"
+        data-ring-labels="right"
+        style={`top: ${quadrantSize}px; height: ${margin}px; width: ${quadrantSize}px;`}
+      >
+        {
+          ringLabelData.map((data) => {
+            const labelStyle = `left: ${data.ringCenter}px; height: ${margin}px; opacity: ${data.opacity};`;
+
+            return (
+              <div
+                class="absolute text-xs font-bold text-gray-600 flex items-center -translate-x-1/2"
+                style={labelStyle}
+              >
+                {data.label}
+              </div>
+            );
+          })
+        }
+      </div>
+
+      <!-- Quadrant Labels in Corners -->
+      {
+        Object.entries(QUADRANTS).map(([name, config]) => {
+          const position = labelPositionMap[config.gridPosition];
+          const labelStyle = `${position.style} padding: 8px; color: ${config.color};`;
+
+          return (
+            <div
+              class={`absolute text-lg font-bold ${position.align} quadrant-label`}
+              data-label-quadrant={config.key}
+              style={labelStyle}
+            >
+              {name}
+            </div>
+          );
+        })
+      }
+    </div>
+  </div>
+
+  <!-- Quadrant Tiles for mobile (hidden by default, shown below 870px) -->
+  <div class="quadrant-tiles" style="display: none;">
+    {
+      Object.entries(QUADRANTS).map(([name, config]) => (
+        <div
+          class="quadrant-tile"
+          data-quadrant-tile={config.key}
+          style={`background-color: ${config.color};`}
+        >
+          {name}
+        </div>
+      ))
+    }
+  </div>
+
+  <!-- Quadrant Item Lists (hidden by default) -->
+  {
+    Object.entries(QUADRANTS).map(([name, config]) => (
+      <RadarQuadrantItemList
+        items={itemsByQuadrant[name as QuadrantName]}
+        quadrantName={name}
+        color={config.color}
+        parentPageSlug={parentPageSlug}
+      />
+    ))
+  }
+</div>
+
+<style>
+  .radar-chart-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    /* Shared variables */
+    --hover-dim-opacity: 0.5;
+    --zoom-scale: 1.75;
+    /* Animation timing variables */
+    --animation-phase-duration: 500ms;
+    --animation-total-duration: 1000ms;
+    --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .radar-chart-container {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .radar-chart-wrapper.list-visible .radar-chart-container {
+    transform: translateX(-200px);
+  }
+
+  /* Position item lists */
+  .radar-chart-wrapper :global(.quadrant-item-list) {
+    position: absolute;
+    left: calc(50% + 220px);
+    top: 0;
+    z-index: 20;
+  }
+
+  @media (max-width: 1280px) and (min-width: 1025px) {
+    .radar-chart-wrapper {
+      transform: scale(var(--radar-scale, 1));
+      transform-origin: center top;
+      height: calc(820px * var(--radar-scale, 1));
+    }
+
+    /* Compensate for the wrapper scale to keep the list at a consistent size */
+    .radar-chart-wrapper :global(.quadrant-item-list) {
+      transform: scale(var(--radar-inverse-scale, 1));
+      transform-origin: top left;
+    }
+
+    /* Constrain scrollable area so scaled list doesn't overflow the wrapper */
+    .radar-chart-wrapper :global(.quadrant-item-list .space-y-6) {
+      max-height: calc(820px * var(--radar-scale, 1) * var(--radar-scale, 1) - 120px);
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .radar-chart-container {
+      display: none;
+    }
+
+    .radar-chart-wrapper :global(.quadrant-item-list) {
+      position: static;
+      left: auto;
+      width: min(100%, 24rem);
+      margin-inline: auto;
+    }
+
+    .quadrant-tiles {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 0 auto;
+    }
+
+    .radar-chart-wrapper.list-visible .quadrant-tiles {
+      display: none !important;
+    }
+
+    .quadrant-tile {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      padding: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 1.125rem;
+      font-weight: bold;
+      color: white;
+      transition:
+        opacity var(--animation-phase-duration) var(--animation-easing),
+        transform var(--animation-phase-duration) var(--animation-easing);
+    }
+
+    .quadrant-tile:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Hover dim effect for tiles */
+    .quadrant-tiles.hovering .quadrant-tile {
+      opacity: var(--hover-dim-opacity);
+    }
+
+    .quadrant-tiles.hovering .quadrant-tile.active {
+      opacity: 1;
+    }
+
+    /* Selection animation for tiles */
+    .quadrant-tiles.selecting .quadrant-tile {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    .quadrant-tiles.selecting .quadrant-tile.selected {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+  }
+
+  @media (max-width: 360px) {
+    .quadrant-tiles {
+      grid-template-columns: 1fr;
+    }
+
+    /* Disable hover effects in single column */
+    .quadrant-tiles.hovering .quadrant-tile {
+      opacity: 1 !important;
+    }
+  }
+
+  .radar-chart.hovering .quadrant-wrapper {
+    opacity: var(--hover-dim-opacity);
+  }
+
+  .radar-chart.hovering .quadrant-wrapper.active {
+    opacity: 1;
+  }
+
+  .radar-chart.hovering .quadrant-label {
+    opacity: var(--hover-dim-opacity);
+  }
+
+  .radar-chart.hovering .quadrant-label.active {
+    opacity: 1;
+  }
+
+  .quadrant-wrapper {
+    cursor: pointer;
+    transition:
+      opacity var(--animation-phase-duration) var(--animation-easing),
+      transform var(--animation-phase-duration) var(--animation-easing);
+  }
+
+  .quadrant-label {
+    transition: opacity var(--animation-phase-duration) var(--animation-easing);
+  }
+
+  .ring-labels {
+    transition:
+      opacity var(--animation-phase-duration) var(--animation-easing),
+      transform var(--animation-phase-duration) var(--animation-easing);
+  }
+
+  .radar-chart-container {
+    transition: transform var(--animation-phase-duration)
+      var(--animation-easing);
+  }
+
+  /* Zoomed state - hide non-selected quadrants */
+  .radar-chart.zoomed .quadrant-wrapper {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .radar-chart.zoomed .quadrant-wrapper.zoomed-in {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Position adjustments for each quadrant when zoomed */
+  .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="tools"] {
+    transform: scale(var(--zoom-scale)) translate(25%, 25%);
+  }
+
+  .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="techniques"] {
+    transform: scale(var(--zoom-scale)) translate(-25%, 25%);
+  }
+
+  .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="platforms"] {
+    transform: scale(var(--zoom-scale)) translate(25%, calc(-25% - 15px));
+  }
+
+  .radar-chart.zoomed .quadrant-wrapper.zoomed-in[data-quadrant="frameworks"] {
+    transform: scale(var(--zoom-scale)) translate(-25%, calc(-25% - 15px));
+  }
+
+  /* Hide labels when zoomed */
+  .radar-chart.zoomed .quadrant-label {
+    display: none;
+  }
+
+  /* Hide ring labels when zoomed, show relevant ones */
+  .radar-chart.zoomed .ring-labels {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .radar-chart.zoomed.zoom-tools .ring-labels[data-ring-labels="left"] {
+    opacity: 1;
+    transform: scale(var(--zoom-scale)) translate(25%, 190px);
+  }
+
+  .radar-chart.zoomed.zoom-platforms .ring-labels[data-ring-labels="left"] {
+    opacity: 1;
+    transform: scale(var(--zoom-scale)) translate(25%, -205px);
+  }
+
+  .radar-chart.zoomed.zoom-techniques .ring-labels[data-ring-labels="right"] {
+    opacity: 1;
+    transform: scale(var(--zoom-scale)) translate(-25%, 190px);
+  }
+
+  .radar-chart.zoomed.zoom-frameworks .ring-labels[data-ring-labels="right"] {
+    opacity: 1;
+    transform: scale(var(--zoom-scale)) translate(-25%, -205px);
+  }
+</style>
+
+<script>
+  import { initializeOnReady, QUADRANTS } from "./radarUtils";
+
+  // =============================================================================
+  // Types and Constants
+  // =============================================================================
+
+  type ResponsiveState = "fullchart" | "tiles" | "singlecol";
+
+  // Media query breakpoints (must match CSS)
+  const BREAKPOINTS = {
+    fullchart: "(min-width: 1025px)",
+    tiles: "(max-width: 1024px) and (min-width: 361px)",
+    singlecol: "(max-width: 360px)",
+  } as const;
+
+  // Create reverse mapping: key -> name
+  const quadrantNameMap: Record<string, string> = Object.fromEntries(
+    Object.entries(QUADRANTS).map(([name, config]) => [config.key, name])
+  );
+
+  // =============================================================================
+  // Responsive State Detection
+  // =============================================================================
+
+  function getResponsiveState(): ResponsiveState {
+    if (window.matchMedia(BREAKPOINTS.fullchart).matches) return "fullchart";
+    if (window.matchMedia(BREAKPOINTS.tiles).matches) return "tiles";
+    return "singlecol";
+  }
+
+  // =============================================================================
+  // Responsive Scaling (1025px - 1280px)
+  // =============================================================================
+
+  const SCALE_BREAKPOINT = "(max-width: 1280px) and (min-width: 1025px)";
+  const SCALE_BASE = 1350;
+
+  function updateRadarScale() {
+    const wrapper = document.querySelector(".radar-chart-wrapper") as HTMLElement | null;
+    if (!wrapper) return;
+
+    if (window.matchMedia(SCALE_BREAKPOINT).matches) {
+      const scale = window.innerWidth / SCALE_BASE;
+      const inverseScale = 1 / scale;
+      wrapper.style.setProperty("--radar-scale", scale.toString());
+      wrapper.style.setProperty("--radar-inverse-scale", inverseScale.toString());
+    } else {
+      wrapper.style.removeProperty("--radar-scale");
+      wrapper.style.removeProperty("--radar-inverse-scale");
+    }
+  }
+
+  // =============================================================================
+  // Shared DOM References
+  // =============================================================================
+
+  interface RadarElements {
+    wrapper: Element;
+    chart: Element | null;
+    quadrants: NodeListOf<Element>;
+    labels: NodeListOf<Element>;
+    tiles: NodeListOf<Element>;
+    tilesContainer: Element | null;
+    itemLists: NodeListOf<Element>;
+    backButtons: NodeListOf<Element>;
+  }
+
+  function getRadarElements(): RadarElements | null {
+    const wrapper = document.querySelector(".radar-chart-wrapper");
+    if (!wrapper) return null;
+
+    return {
+      wrapper,
+      chart: wrapper.querySelector(".radar-chart"),
+      quadrants: wrapper.querySelectorAll(".quadrant-wrapper"),
+      labels: wrapper.querySelectorAll(".quadrant-label"),
+      tiles: wrapper.querySelectorAll(".quadrant-tile"),
+      tilesContainer: wrapper.querySelector(".quadrant-tiles"),
+      itemLists: wrapper.querySelectorAll(".quadrant-item-list"),
+      backButtons: wrapper.querySelectorAll(".back-to-radar"),
+    };
+  }
+
+  // =============================================================================
+  // Shared Utilities
+  // =============================================================================
+
+  function showItemList(elements: RadarElements, quadrantKey: string) {
+    const { itemLists } = elements;
+    const quadrantName = quadrantNameMap[quadrantKey] || "";
+
+    itemLists.forEach((list) => {
+      const listQuadrant = list.querySelector("h3")?.textContent?.trim();
+      if (listQuadrant === quadrantName) {
+        list.classList.add("visible");
+      } else {
+        list.classList.remove("visible");
+      }
+    });
+  }
+
+  function hideItemList(elements: RadarElements, quadrantKey: string) {
+    const { itemLists } = elements;
+    const quadrantName = quadrantNameMap[quadrantKey] || "";
+
+    itemLists.forEach((list) => {
+      list.classList.remove("visible");
+
+      const listQuadrant = list.querySelector("h3")?.textContent?.trim();
+      if (listQuadrant === quadrantName) {
+        // Trigger closing animation
+        list.classList.add("closing");
+        setTimeout(() => {
+          list.classList.remove("closing");
+        }, ANIMATION_DURATION);
+      }
+    });
+  }
+
+  // =============================================================================
+  // Quadrant Selection
+  // =============================================================================
+
+  // Animation duration (must match CSS --animation-phase-duration)
+  const ANIMATION_DURATION = 500;
+
+  function initQuadrantSelection(elements: RadarElements) {
+    const { wrapper, chart, quadrants, tiles, tilesContainer } = elements;
+    let isAnimating = false;
+    let currentQuadrantKey: string | null = null;
+
+    const showList = async (quadrantKey: string, element: Element) => {
+      if (isAnimating) return;
+      isAnimating = true;
+
+      const state = getResponsiveState();
+
+      // For tiles/singlecol: animate tile selection before hiding
+      if (state === "tiles" || state === "singlecol") {
+        element.classList.add("selected");
+        tilesContainer?.classList.add("selecting");
+
+        // Wait for tile animation
+        await new Promise((r) => setTimeout(r, ANIMATION_DURATION));
+
+        // Clean up tile classes (they'll be hidden by display:none anyway)
+        tilesContainer?.classList.remove("selecting");
+        element.classList.remove("selected");
+      }
+
+      // Show the list
+      wrapper.classList.add("list-visible");
+      currentQuadrantKey = quadrantKey;
+
+      if (chart) {
+        chart.classList.add("zoomed", `zoom-${quadrantKey}`);
+        element.classList.add("zoomed-in");
+      }
+
+      showItemList(elements, quadrantKey);
+      isAnimating = false;
+    };
+
+    const hideList = () => {
+      const state = getResponsiveState();
+
+      if (chart) {
+        chart.classList.remove(
+          "zoomed",
+          "zoom-tools",
+          "zoom-techniques",
+          "zoom-platforms",
+          "zoom-frameworks"
+        );
+      }
+      quadrants.forEach((q) => q.classList.remove("zoomed-in"));
+
+      if (currentQuadrantKey) {
+        hideItemList(elements, currentQuadrantKey);
+        currentQuadrantKey = null;
+      }
+
+      // For tiles/singlecol: delay showing tiles until closing animation completes
+      if (state === "tiles" || state === "singlecol") {
+        setTimeout(() => {
+          wrapper.classList.remove("list-visible");
+        }, ANIMATION_DURATION);
+      } else {
+        wrapper.classList.remove("list-visible");
+      }
+    };
+
+    // Click handlers for quadrants
+    quadrants.forEach((quadrant) => {
+      const quadrantKey = quadrant.getAttribute("data-quadrant");
+
+      quadrant.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        if (target.closest("a")) return;
+        e.stopPropagation();
+
+        if (wrapper.classList.contains("list-visible")) {
+          hideList();
+        } else if (quadrantKey) {
+          showList(quadrantKey, quadrant);
+        }
+      });
+    });
+
+    // Click handlers for tiles
+    tiles.forEach((tile) => {
+      const quadrantKey = tile.getAttribute("data-quadrant-tile");
+
+      tile.addEventListener("click", () => {
+        if (quadrantKey) {
+          showList(quadrantKey, tile);
+        }
+      });
+    });
+
+    // Back button handlers
+    elements.backButtons.forEach((button) => {
+      button.addEventListener("click", () => hideList());
+    });
+  }
+
+  // =============================================================================
+  // Hover Effects
+  // =============================================================================
+
+  function initRadarHover(elements: RadarElements) {
+    const { wrapper, chart, quadrants, labels, tiles, tilesContainer } =
+      elements;
+
+    // Hover for radar quadrants (desktop)
+    quadrants.forEach((quadrant) => {
+      const quadrantKey = quadrant.getAttribute("data-quadrant");
+      const correspondingLabel = Array.from(labels).find(
+        (label) => label.getAttribute("data-label-quadrant") === quadrantKey
+      );
+
+      quadrant.addEventListener("mouseenter", () => {
+        if (!wrapper.classList.contains("list-visible")) {
+          chart?.classList.add("hovering");
+          quadrant.classList.add("active");
+          correspondingLabel?.classList.add("active");
+        }
+      });
+
+      quadrant.addEventListener("mouseleave", () => {
+        chart?.classList.remove("hovering");
+        quadrant.classList.remove("active");
+        correspondingLabel?.classList.remove("active");
+      });
+    });
+
+    // Hover for tiles (mobile)
+    tiles.forEach((tile) => {
+      tile.addEventListener("mouseenter", () => {
+        if (!wrapper.classList.contains("list-visible")) {
+          tilesContainer?.classList.add("hovering");
+          tile.classList.add("active");
+        }
+      });
+
+      tile.addEventListener("mouseleave", () => {
+        tilesContainer?.classList.remove("hovering");
+        tile.classList.remove("active");
+      });
+    });
+  }
+
+  // =============================================================================
+  // Cross-Highlight (list item <-> radar item)
+  // =============================================================================
+
+  function initCrossHighlight(elements: RadarElements) {
+    const { wrapper } = elements;
+    const listItems = wrapper.querySelectorAll(".list-radar-item");
+    const radarItems = wrapper.querySelectorAll(".radar-item");
+
+    listItems.forEach((listItem) => {
+      const itemNumber = listItem.getAttribute("data-item-number");
+
+      listItem.addEventListener("mouseenter", () => {
+        const correspondingRadarItem = Array.from(radarItems).find(
+          (item) => item.getAttribute("data-item-number") === itemNumber
+        );
+        correspondingRadarItem?.classList.add("highlighted");
+      });
+
+      listItem.addEventListener("mouseleave", () => {
+        const correspondingRadarItem = Array.from(radarItems).find(
+          (item) => item.getAttribute("data-item-number") === itemNumber
+        );
+        correspondingRadarItem?.classList.remove("highlighted");
+      });
+    });
+  }
+
+  // =============================================================================
+  // Main Initialization
+  // =============================================================================
+
+  function initRadar() {
+    const elements = getRadarElements();
+    if (!elements) return;
+
+    const state = getResponsiveState();
+
+    // Initialize responsive scaling
+    updateRadarScale();
+    window.addEventListener("resize", updateRadarScale);
+
+    // Initialize hover effects
+    initRadarHover(elements);
+
+    // Initialize cross-highlight
+    initCrossHighlight(elements);
+
+    // Initialize selecting quadrants
+    initQuadrantSelection(elements);
+  }
+
+  // Initialize on page load
+  initializeOnReady(initRadar);
+</script>

@@ -1,0 +1,284 @@
+# XPRTZ Websites Monorepo - Agent Context
+
+## Project Overview
+This is a monorepo for XPRTZ websites built with Astro, consuming content from a Strapi CMS. It uses npm workspaces to manage multiple applications and shared libraries.
+
+## Monorepo Structure
+
+```
+/website
+├── apps/
+│   ├── dotnet/          # Main .NET-focused website (xprtz.net)
+│   └── learning/        # Learning platform for polyglot programming
+├── libs/
+│   ├── ui/              # Shared Astro/React UI components
+│   └── cms/             # TypeScript types and API wrapper for Strapi
+├── infrastructure/      # Infrastructure configuration
+└── package.json         # Root workspace configuration
+```
+
+## Workspace Configuration
+
+### npm Workspaces
+The monorepo uses npm workspaces defined in the root [package.json](package.json):
+
+```json
+"workspaces": [
+  "apps/dotnet",
+  "apps/learning",
+  "libs/ui",
+  "libs/cms"
+]
+```
+
+### Package Naming Convention
+- Apps: `@xprtz/dotnet`, `@xprtz/learning`
+- Libraries: `@xprtz/ui`, `@xprtz/cms`
+
+### Dependency Pattern
+Both apps depend on shared libraries using local file references:
+```json
+"dependencies": {
+  "@xprtz/ui": "file:../../libs/ui",
+  "@xprtz/cms": "file:../../libs/cms"
+}
+```
+
+## Technology Stack
+
+### Core Technologies
+- **Astro 5.16+** - Static site generator with islands architecture
+- **React 18.3+** - Client-side interactivity
+- **TypeScript 5.4+** - Type safety across the monorepo
+- **Tailwind CSS 3.4+** - Utility-first CSS framework
+- **Strapi CMS** - Headless CMS for content management
+
+### Key Dependencies
+- `@astrojs/tailwind` - Tailwind integration
+- `@astrojs/react` - React integration for interactive components
+- `@astrojs/sitemap` - Sitemap generation
+- `@headlessui/react` - Unstyled, accessible UI components
+- `@heroicons/react` - Icon library
+- `embla-carousel` - Carousel/slider library
+- `marked` - Markdown parser
+
+## File Naming Conventions
+
+### General Rules
+- **Astro components**: `PascalCase.astro` (e.g., `Hero.astro`, `Footer.astro`)
+- **React components**: `PascalCase.tsx` (e.g., `Header.tsx`)
+- **TypeScript files**: `camelCase.ts` (e.g., `api.ts`, `page.ts`)
+- **Configuration files**: Standard names (`package.json`, `astro.config.mjs`, `tsconfig.json`)
+
+### Specific Conventions
+- CMS models: `camelCase.ts` in `libs/cms/models/`
+- Page components: File-based routing in `apps/*/src/pages/`
+- Layout files: `camelCase.astro` in `apps/*/src/layouts/`
+- Dynamic routes: `[param].astro` or `[...slug].astro`
+
+## Multi-Tenant Architecture
+
+The system supports multiple sites using the `PUBLIC_SITE` environment variable:
+
+### Site Identifiers
+- `"dotnet"` - Main .NET-focused website (xprtz.net)
+- `"learning"` - Learning platform for polyglot programming
+
+### Content Filtering
+All CMS queries filter content by site:
+```typescript
+query: {
+  "filters[site][$eq]": import.meta.env.PUBLIC_SITE,
+  status: "published"
+}
+```
+
+## Environment Variables
+
+### Required Variables
+- `PUBLIC_SITE` - Site identifier ("dotnet" or "learning")
+- `PUBLIC_STRAPI_URL` - Strapi CMS API base URL
+- `PUBLIC_IMAGES_URL` - Image CDN base URL
+
+### Usage Pattern
+```typescript
+const site = import.meta.env.PUBLIC_SITE || "no-site-found";
+const imagesUrl = import.meta.env.PUBLIC_IMAGES_URL;
+```
+
+## Development Scripts
+
+### Root Level Commands
+```bash
+npm run develop:dotnet      # Start dotnet app dev server (port 3001)
+npm run develop:learning    # Start learning app dev server
+npm run build               # Build all workspaces
+npm run build:dotnet        # Build dotnet app only
+npm run build:learning      # Build learning app only
+npm run build:ui            # Type-check UI library
+npm run format              # Format and lint all files
+```
+
+### Individual Workspace Commands
+```bash
+cd apps/dotnet
+npm run develop             # Start dev server
+npm run build               # Type-check and build
+npm run preview             # Preview production build
+```
+
+## TypeScript Configuration
+
+### Root tsconfig.json
+Provides shared TypeScript configuration for all workspaces with strict mode enabled.
+
+### Import Path Conventions
+- Use `.js` extensions in imports (TypeScript ESM requirement)
+- Type-only imports: `import { type Hero } from "@xprtz/cms"`
+- Component imports: `import { ComponentRenderer } from "@xprtz/ui"`
+
+## Coding Standards
+
+### Code Style
+- Prettier for formatting (config in [.prettierrc.json](.prettierrc.json))
+- ESLint for linting (config in [eslint.config.mjs](eslint.config.mjs))
+- TypeScript strict mode enabled
+
+### Import Organization
+1. External dependencies
+2. Workspace packages (`@xprtz/*`)
+3. Relative imports
+
+### Naming Conventions
+- **Functions**: `camelCase` (e.g., `fetchData`, `formatDate`)
+- **Types**: `PascalCase` (e.g., `Hero`, `Article`, `Page`)
+- **Constants**: `UPPER_SNAKE_CASE` (e.g., `CAROUSEL_CONFIG`)
+- **CSS classes**: Tailwind utilities + custom kebab-case
+
+## Git Workflow
+
+### Recent Activity
+- Current branch: `feature/technology-radar`
+- Recent commits focus on radar chart animation improvements and accessibility enhancements
+- Fixed tile zoom and list slide animations for mobile view
+
+## Astro-Specific Configuration
+
+### Hot Module Replacement (HMR) for Workspace Dependencies
+The Astro dev server may not properly hot-reload CSS changes from workspace dependencies (`@xprtz/ui`, `@xprtz/cms`). This has been resolved by configuring Vite in each app's `astro.config.mjs`:
+
+```js
+export default defineConfig({
+  vite: {
+    server: {
+      watch: {
+        // Force Vite to watch workspace dependencies
+        ignored: ['!**/node_modules/@xprtz/ui/**']
+      }
+    },
+    optimizeDeps: {
+      // Prevent pre-bundling of workspace dependencies
+      exclude: ['@xprtz/ui']
+    }
+  }
+})
+```
+
+This configuration ensures that changes to UI library files trigger proper hot reloads without requiring dev server restarts.
+
+## Radar Chart Component
+
+### Overview
+The Technology Radar chart ([RadarChart.astro](libs/ui/src/radar/RadarChart.astro)) is a complex interactive component that displays technology items organized by quadrants and rings. It has different behaviors for desktop and mobile viewports.
+
+### Architecture
+- **Desktop (>1000px)**: Full radar chart with quadrants that can zoom
+- **Mobile (≤1000px)**: Colored tiles representing each quadrant
+
+### Animation System
+
+#### Desktop Radar Animations
+1. **Hover Effect**: Non-hovered quadrants dim to 50% opacity
+2. **Zoom In**:
+   - Clicked quadrant scales to 1.75x and centers
+   - Other quadrants fade to opacity 0
+   - Ring labels transform with the zoomed quadrant
+   - Duration: 500ms
+3. **List Slide**:
+   - After zoom, wrapper translates left by 200px
+   - Item list slides in from right
+   - Duration: 400ms
+
+#### Mobile Tile Animations
+The mobile animations were redesigned to create smooth cross-slide transitions:
+
+1. **Opening (Tile → List)**:
+   - Tile zooms in via `tileZoomIn` keyframe (scale 2.05) - 500ms
+   - After zoom: Tile slides left AND fades out while list slides in from right - 400ms
+   - Both elements pass each other smoothly
+   - After slide completes, tile becomes `display: none`
+
+2. **Closing (List → Tile)**:
+   - Tile positioned off-screen left with opacity 0
+   - List slides right while tile slides in from left AND fades in - 400ms
+   - After slide: Tile zooms out via `tileZoomOut` keyframe - 500ms
+
+#### Key CSS Classes for Mobile
+- `.sliding-out`: Tiles slide left with `translateX(-100%)` and fade to `opacity: 0`. For lists, triggers `slideOut` keyframe animation
+- `.sliding-in`: Tiles positioned at `translateX(-100%)` ready to slide in
+- `.zooming-in`: Triggers `tileZoomIn` keyframe animation on tiles
+- `.zooming-out`: Triggers `tileZoomOut` keyframe animation on tiles
+- `.list-visible`: Triggers list `slideIn` keyframe animation
+- `.list-animation-complete`: Switches list to `position: static` after animation
+
+#### Animation Implementation
+All mobile animations use CSS **keyframe animations** instead of transitions for better mobile compatibility:
+- **tileZoomIn keyframe**: Animates tile from `scale(1)` to `scale(2.05)` - defined in [RadarChart.astro](libs/ui/src/radar/RadarChart.astro)
+- **tileZoomOut keyframe**: Animates tile from `scale(2.05)` to `scale(1)` - defined in [RadarChart.astro](libs/ui/src/radar/RadarChart.astro)
+- **slideIn keyframe**: Animates list from `translateX(100%)` opacity 0 to `translateX(0)` opacity 1 - defined in [RadarQuadrantItemList.astro](libs/ui/src/radar/RadarQuadrantItemList.astro)
+- **slideOut keyframe**: Animates list from `translateX(0)` opacity 1 to `translateX(100%)` opacity 0 - defined in [RadarQuadrantItemList.astro](libs/ui/src/radar/RadarQuadrantItemList.astro)
+- Keyframes are more reliable on mobile devices than CSS transitions
+
+#### Animation Timing Variables
+Defined in [RadarChart.astro:200-205](libs/ui/src/radar/RadarChart.astro#L200-L205):
+```css
+--fade-out-duration: 300ms;
+--fade-out-delay: 100ms;
+--fade-in-duration: 400ms;
+--zoom-duration: 500ms;
+--slide-duration: 400ms;
+--transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+```
+
+### Important Constraints
+1. **DO NOT** change the `position: static` rule for `.list-animation-complete` on mobile - this is required to prevent content overlap
+2. List positioning uses `left: 50%` with `margin-left: -192px` (half of 384px width) to ensure proper centering during animation
+
+### Related Components
+- [RadarQuadrant.astro](libs/ui/src/radar/RadarQuadrant.astro) - Individual quadrant rendering
+- [RadarQuadrantItemList.astro](libs/ui/src/radar/RadarQuadrantItemList.astro) - Item list with slide animations
+- [radarUtils.ts](libs/ui/src/radar/radarUtils.ts) - Shared constants and utilities
+
+## Important Notes
+
+### When Adding New Features
+1. UI components go in `libs/ui/src/`
+2. CMS models go in `libs/cms/models/`
+3. Export new components/types from respective `index.ts` files
+4. Register new UI components in `ComponentRenderer.astro` if they're CMS-driven
+5. Follow existing patterns for file naming and code structure
+
+### When Adding New Content Types
+1. Create type definition in `libs/cms/models/`
+2. Export from `libs/cms/index.ts`
+3. Create corresponding Astro component in `libs/ui/src/`
+4. Export from `libs/ui/index.ts`
+5. Add to `ComponentRenderer.astro` mapping if applicable
+6. Ensure Strapi CMS has matching content type
+
+### Development Workflow
+1. Start with understanding the CMS model structure
+2. Create or update TypeScript types in `libs/cms`
+3. Create or update UI components in `libs/ui`
+4. Use components in apps via `ComponentRenderer` or direct imports
+5. Test with both dotnet and learning sites to ensure multi-tenant compatibility

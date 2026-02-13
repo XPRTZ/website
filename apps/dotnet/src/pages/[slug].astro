@@ -6,9 +6,9 @@ import { Page } from "@xprtz/ui";
 // Get the slug parameter from the URL
 const { slug } = Astro.params;
 
-// Check if the slug is exactly 'artikelen'
-if (slug === 'artikelen') {
-  return Astro.rewrite('/artikelen/page/1');
+// Check if the slug is exactly 'artikelen' or 'expertise'
+if (slug === "artikelen") {
+  return Astro.rewrite("/artikelen/page/1");
 }
 
 export async function getStaticPaths() {
@@ -29,6 +29,7 @@ export async function getStaticPaths() {
 
 const page: PageType = Astro.props;
 ---
+
 <Layout title={page.title_website} description={page.description}>
   <Page page={page} />
 </Layout>

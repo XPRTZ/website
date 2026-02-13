@@ -19,6 +19,11 @@ import Listing from "./src/Listing.astro";
 import SubtitleWithText from "./src/SubtitleWithText.astro";
 import Quote from "./src/Quote.astro";
 import Blogs from "./src/Blogs.astro";
+import TechnologyRadar from "./src/radar/TechnologyRadar.astro";
+import RadarQuadrant from "./src/radar/RadarQuadrant.astro";
+import RadarChart from "./src/radar/RadarChart.astro";
+import RadarQuadrantItemList from "./src/radar/RadarQuadrantItemList.astro";
+import { QUADRANTS, RINGS, initializeOnReady } from "./src/radar/radarUtils.js";
 
 import ComponentRenderer from "./src/ComponentRenderer.astro";
 
@@ -44,5 +49,12 @@ export {
   SubtitleWithText,
   Quote,
   Blogs,
+  TechnologyRadar,
+  RadarQuadrant,
+  RadarChart,
+  RadarQuadrantItemList,
+  QUADRANTS,
+  RINGS,
+  initializeOnReady,
   ComponentRenderer
 };

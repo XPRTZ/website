@@ -1,0 +1,128 @@
+---
+import { fetchData, type RadarItem } from "@xprtz/cms";
+import RadarChart from "./RadarChart.astro";
+
+interface TechnologyRadarProps {
+  __component: "ui.technology-radar";
+  title: string;
+}
+
+const { title } = Astro.props as TechnologyRadarProps;
+
+// Get the current page slug from Astro context
+// This will be used as the back link for radar items
+const currentPageSlug = Astro.url.pathname.replace(/^\//, "").replace(/\/$/, "") || "home";
+
+// Fetch all radar items for the chart
+const allRadarItems = await fetchData<Array<RadarItem>>({
+  endpoint: "radar-items",
+  wrappedByKey: "data",
+  query: {
+    "populate[tags][fields][0]": "title",
+    status: "published",
+  },
+});
+
+// Extract all unique tags from radar items
+const allTags = Array.from(
+  new Set(
+    allRadarItems.flatMap((item) => item.tags || []).map((tag) => tag.title)
+  )
+).sort();
+---
+
+<h2
+  class="mt-12 text-pretty text-3xl font-semibold tracking-tight text-primary-600"
+>
+  {title}
+</h2>
+<div class="mt-10 flex justify-center" id="radar-container">
+  <RadarChart items={allRadarItems} parentPageSlug={currentPageSlug} />
+</div>
+{
+  allTags.length > 0 && (
+    <div
+      class="mt-10 flex flex-wrap justify-center gap-3"
+      id="tag-filter-container"
+    >
+      {allTags.map((tag) => (
+        <button
+          type="button"
+          class="tag-filter inline-flex items-center rounded-xl bg-primary-100 px-4 py-1 text-sm/6 font-medium text-primary-700 hover:bg-primary-200 transition-colors cursor-pointer"
+          data-tag={tag}
+        >
+          #{tag}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+<script>
+  import { initializeOnReady } from "./radarUtils";
+
+  let selectedTag: string | null = null;
+
+  const initTagFiltering = () => {
+    const tagButtons = document.querySelectorAll(".tag-filter");
+    const radarContainer = document.getElementById("radar-container");
+
+    if (!radarContainer) {
+      return;
+    }
+
+    tagButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const tag = button.getAttribute("data-tag");
+
+        // Toggle tag selection
+        if (selectedTag === tag) {
+          selectedTag = null;
+          // Reset all buttons
+          tagButtons.forEach((btn) => {
+            btn.classList.remove("bg-primary-600", "text-white");
+            btn.classList.add("bg-primary-100", "text-primary-700");
+          });
+          // Show all items
+          filterRadarItems(null);
+        } else {
+          selectedTag = tag;
+          // Update button states
+          tagButtons.forEach((btn) => {
+            if (btn.getAttribute("data-tag") === tag) {
+              btn.classList.remove("bg-primary-100", "text-primary-700");
+              btn.classList.add("bg-primary-600", "text-white");
+            } else {
+              btn.classList.remove("bg-primary-600", "text-white");
+              btn.classList.add("bg-primary-100", "text-primary-700");
+            }
+          });
+          // Filter items
+          filterRadarItems(tag);
+        }
+      });
+    });
+  };
+
+  const filterRadarItems = (tag: string | null) => {
+    // Filter both radar chart items and list items
+    const radarItems = document.querySelectorAll(".radar-item");
+    const listItems = document.querySelectorAll(".list-radar-item");
+    const allItems = [...Array.from(radarItems), ...Array.from(listItems)];
+
+    // Filter all items (dim but keep clickable)
+    allItems.forEach((item) => {
+      const tagsAttr = item.getAttribute("data-tags");
+      const tags: string[] = tagsAttr ? JSON.parse(tagsAttr) : [];
+
+      if (!tag || tags.includes(tag)) {
+        item.classList.remove("filtered-out");
+      } else {
+        item.classList.add("filtered-out");
+      }
+    });
+  };
+
+  // Initialize on page load
+  initializeOnReady(initTagFiltering);
+</script>
