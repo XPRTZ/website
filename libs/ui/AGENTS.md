@@ -504,9 +504,9 @@ Individual quadrant representing 90° of the radar (one quarter circle).
 
 **Features:**
 - Four concentric rings representing adoption stages (defined in `radarUtils.ts`):
-  - **Adopt** (innermost, 25% radius)
-  - **Trial** (50% radius)
-  - **Assess** (75% radius)
+  - **Adopt** (innermost, 37.5% radius)
+  - **Trial** (60% radius)
+  - **Assess** (81% radius)
   - **Hold** (outermost, 100% radius)
 - Items displayed as numbered circles (12px radius)
 - Deterministic positioning using golden angle distribution
@@ -523,6 +523,9 @@ Individual quadrant representing 90° of the radar (one quarter circle).
 - Pseudo-random but deterministic distribution using item number as seed
 - Golden angle (137.508°) for optimal spread
 - Radius variation within ring (30-90% of ring width) to reduce overlap
+- Collision resolution: iteratively pushes overlapping items apart (up to 50 iterations)
+- Items are kept within quadrant bounds during collision resolution
+- If collisions cannot be fully resolved (too many items), remaining overlaps are accepted
 - Optimized for 20-30 items per quadrant
 
 **Item Links:**
@@ -600,15 +603,16 @@ The radar components share common utilities defined in `radarUtils.ts`:
 **Constants:**
 ```typescript
 export const RINGS: readonly { readonly label: RadarRing; readonly radiusPosition: number }[] = [
-  { label: "Adopt", radiusPosition: 25 },
-  { label: "Trial", radiusPosition: 50 },
-  { label: "Assess", radiusPosition: 75 },
+  { label: "Adopt", radiusPosition: 37.5 },
+  { label: "Trial", radiusPosition: 60 },
+  { label: "Assess", radiusPosition: 81 },
   { label: "Hold", radiusPosition: 100 },
 ] as const;
 ```
 - Single source of truth for ring configuration
 - Used by RadarChart, RadarQuadrant, and RadarQuadrantItemList
 - Ensures consistent ring ordering and positioning across all components
+- Radius values are a blend between equal-radius and equal-area distributions for visual balance
 
 **Functions:**
 
