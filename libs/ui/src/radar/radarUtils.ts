@@ -5,9 +5,9 @@ import type { RadarRing } from "@xprtz/cms";
  * Ordered from center (Adopt) to outside (Hold)
  */
 export const RINGS: readonly { readonly label: RadarRing; readonly radiusPosition: number }[] = [
-  { label: "Adopt", radiusPosition: 25 },
-  { label: "Trial", radiusPosition: 50 },
-  { label: "Assess", radiusPosition: 75 },
+  { label: "Adopt", radiusPosition: 37.5 },
+  { label: "Trial", radiusPosition: 60 },
+  { label: "Assess", radiusPosition: 81 },
   { label: "Hold", radiusPosition: 100 },
 ] as const;
 
