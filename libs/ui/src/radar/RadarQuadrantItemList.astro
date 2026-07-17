@@ -1,6 +1,7 @@
 ---
 import type { RadarItemWithNumber } from "@xprtz/cms";
 import { buildRadarItemLink, RINGS } from "./radarUtils";
+import { marked } from "marked";
 
 interface Props {
   /**
@@ -89,20 +90,23 @@ const itemsByRing = RINGS.reduce(
                     data-tags={tagsJson}
                     data-item-number={item.number}
                   >
-                    <a
-                      href={itemLink}
+                    <div
                       class="item-link block py-3"
                       style={`--item-color: ${color};`}
+                      data-href={itemLink}
+                      role="link"
+                      tabindex="0"
                     >
                       <div class="font-medium text-gray-900">
                         {item.number}. {item.title}
                       </div>
                       {item.description && (
-                        <div class="text-sm text-gray-600 mt-1 line-clamp-2">
-                          {item.description}
-                        </div>
+                        <div
+                          class="text-sm text-gray-600 mt-1 line-clamp-2"
+                          set:html={marked.parse(item.description)}
+                        />
                       )}
-                    </a>
+                    </div>
                   </li>
                 );
               })}
@@ -113,6 +117,40 @@ const itemsByRing = RINGS.reduce(
     </div>
   </div>
 </div>
+
+<script>
+  import { initializeOnReady } from "./radarUtils";
+
+  // The card is navigable as a whole (click/Enter/Space), but its
+  // description can contain real <a> links (from markdown). It can't be a
+  // native <a> itself, since nesting an <a> inside another <a> is invalid
+  // HTML and browsers duplicate/mangle the outer anchor when parsing it.
+  function initItemLinks() {
+    document
+      .querySelectorAll<HTMLElement>(".item-link[data-href]")
+      .forEach((el) => {
+        if (el.dataset.itemLinkBound) return;
+        el.dataset.itemLinkBound = "true";
+
+        const href = el.dataset.href;
+        if (!href) return;
+
+        el.addEventListener("click", (e) => {
+          if ((e.target as HTMLElement).closest("a")) return;
+          window.location.href = href;
+        });
+
+        el.addEventListener("keydown", (e) => {
+          if (e.key !== "Enter" && e.key !== " ") return;
+          if ((e.target as HTMLElement).closest("a")) return;
+          e.preventDefault();
+          window.location.href = href;
+        });
+      });
+  }
+
+  initializeOnReady(initItemLinks);
+</script>
 
 <style>
   .quadrant-item-list {
@@ -208,9 +246,18 @@ const itemsByRing = RINGS.reduce(
   }
 
   /* Item hover effect */
+  .item-link {
+    cursor: pointer;
+  }
+
   .item-link:hover {
     background-color: color-mix(in srgb, var(--item-color) 8%, white);
     padding-left: 0.7rem;
+  }
+
+  .item-link:focus-visible {
+    outline: 2px solid var(--item-color);
+    outline-offset: -2px;
   }
 
   /* Custom scrollbar styling */
