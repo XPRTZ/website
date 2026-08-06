@@ -21,7 +21,7 @@ on:
 jobs:
   apply-infrastructure:
     name: Apply infrastructure
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     environment: ${{ inputs.environment }}
     outputs:
       storageAccount: ${{ steps.deploybicep.outputs.storageAccountName }}
